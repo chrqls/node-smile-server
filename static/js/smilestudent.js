@@ -49,7 +49,7 @@ var SMILEROUTES = {
     "getresults": "/smile/student/%s/result"
 };
 
-var VERSION = '0.9.24';
+var VERSION = '1.0.0';
 
 //
 // 1 - login screen
@@ -153,10 +153,11 @@ var GlobalViewModel = {
     qidx: ko.observable(0),
     picurl: ko.observable(""),
     pic: ko.observable(""),
+    picdatauri: ko.observable("data:image/png;base64,"),
     rating: ko.observable(""),
     answersarray: ko.observableArray([]),
     ratingsarray: ko.observableArray([]),
-    version: VERSION
+    version: ko.observable(VERSION)
 };
 
 GlobalViewModel.fullName = ko.computed(function() {
@@ -171,9 +172,21 @@ GlobalViewModel.curq = ko.computed(function() {
     return self.qidx + 1;
 }, self);
 
+/* XXX This doesn't notify
+GlobalViewModel.picdatauri = ko.computed(function() {
+    var self = this;
+    // Knockout tracks dependencies automatically. It knows that fullName depends on firstName and lastName, because these get called when evaluating fullName.
+    console.log(self.pic);
+    return 'data:image/png;base64,' + self.pic;
+}, self).extend({ notify: 'always' });
+*/
 
 GlobalViewModel.doLogin = function() {
     var self = this;
+    if (!self.username() || self.username() === "") {
+        smileAlert('#globalstatus', 'Please Enter a username', 'red', 5000);
+        return false;
+    }
     if (!self.hasSubmitted()) {
         console.log('doLogin');
         smileAlert('#globalstatus', 'Logging in ' + self.username(), 'green', 5000);
@@ -219,6 +232,8 @@ GlobalViewModel.doInquiryReset = function() {
     self.question("");
     self.picurl("");
     self.pic("");
+    self.picdatauri("");
+    self.rating("5");
 }
 
 GlobalViewModel.doSubmitQ = function() {
@@ -228,6 +243,7 @@ GlobalViewModel.doSubmitQ = function() {
         var jsondata = generateJSONInquiry(self.clientip(), self.username(), self.question(), self.a1(), self.a2(), self.a3(), self.a4(), self.rightanswer(), self.picurl(), self.pic());
         doPostInquiry(jsondata, function() {
             self.doInquiryReset();
+            $('#iq-pic').empty();
         });
     } else {
         console.log("Cannot validateInquiry");
@@ -249,7 +265,7 @@ GlobalViewModel.doSubmitQandDone = function() {
             console.log("waiting for next phase");
             self.doInquiryReset();
             // XXX Localize this
-
+            $('#iq-pic').empty();
             $('div#inquiry-form-area').block({
                 message: '<h1>Done.  Please wait for the rest of the students to finish Creating Questions</h1>',
                 css: { border: '3px solid #a00', width: '80%'
@@ -363,6 +379,8 @@ $(document).ready(function() {
     //
     // Init UI
     //
+    $(document).attr("title", "SMILE Student Web " + GlobalViewModel.version());
+
     restoreLoginState();
 
     //
@@ -394,6 +412,17 @@ $(document).ready(function() {
             window.location.href = $(this).attr('href');
         }
     });
+
+    //
+    // Fix for #50 (github), though we don't know why this is necessary
+    // 
+    $("input[type='radio'].css-checkbox").change(function () {
+        var selection=$(this).val();
+        $(this).prop('checked', true);
+        GlobalViewModel.answer($(this).val());
+    });
+
+
 });
 
 //
@@ -576,6 +605,7 @@ function doGetInquiry(qnum, cb) {
             GlobalViewModel.a2(data.O2);
             GlobalViewModel.a3(data.O3);
             GlobalViewModel.a4(data.O4);
+            GlobalViewModel.qidx(qnum);
             GlobalViewModel.othermsg((GlobalViewModel.qidx() + 1) + "/" + GlobalViewModel.numq());
             if (GlobalViewModel.answersarray()[GlobalViewModel.qidx()]) {
                 GlobalViewModel.answer("a" + GlobalViewModel.answersarray()[GlobalViewModel.qidx()]);
@@ -713,6 +743,7 @@ function statechange(from, to, data, cb) {
         }
         if (to == 4) { // Enter Answer Questions Phase
             SMILESTATE = 4;
+            $('div#inquiry-form-area').unblock();
             $('div#answer-form-area').unblock();
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["4"].id + '"]');
             if ($next) {
@@ -828,24 +859,37 @@ function statechange(from, to, data, cb) {
                 }
             }
         }
+    } else if (from == 5) { // FROM 5
+        if (SMILESTATE != 5) {
+            return;
+        }
+        if (to == 1) {
+            restoreLoginState();
+            return;
+        } // Teacher reset game, we should logout
+        if (to == 2) {
+            return;
+        } // Not sure why this would happen
+        if (to == 5) { // Enter Show Results Phase
+            // Ignore
+        }
     }
 
 }
 
 function clearAnswerState() {
     GlobalViewModel.question("");
-    GlobalViewModel.answer("a1");
+    GlobalViewModel.answer("");
     GlobalViewModel.a1("");
     GlobalViewModel.a2("");
     GlobalViewModel.a3("");
     GlobalViewModel.a4("");
     GlobalViewModel.picurl(SMILEROUTES["defaultpicurl"]);
-    GlobalViewModel.rating("");
     GlobalViewModel.rating("5");
-    $('#star-rating').rating(function(vote, event) {
+    /* $('#star-rating').rating(function(vote, event) {
         console.log(vote, event);
         GlobalViewModel.rating(vote);
-    });
+    }); */
 }
 
 /* 
@@ -875,7 +919,7 @@ function displayResults(data) {
         // Add a Score
         //
         try {
-            percentage = (data.SCORE_AS_PERCENTAGE * 100).toPrecision(2);
+            percentage = (data.SCORE_AS_PERCENTAGE * 100).toFixed(2);
         } catch (e) {
             percentage = 'N/A';
         }
@@ -918,6 +962,11 @@ function restoreLoginState() {
     //
     // XXX This needs to clean up the sidebar area too
     //
+    GlobalViewModel.doInquiryReset();
+
+    $('div#inquiry-form-area').unblock();
+    $('div#answer-form-area').unblock();
+    
     var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["1"].id + '"]');
     $('#logoutarea').hide();
     if ($next) {
