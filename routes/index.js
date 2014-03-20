@@ -165,13 +165,13 @@ exports.handlePostNewIQSet = function(req, res) {
                     
                     if (iqset.iqdata[i].PICURL) {
                         // /smile/questionview/1.jpg
-                        var tmpidx = parseInt(iqset.iqdata[i].PICURL.split('/')[3].split('.')[0]);
+                        var tmpidx = parseInt(iqset.iqdata[i].PICURL.split('/')[3].split('.')[0], 10);
                         console.log("Handle PIC data at tmpidx = " + tmpidx);
                         // console.log(game.questions.getList());
                         iqset.iqdata[i].PIC = game.questions.getQuestionPicture(tmpidx);
                         iqset.iqdata[i].PICURL = '/smile/questionview/' + tmpidx + '.jpg';
                         console.log("New PICURL = " + iqset.iqdata[i].PICURL);
-                        console.log(iqset.iqdata[i].PIC);
+                        // console.log(iqset.iqdata[i].PIC);
                     }
                 }
             }
@@ -763,6 +763,8 @@ exports.handleQuestionJSONDelete = function(req, res) {
         console.log("no question found matching ID = " + req.id);
         return res.sendJSON(HTTP_STATUS_OK, {'error': 'Cannot find question matching ID, cannot delete'
         });
+    } else {
+        console.log("Attempting to delete question #" + questionNumber);
     }
 
     //
@@ -778,8 +780,20 @@ exports.handleQuestionJSONDelete = function(req, res) {
     // Handle deletion
     //
     var status = game.questions.deleteQuestion(questionNumber);
-    console.log("question delete status: " + status);
 
+    console.log(status);
+
+    // Verify we get back an SessionID of the deleted question
+    if (status !== 0) {
+        var msgs = game.messages.past;
+
+        for (var i = 0; i < msgs.length; i++) {
+            if ((msgs[i].SessionID !== undefined) && (msgs[i].SessionID === status.SessionID) ){
+                console.log("Deleting question from game.messages.past with SessionID = " + status.SessionID);
+                game.messages.past.splice(i, 1); // Delete the question from the ghost of messages past
+            }
+        }
+    }
     res.sendJSON(HTTP_STATUS_OK, {'status': status});
 };
 
