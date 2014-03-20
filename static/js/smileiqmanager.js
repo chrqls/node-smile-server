@@ -1,6 +1,6 @@
 /**
  #
- #Copyright (c) 2011-2013 Razortooth Communications, LLC. All rights reserved.
+ #Copyright (c) 2011-2014 Razortooth Communications, LLC. All rights reserved.
  #
  #Redistribution and use in source and binary forms, with or without modification,
  #are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '1.0.0prealpha1';
+var VERSION = '1.0.4';
 
 // XXX Should generalize the app view model to wrap the required child models and use :with binding
 function iqsetSummaryModel() {
@@ -83,6 +83,7 @@ function sessionResultsModel() {
     self.rightAnswers = ko.observableArray([]);
     self.averageRatings = ko.observableArray([]);
     self.questionsCorrectPercentage = ko.observableArray([]);
+    self.likes = ko.observableArray([]);
 }
 
 /*
@@ -166,7 +167,7 @@ function doShowIQSetUploadSummaryModal(resp) {
 
     var fvm = globalViewModel.iqsetSummary;
 
-    
+
     fvm.title(resp.title);
     fvm.createdate(resp.date);
     fvm.groupname(resp.groupname);
@@ -275,6 +276,7 @@ function loadSession(evtdata, cb) {
         alert("Problem getting session " + evtdata.attr('id'));
     }, success: function(data) {
         if (data) {
+            var i;
             // console.log(data);
             // ko.mapping.fromJS(data, globalViewModel.sessionSummary);
             globalViewModel.sessionSummary.sessionName(data.sessionName);
@@ -292,27 +294,43 @@ function loadSession(evtdata, cb) {
             globalViewModel.sessionSummary.results.rightAnswers.removeAll();
             globalViewModel.sessionSummary.results.rightAnswers.removeAll();
             globalViewModel.sessionSummary.results.questionsCorrectPercentage.removeAll();
+            globalViewModel.sessionSummary.results.likes.removeAll();
             ko.utils.arrayPushAll(globalViewModel.sessionSummary.results.rightAnswers, data.results.rightAnswers);
             ko.utils.arrayPushAll(globalViewModel.sessionSummary.results.averageRatings, data.results.averageRatings);
             ko.utils.arrayPushAll(globalViewModel.sessionSummary.results.questionsCorrectPercentage, data.results.questionsCorrectPercentage);
-            
+
             globalViewModel.sessionSummary.sessionStats.numberOfStudents(data.sessionstats.numberOfStudents);
             globalViewModel.sessionSummary.sessionStats.numberOfQuestions(data.sessionstats.numberOfQuestions);
             globalViewModel.sessionSummary.sessionStats.numberOfStudentsPostingAnswers(data.sessionstats.numberOfStudentsPostingAnswers);
-
+            
             globalViewModel.sessionSummary.sessionMetadata.teacherName(data.metadata.teacherName);
             globalViewModel.sessionSummary.sessionMetadata.groupName(data.metadata.groupName);
             globalViewModel.sessionSummary.sessionMetadata.iqid(data.metadata.iqid);
             globalViewModel.sessionSummary.sessionMetadata.iqtitle(data.metadata.iqtitle);
-            
+
+            // Pre-init likes ... we can do this on the server, and we should, but save this for later if there is time
+            var likes = [];
+            for (i = 0; i < data.sessionstats.numberOfQuestions; i++) {
+                likes.push(0);
+            }
+            console.log(likes);
+
             if (data.students) {
                 console.log("students found");
                 globalViewModel.sessionSummary.students.removeAll();
                 for (var student in data.students) {
                     console.log("push student: " + student);
                     globalViewModel.sessionSummary.students.push(data.students[student]);
+                    var ratings = data.students[student].ratings; // array of ratings, hopefully it's just empty array if the student didn't post answers
+                    for (i = 0; i < ratings.length; i++) {
+                        if (ratings[i] === "5") { // XXX This can break if we post numbers and not strings
+                            likes[i] += 1;
+                        }
+                    }
                 }
             }
+            console.log(likes);
+            ko.utils.arrayPushAll(globalViewModel.sessionSummary.results.likes, likes);
 
             if (cb) {
                 cb();
@@ -344,11 +362,11 @@ function pushSection(toID, fromID) {
 }
 
 var handleDialog1 = function(evtdata) {
-    $('#dialog1-yes').click(function() { 
+    $('#dialog1-yes').click(function() {
 
-        // update the block message 
-        $.blockUI({ message: "<h4 class='subheader'>Deleting IQSet: " + evtdata.attr('id') + "</h4>" }); 
- 
+        // update the block message
+        $.blockUI({ message: "<h4 class='subheader'>Deleting IQSet: " + evtdata.attr('id') + "</h4>" });
+
         $.ajax({ cache: false, type: "DELETE", dataType: "json", url: '/smile/iqset/' + evtdata.attr('id'), data: {}, error: function(xhr, text, err) {
         // TODO: XXX Decide what to do if this post fails
         // smileAlert('#globalstatus', 'Unable to get inquiry.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
@@ -364,26 +382,26 @@ var handleDialog1 = function(evtdata) {
                 */
                 if (data.error) {
                     // Let's write an error
-                    $.blockUI({ message: 'Error deleting IQSet, reason: ' + data.error }); 
+                    $.blockUI({ message: 'Error deleting IQSet, reason: ' + data.error });
                 } else {
                     // Delete the row in question from the model
                     var rowidx = evtdata.parent().parent().attr('id');
                     globalViewModel.iqsetCollection.iqsets.splice(rowidx, 1);
-                    $.blockUI({ message: 'Success deleting IQSet'}); 
+                    $.blockUI({ message: 'Success deleting IQSet'});
                 }
             } else {
-                $.blockUI({ message: 'Error, no data returned, probably did not work'}); 
+                $.blockUI({ message: 'Error, no data returned, probably did not work'});
             }
             setTimeout(function() {
-                    $.unblockUI(); 
+                    $.unblockUI();
             }, 4000);
         }
         });
-    }); 
- 
-    $('#dialog1-no').click(function() { 
-            $.unblockUI(); 
-            return false; 
+    });
+
+    $('#dialog1-no').click(function() {
+            $.unblockUI();
+            return false;
     });
 };
 
@@ -397,7 +415,7 @@ $(document).ready(function() {
     // Init handlers
     //
     createIQSetUploader(); // fineuploader for IQSets
-    $('#iqsetupload_btn').click(function() { 
+    $('#iqsetupload_btn').click(function() {
         $('#fine-uploader input:file').trigger('click');
     });
 
@@ -410,7 +428,7 @@ $(document).ready(function() {
         $.blockUI({ message: $('#dialog1'),
                     css: { width: '275px' },
                     onBlock: handleDialog1($(this))
-        }); 
+        });
     });
 
     $('#iqsets-section').on('click', '.iqset-view-btn', function() {
@@ -421,11 +439,11 @@ $(document).ready(function() {
         loadIQSet($(this), pushSection('#iqset-detail-section'));
         $('#iqsetupload-summary').foundation('reveal', 'close');
     });
- 
+
     $('#sessions-section').on('click', '.session-view-btn', function() {
         loadSession($(this), pushSection('#session-detail-section'));
     });
 
-    
+
 
 });

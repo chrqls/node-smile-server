@@ -271,6 +271,7 @@
 									  <th width="150">Answer 4</th>
 									  <th width="">Correct</th>
 									  <th width="">Image</th>
+									  <th width="">Likes</th>
 									</tr>
 								</thead>
 								<tbody data-bind="foreach: iqdata">
@@ -282,7 +283,19 @@
 										<td data-bind="text: O3">TV</td>
 										<td data-bind="text: O4">Floor</td>
 										<td data-bind="text: A">3</td>
-										<td><a class="tiny button" href="#" onclick="alert('No Images Available'); return false;"><img src="images/photo-icon.png" /></a></td>
+										<td><div data-bind="if: $data.PICURL">
+												<!-- data:image/png;base64, -->
+												<a class="reveal-link tiny button" href="#"  data-reveal-id="myModal" data-reveal>
+												<img src="images/photo-icon.png" />
+												<!-- Modal to display the picture -->
+												<div id="myModal" class="reveal-modal" data-reveal>
+	    											<img  data-bind="attr: { src: 'data:image/png;base64,' + $data.PIC}" />
+	    											<a class="close-reveal-modal">&#215;</a>
+												</div>	
+												</a><!-- <input type="hidden" name="hidden_picurl" /> --><!-- <input type="hidden" name="hidden_picurl" data-bind="attr: { value: PICURL}" /> -->
+											</div>
+										</td>
+										<td><span data-bind="text: ($parent.results.likes()[$index()]/$parent.sessionStats.numberOfStudentsPostingAnswers()*100).toFixed(2)">90</span>%</td>
 									</tr>
 								</tbody>
 					        </table>
@@ -366,7 +379,18 @@
 										<td data-bind="text: O3">Olive Elementary 5th Grade</td>
 										<td data-bind="text: O4">Olive Elementary 5th Grade</td>
 										<td data-bind="text: A"></td>
-										<td><a class="tiny button" href="#" onclick="alert('No Images Available'); return false;"><img src="images/photo-icon.png" /></a></td>
+										<td><div data-bind="if: $data.PICURL">
+												<!-- data:image/png;base64, -->
+												<a class="reveal-link tiny button" href="#"  data-reveal-id="myModal" data-reveal>
+												<img src="images/photo-icon.png" />
+												<!-- Modal to display the picture -->
+												<div id="myModal" class="reveal-modal" data-reveal>
+	    											<img  data-bind="attr: { src: 'data:image/png;base64,' + $data.PIC}" />
+	    											<a class="close-reveal-modal">&#215;</a>
+												</div>	
+												</a><!-- <input type="hidden" name="hidden_picurl" /> --><!-- <input type="hidden" name="hidden_picurl" data-bind="attr: { value: PICURL}" /> -->
+											</div>
+										</td>
 									</tr>
 								</tbody>
 					        </table>
@@ -383,6 +407,7 @@
         	<input type="button" id="dialog1-yes" value="Delete" /> 
         	<input type="button" id="dialog1-no" value="Cancel" /> 
 		</div> 
+
 	</section>
 	<!-- section#iqset-detail-section -->
 	<!-- div: row -->
@@ -400,7 +425,6 @@
 	</div>
 	<!-- div.section-container -->
 
-	<!-- Included JS Files -->
 	<!-- Included JS Files -->
 	<script>
 	  /* document.write('<script src=' +
@@ -437,9 +461,32 @@
 	<script type='text/javascript' src='js/jquery.blockUI-2.66.0.js'></script>
 	<script type="text/javascript" src="js/rating.js"></script>
 	<script type="text/javascript" src="js/jquery.fineuploader-3.5.0.min.js"></script>
+
+	
 	<script>
-	// jQuery.noConflict();
-	$(document).foundation();
+	    // jQuery.noConflict();
+
+	    // initialize foundation
+	    $(document).foundation();
+
+	    // Opening picture in modal
+	    $("body").on("click", 'a.reveal-link', function(){
+		  
+		// We load the url in the reveal/modal to display the image
+	        var picurl = $(this).parent().find("input[name=hidden_picurl]").attr('value');
+	        $('#modalImg').attr('src',picurl);
+	        
+		// Open modal
+		$('#myModal').foundation('reveal', 'open');
+	    });
+	    
+	    // Closing modal
+	    $("body").on("click", 'a.close-reveal-modal', function(){
+		
+	        $('#modalImg').attr('src','');		
+		$('#myModal').foundation('reveal', 'close');
+		$('.reveal-modal-bg').attr('style','');
+	    });
 	</script>
 </body>
 </html>
