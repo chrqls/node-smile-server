@@ -17,12 +17,13 @@
 <!-- Set the viewport width to device width for mobile -->
 <meta name="viewport" content="width=device-width" />
 
-<title>Welcome to The SMILE Plug</title>
+<title>SMILE Student Web</title>
 
 <!-- Included CSS Files -->
 <!-- Combine and Compress These CSS Files -->
 <link rel="stylesheet" href="css/foundation.css">
 <link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/checkbox-style.css">
 <link rel="stylesheet" href="css/rating.css" />
 <link rel="stylesheet" href="css/fineuploader-3.5.0.css" />
 
@@ -124,17 +125,18 @@
 												<form action="return false;">
 													<label>Question</label>
 													<textarea data-bind="value: question" rows="5" cols="20"></textarea>
-
+													<P>
+														<img data-bind="attr: { src: picdatauri}" />
+													</P>
 													<div class="row">
 														<div class="large-8 small-8 columns">
 															<label>Answer 1</label>
 															<input data-bind="value: a1, valueUpdate: 'keyup'"
 																type="text" />
-														</div>
+														</div> 
 														<div class="large-4 small-4 mobile-one columns">
-															<label for="a1">
-																<input value="a1" data-bind="checked: rightanswer"
-																	name="answer-options" type="radio" id="a1">
+																<input class="css-checkbox" value="a1" data-bind="checked: rightanswer"
+																	name="answer-options" type="radio" id="a1"><label class="css-label" for="a1">
 																Correct?
 															</label>
 														</div>
@@ -145,9 +147,9 @@
 															<input data-bind="value: a2" type="text" />
 														</div>
 														<div class="large-4 small-4 mobile-one columns">
-															<label for="a2">
-																<input value="a2" data-bind="checked: rightanswer"
-																	name="answer-options" type="radio" id="a2">
+															
+																<input class="css-checkbox" value="a2" data-bind="checked: rightanswer"
+																	name="answer-options" type="radio" id="a2"><label class="css-label" for="a2">
 																Correct?
 															</label>
 														</div>
@@ -158,9 +160,9 @@
 															<input data-bind="value: a3" type="text" />
 														</div>
 														<div class="large-4 small-4 mobile-one columns">
-															<label for="a3">
-																<input value="a3" data-bind="checked: rightanswer"
-																	name="answer-options" type="radio" id="a3">
+															
+																<input class="css-checkbox" value="a3" data-bind="checked: rightanswer"
+																	name="answer-options" type="radio" id="a3"><label class="css-label" for="a3">
 																Correct?
 															</label>
 														</div>
@@ -171,9 +173,9 @@
 															<input data-bind="value: a4" type="text" />
 														</div>
 														<div class="large-4 small-4 mobile-one columns">
-															<label for="a4">
-																<input value="a4" data-bind="checked: rightanswer"
-																	name="answer-options" type="radio" id="a4">
+															
+																<input class="css-checkbox" value="a4" data-bind="checked: rightanswer"
+																	name="answer-options" type="radio" id="a4"><label class="css-label" for="a4">
 																Correct?
 															</label>
 														</div>
@@ -226,9 +228,12 @@
 																</label>
 															</div>
 															<div class="large-4 small-4 mobile-one columns">
-																<label for="a1">
-																	<input data-bind="checked: answer" name="answer-options"
-																		type="radio" value="a1" id="a1">
+																	<!--  <input class="css-checkbox" value="a4" data-bind="checked: rightanswer"
+																	name="answer-options" type="radio" id="a4"><label class="css-label" for="a4">
+																Correct?
+															</label> -->
+																	<input class="css-checkbox" value="a1" data-bind="checked: answer"
+																	name="answer-options" type="radio"  id="a1"><label class="css-label" for="a1">
 																	Correct?
 																</label>
 															</div>
@@ -241,9 +246,8 @@
 																</label>
 															</div>
 															<div class="large-4 small-4 mobile-one columns">
-																<label for="a2">
-																	<input data-bind="checked: answer" name="answer-options"
-																		type="radio" value="a2" id="a2">
+																	<input class="css-checkbox" data-bind="checked: answer" name="answer-options"
+																		type="radio" value="a2" id="a2"><label class="css-label" for="a2">
 																	Correct?
 																</label>
 															</div>
@@ -258,9 +262,8 @@
 																</label>
 															</div>
 															<div class="large-4 small-4 mobile-one columns">
-																<label for="a3">
-																	<input data-bind="checked: answer" name="answer-options"
-																		type="radio" value="a3" id="a3">
+																	<input class="css-checkbox" data-bind="checked: answer" name="answer-options"
+																		type="radio" value="a3" id="a3"><label class="css-label" for="a3">
 																	Correct?
 																</label>
 															</div>
@@ -273,17 +276,16 @@
 																</label>
 															</div>
 															<div class="large-4 small-4 mobile-one columns">
-																<label for="a4">
-																	<input data-bind="checked: answer" name="answer-options"
+																	<input class="css-checkbox" data-bind="checked: answer" name="answer-options"
 																		type="radio" value="a4" id="a4">
-																	Correct?
-																</label>
+																	<label class="css-label" for="a4">Correct?</label>
 															</div>
 														</div>
 														<P>
 															<em>Rating:</em>
 														</P>
 
+														<!--
 														<div id="star-rating">
 															<input data-bind="checked: rating" type="radio"
 																name="rating" class="rating" value="1" />
@@ -295,6 +297,17 @@
 																name="rating" class="rating" value="4" />
 															<input data-bind="checked: rating" type="radio"
 																name="rating" class="rating" value="5" />
+														</div>
+														-->
+														<div class="thumbsup-rating">
+															<input data-bind="checked: rating" type="radio"
+																name="rating" class="rating" id="thumbs-down" value="1" /><label for="thumbs-down">
+																<img src="images/thumbsdown_48x48.png" />
+																</label>
+															<input data-bind="checked: rating" type="radio"
+																name="rating" class="rating" id="thumbs-up" value="5" /><label for="thumbs-up">
+																<img src="images/thumbsup_48x48.png" />
+															</label>
 														</div>
 														<br />
 														<ul class="button-group even two-up">
@@ -370,6 +383,7 @@
 						</div>
 						</p>
 					</div>
+					<p><img src="images/jamsj_slim.png" />
 				</div>
 			</div>
 			<div id="iq-area" style="display: none">
@@ -455,6 +469,17 @@
 			</div>
 		</div>
 		<!-- div: row -->
+		<div class="row">
+			<div class="small-6 small-centered columns">
+				<a class="smile-logo regular" href="http://www.smileconsortium.org"></a>
+				<ul class="smile-links">
+					<li><a href="mailto:reply+i-23475388-c2457b2df337933075fa1a78843d843cefe305ca-64202@reply.github.com">Support</a></li>
+					<li><a onclick="alert('Help Not Implemented.  Help! visit: https://plus.google.com/u/0/communities/117391182825484902493 for more human support'); return false;" href="#">Help</a></li>
+				</ul>
+				<p class="copyright">© 2012‐2013 SMILE Consortium, Inc., a 501c3 Non-Profit</p>
+			</div>
+		</div>
+		<!-- div: row -->
 	</div>
 	<!-- container -->
 
@@ -504,14 +529,21 @@
 	<script>
         function createUploader() {
             var uploader = new qq.FineUploader({
+            	// XXX We should add upload limits or this will crash the server (file size < 1MB)
                 element : $('#fine-uploader')[0],
                 callbacks : {
                     onComplete : function(id, name, response) {
+                    	// $('#fine-uploader').fadeIn();
+                		// $('div.qq-upload-button').hide();
+                		$('li.qq-upload-success').fadeOut(5000, "linear");
                         GlobalViewModel.pic(response.base64);
+                        GlobalViewModel.picdatauri('data:image/png;base64,' + response.base64);
+                        $('#iq-pic').empty().append('<p>Image Uploaded</p>');
                     }
                 },
                 validation : {
-                    allowedExtensions : [ 'jpeg', 'jpg', 'gif', 'png' ],
+                    allowedExtensions : [ 'jpeg', 'jpg', 'png', 'gif'],
+                    sizeLimit: 1032246,
                 },
                 request : {
                     endpoint : '/smile/upload/image'

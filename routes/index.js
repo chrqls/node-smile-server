@@ -88,27 +88,143 @@ exports.handleGetIQSet = function(req, res) {
     });
 };
 
+exports.handleDeleteIQSet = function(req, res) {
+    //
+    // Ideally we'd be getting parameters of the incoming request
+    //
+    if (!req.id) {
+        return res.sendJSON(HTTP_STATUS_OK, {
+                'error': 'ID missing from request'
+            });
+    }
+
+    pdb.getIQSet(req.id, {}, function(err, result) {
+        pdb.deleteIQSet(result, {}, function(err, result) {
+            if (err) {
+                res.sendJSON(HTTP_STATUS_OK, err);
+            }
+            res.sendJSON(HTTP_STATUS_OK, result);
+        });
+    });
+};
+
+
+/**
+    Save a new iqset from teacher app
+**/
 exports.handlePostNewIQSet = function(req, res) {
-    // console.log(req);
-    var file = req.file;
-    var csvData = fs.readFileSync(file.path, 'utf8');
-        csv().from.string(csvData,
-        {comment: '#'} ).to.array( function(data){
+    
+    console.log("\n\n[BODY of json request]");
+    console.log("\t>> %j\n", req.body);
+    console.log("[HEADERS of json request]");
+    console.log("\t>> %j\n\n", req.headers);
+
+    var headers = req.headers;
+    var iqset;
+
+    if (headers['content-type'] === 'application/json; charset=UTF-8') {	
+        console.log('Handle post of iqset from json');
+        //
+        // Handle the upload from JSON
+        //
+        var queryData;
+        var isValid = true;
+        if ((req.method == 'POST') || (req.method == 'PUT')) {
+            iqset = req.body;
+        }
+
+        if (!iqset.title) {
+            // iqset.title = iqdoc.date + "-IQSet";
+        }
+
+        if (!iqset.teachername) {
+            // iqset.teachername = "Teacher";
+        }
+
+        if (!iqset.groupname) {
+            // iqset.groupname = "General";
+        }
+
+        if (!iqset.iqdata) {
+            isValid = false;
+        }
+
+        if (isValid === true) {
+            //
+            // Quickly pre-process the iqsets to inject the PIC and reorder the PICURL if it exists
+            //
+            for (var i = 0; i < iqset.iqdata.length; i++) {
+                // Is it a PICURL?
+                console.log("Question TYPE = " + iqset.iqdata[i].TYPE);
+                if (iqset.iqdata[i].TYPE === "QUESTION_PIC") {
+                    //
+                    // PICURL
+                    // 1. Get the original index of the image
+                    // 2. Change the PICURL to match the new index 
+                    //
+                    
+                    if (iqset.iqdata[i].PICURL) {
+                        // /smile/questionview/1.jpg
+                        var tmpidx = parseInt(iqset.iqdata[i].PICURL.split('/')[3].split('.')[0]);
+                        console.log("Handle PIC data at tmpidx = " + tmpidx);
+                        // console.log(game.questions.getList());
+                        iqset.iqdata[i].PIC = game.questions.getQuestionPicture(tmpidx);
+                        iqset.iqdata[i].PICURL = '/smile/questionview/' + tmpidx + '.jpg';
+                        console.log("New PICURL = " + iqset.iqdata[i].PICURL);
+                        console.log(iqset.iqdata[i].PIC);
+                    }
+                }
+            }
+            console.log('IQSet is valid, commit');
+            pdb.putIQSet(iqset, function(err, result) {
+                if (!err) {
+                    iqset.success = true;
+                    return res.sendJSON(HTTP_STATUS_OK, iqset);
+                } else {
+                    return res.sendJSON(HTTP_STATUS_OK, {
+                        'error': 'Unable to persist IQSet data',
+                        'success': false
+                    });
+                }
+            });
+
+            
+            
+        } else {
+            console.log('IQSet is not valid, don\'t persist');
+            return res.sendJSON(HTTP_STATUS_OK, {
+            'error': 'Unable to persist IQSet data, missing IQSet iqdata',
+            'success': false
+            });
+        }
+    } else {
+        // XXX We wrongly assume this was a CSV upload, need to verify the submission is multipart/mime
+        var file = req.file;
+        var csvData = fs.readFileSync(file.path, 'utf8');
+        csv().from.string(csvData, {comment: '#'} ).to.array( function(data){
             // console.log(data);
-            var iqset = game.questions.parseCSVtoIQSetObj(data);
+            iqset = game.questions.parseCSVtoIQSetObj(data);
             console.log(iqset);
+            //
+            // Per Fineuploader spec, add the right handler response messages for success/failure
+            // http://docs.fineuploader.com/branccharset=UTF-8h/master/endpoint_handlers/traditional.html
+            //
+            //
             if (iqset.error) {
                 console.debug('Error parsing CSV, reason: ' + iqset.error);
                 return res.sendJSON(HTTP_STATUS_OK, {
-                            'error': 'Error parsing CSV, reason: ' + iqset.error
+                            'error': 'Error parsing CSV, reason: ' + iqset.error,
+                            'success': false
                         });
             } else {
                 pdb.putIQSet(iqset, function(err, result) {
                     if (!err) {
+                        iqset.success = true;
                         return res.sendJSON(HTTP_STATUS_OK, iqset);
                     } else {
                         return res.sendJSON(HTTP_STATUS_OK, {
-                            'error': 'Unable to persist IQSet data'
+                            'error': 'Unable to persist IQSet data',
+                            'success': false
                         });
                     }
                 });
@@ -116,9 +232,11 @@ exports.handlePostNewIQSet = function(req, res) {
         }).on('error', function(error){
             console.error(error.message);
             return res.sendJSON(HTTP_STATUS_OK, {
-                'error': error.message
+                'error': error.message,
+                'success': false
             });
         });
+    }
 };
 
 exports.handleImageUpload = function(req, res) {
@@ -184,32 +302,35 @@ exports.handleStartMakeQuestionPut = function(req, res) {
         });
     }
 
-    if (teacherMeta === null || teacherMeta === "") {
-        // XXX TODO: Put our defaults somewhere
-            game.teacherName = "Teacher";
-            game.sessionName = "IQ Session " + new Date().toISOString();
-            game.groupName = "IQ Group";
-    } else {
-        // Validate our data or supply defaults
-        if (!teacherMeta.teacherName) {
-            game.teacherName = "Teacher";
+    if (game.teacherName === null || game.sessionName === null || game.groupName === null) {
+        
+        if (teacherMeta === null || teacherMeta === "") {
+            // XXX TODO: Put our defaults somewhere
+                game.teacherName = "Teacher";
+                game.sessionName = "IQ Session " + new Date().toISOString();
+                game.groupName = "IQ Group";
         } else {
-            game.teacherName = teacherMeta.teacherName;
-        }
+            console.log("TeacherMeta: " + teacherMeta);
+            // Validate our data or supply defaults
+            if (!teacherMeta.teacherName) {
+                game.teacherName = "Teacher";
+            } else {
+                game.teacherName = teacherMeta.teacherName;
+            }
 
-        if (!teacherMeta.sessionName) {
-            game.sessionName = "IQ Session " + new Date().toISOString();
-        } else {
-            game.sessionName = teacherMeta.sessionName;
-        }
+            if (!teacherMeta.sessionName) {
+                game.sessionName = "IQ Session " + new Date().toISOString();
+            } else {
+                game.sessionName = teacherMeta.sessionName;
+            }
 
-        if (!teacherMeta.groupName) {
-            game.groupName = "IQ Group";
-        } else {
-            game.groupName = teacherMeta.groupName;
+            if (!teacherMeta.groupName) {
+                game.groupName = "IQ Group";
+            } else {
+                game.groupName = teacherMeta.groupName;
+            }
         }
-    }
-
+    }    
     return res.sendText(HTTP_STATUS_OK, OK);
 };
 
@@ -310,11 +431,13 @@ exports.handleSendShowResultsPut = function(req, res) {
     message.AVG_RATINGS = result.averageRatings;
     message.RPERCENT = result.questionsCorrectPercentage;
     if (!game.resultsSaved) {
+        console.log("About to store session");
         pdb.putSession(game.getAllSessionData(), function(err, result) {
             if (err) { // XXX TODO: Add in logger instead of console logging
                 console.err(err);
             } else {
                 console.log('Stored session successfully');
+                console.log(result);
                 game.resultsSaved = true;
             }
         });
@@ -360,7 +483,12 @@ exports.handleAllMessagesGet = function(req, res) {
 
 reset = function() {
     oldGame = game;
-    game = new Game();
+    game = new Game(); // XXX Point to ponder, do we need to save before we destroy the server?
+    game.setCurrentMessage({ TYPE: 'RESET' , TIMESTAMP: (new Date()).toUTCString(), EXPIRY: 1500});
+    setTimeout(function() {
+        console.log("Remove RESET");
+        game.setCurrentMessage({});
+    }, 2000);
 };
 
 exports.handleResetGet = function(req, res) {
@@ -413,21 +541,24 @@ exports.handlePushMessage = function(req, res) {
         // Ignoring the message does not have a type
         console.warn("Unrecognized type: " + type);
         break;
-    case 'RE_TAKE':
-        game.setCurrentMessage(message);
-        error = game.retake();
-        break;
     case 'QUESTION':
         error = game.addQuestion(message);
         break;
     case 'QUESTION_PIC':
         error = game.addQuestion(message);
         break;
+    case 'ANSWER':
+        error = game.registerAnswerByMessage(message);
+        break;
     case 'HAIL':
         error = game.studentsWrapper.addStudent(message);
         break;
-    case 'ANSWER':
-        error = game.registerAnswerByMessage(message);
+    case 'RE_TAKE':
+        game.setCurrentMessage(message);
+        error = game.retake();
+        break;
+    case 'RESET':
+        game.setCurrentMessage({ TYPE: 'RESET'});
         break;
     default:
         error = new Error("Unrecognized type: " + type);
@@ -444,6 +575,36 @@ exports.handlePushMessage = function(req, res) {
             return res.sendText(HTTP_STATUS_OK, OK);
         }
     }
+};
+
+/**
+	Creating a session with teacher name, session title, and group name
+**/
+exports.createSessionFromTeacherApp = function(req, res) {
+
+    try {
+        // console.log('\n## JSON from "createSessionFromTeacherApp" ##');
+        console.log('\n\t>> %j', req.body);
+        console.log('\t>> '+req.body.teacherName);
+        console.log('\t>> '+req.body.sessionName);
+        console.log('\t>> '+req.body.groupName+'\n');
+
+        if (req.body.teacherName) {
+            game.teacherName = req.body.teacherName;
+        }
+
+        if (req.body.sessionName) {
+            game.sessionName = req.body.sessionName;
+        }
+
+        if (req.body.groupName) {
+            game.groupName = req.body.groupName;
+        }
+    } catch (e) {
+        res.handleError("Can't parse Incoming JSON in createSessionFromTeacherApp method");
+    }
+
+    return res.sendText(HTTP_STATUS_OK, OK);
 };
 
 exports.handlePushMsgPost = function(req, res) {
@@ -579,69 +740,47 @@ req.on('error', function(e) {
 console.log('JSON request ==> '+solving_questions);
 
 res.write(solving_questions);
-
-	/* Should be removed soon
-	
-    res.write("<html>\n<head>Question No." + (questionNumber + 1) + " </head>\n<body>\n");
-    res.write("<p>(Question created by " + studentName + ")</p>\n");
-    res.write("<P>Question:\n");
-    res.write(question.Q);
-    res.write("\n</P>\n");
-
-    if (question.TYPE == "QUESTION_PIC") {
-        res.write("<img class=\"main\" src=\"" + questionNumber + ".jpg\" width=\"200\" height=\"180\"/>\n");
-    }
-
-    res.write("<P>\n");
-    res.write("(1) " + question.O1 + "<br>\n");
-    res.write("(2) " + question.O2 + "<br>\n");
-    res.write("(3) " + question.O3 + "<br>\n");
-    res.write("(4) " + question.O4 + "<br>\n");
-    res.write("</P>\n</body></html>\n");
-	*/
     res.end();
 };
-
-/* Already existing just above this comment. Should be removed after a while i
-
-exports.handleQuestionHtmlGet = function(req, res) {
-    var questionNumber = parseInt(req.id, 10);
-    var question = game.questions.getList()[questionNumber];
-    if (!question) {
-        return res.handleError(js.JumboError.notFound('Question not found: ' + questionNumber));
-    }
-    var studentName = question.NAME; // XXX
-    res.writeHead(200, {
-        'Content-Type' : 'text/html; charset=utf-8',
-    });
-    res.write("<html>\n<head>Question No." + (questionNumber + 1) + " </head>\n<body>\n");
-    res.write("<p>(Question created by " + studentName + ")</p>\n");
-    res.write("<P>Question:\n");
-    res.write(question.Q);
-    res.write("\n</P>\n");
-
-    if (question.TYPE == "QUESTION_PIC") {
-        res.write("<img class=\"main\" src=\"" + questionNumber + ".jpg\" width=\"200\" height=\"180\"/>\n");
-    }
-
-    res.write("<P>\n");
-    res.write("(1) " + question.O1 + "<br>\n");
-    res.write("(2) " + question.O2 + "<br>\n");
-    res.write("(3) " + question.O3 + "<br>\n");
-    res.write("(4) " + question.O4 + "<br>\n");
-    res.write("</P>\n</body></html>\n");
-    res.end();
-};
-*/
 
 exports.handleQuestionJSONGet = function(req, res) {
     var questionNumber = parseInt(req.id, 10);
     var question = game.questions.getList()[questionNumber];
     if (!question) {
-        return res.handleError(js.JumboError.notFound('Question not found: ' + questionNumber));
+        return res.sendJSON(HTTP_STATUS_OK, {'error': 'Question not found: ' + questionNumber});
     }
 
     res.sendJSON(HTTP_STATUS_OK, question);
+};
+exports.handleQuestionJSONDelete = function(req, res) {
+    var questionNumber = parseInt(req.id, 10);
+    var question = game.questions.getList()[questionNumber];
+
+    //
+    // Is the Question ID existing
+    //
+    if (!question) {
+        console.log("no question found matching ID = " + req.id);
+        return res.sendJSON(HTTP_STATUS_OK, {'error': 'Cannot find question matching ID, cannot delete'
+        });
+    }
+
+    //
+    // Is it Make Questions State?
+    //
+    if (game.getCurrentMessage().TYPE !== "START_MAKE") {
+        console.log("Can only delete in START_MAKE, current phase: " + game.getCurrentMessage().TYPE);
+        return res.sendJSON(HTTP_STATUS_OK, {'error': 'Can only delete a question during START_MAKE phase'
+        });
+    }
+
+    //
+    // Handle deletion
+    //
+    var status = game.questions.deleteQuestion(questionNumber);
+    console.log("question delete status: " + status);
+
+    res.sendJSON(HTTP_STATUS_OK, {'status': status});
 };
 
 exports.handleQuestionImageGet = function(req, res) {
@@ -727,32 +866,6 @@ req.on('error', function(e) {
 
 // XXX What is this for??
 console.log('JSON request ==> '+detail_resultString);
-	
-	/*  #### TODO => This code will be removed soon #####
-	
-    res.write("<html>\n<head>Question No." + (questionNumber + 1) + " </head>\n<body>\n");
-    res.write("<p>(Question created by " + studentName + ")</p>\n");
-    res.write("<P>Question:\n");
-    res.write(question.Q);
-    res.write("\n</P>\n");
-
-    if (question.TYPE == "QUESTION_PIC") {
-        res.write("<img class=\"main\" src=\"" + questionNumber + ".jpg\" width=\"200\" height=\"180\"/>\n");
-    }
-
-    res.write("<P>\n");
-    res.write("(1) " + question.O1 + (parseInt(question.A, 10) === 1 ? "<font color = red>&nbsp; &#10004;</font>" : "") + "<br>\n");
-    res.write("(2) " + question.O2 + (parseInt(question.A, 10) === 2 ? "<font color = red>&nbsp; &#10004;</font>" : "") + "<br>\n");
-    res.write("(3) " + question.O3 + (parseInt(question.A, 10) === 3 ? "<font color = red>&nbsp; &#10004;</font>" : "") + "<br>\n");
-    res.write("(4) " + question.O4 + (parseInt(question.A, 10) === 4 ? "<font color = red>&nbsp; &#10004;</font>" : "") + "<br>\n");
-    res.write("</P>\n");
-    res.write("Correct Answer: " + question.A + "<br>\n");
-    var numCorrectPeople = game.questionCorrectCountMap[questionNumber];
-    res.write("<P> Num correct people: " + numCorrectPeople + " / " + game.students.getNumberOfStudents() + "<br>\n");
-    res.write("Average rating: " + game.getQuestionAverageRating(questionNumber) + "<br>\n");
-
-    res.write("</body></html>\n");
-	*/
 	res.write(detail_resultString);
     res.end();
 };
