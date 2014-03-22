@@ -652,6 +652,9 @@ function doSMSG() {
                 }
             }
             if (msg === "WAIT_CONNECT") {
+
+                // TODO: RTC #23 >> Should we call from here a method to update the status on student app?
+                statechange(SMILESTATE, 2);
             }
 
             if (msg === "START_SOLVE") {
@@ -874,7 +877,28 @@ function statechange(from, to, data, cb) {
             return;
         } // Teacher reset game, we should logout
         if (to == 2) {
+
             return;
+            
+            /// TODO >> remove comment or delete
+            /*
+            SMILESTATE = 2;
+            console.log('SMILESTATE = 2');
+            var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["2"].id + '"]');
+            if ($next) {
+                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["2"].label + ' phase.', 2500);
+                console.log('go to href = ' + $next.attr('href'));
+                $('#logoutarea').show();
+                // Note, we won't disable the login screen, user can click back to it
+                $next.removeClass('disabled');
+                var a = $next[0]; // get the dom obj
+                var evt = document.createEvent('MouseEvents');
+                evt.initEvent('click', true, true);
+                a.dispatchEvent(evt);
+            }
+            */
+            ///
+
         } // Not sure why this would happen
         if (to == 5) { // Enter Show Results Phase
             // Ignore
