@@ -501,7 +501,7 @@ reset = function() {
     game = new Game(); // XXX Point to ponder, do we need to save before we destroy the server?
     game.setCurrentMessage({ TYPE: 'RESET' , TIMESTAMP: (new Date()).toUTCString(), EXPIRY: 1500});
     setTimeout(function() {
-        console.log("Remove RESET");
+        // Remove RESET
         game.setCurrentMessage({});
     }, 2000);
 };
@@ -555,7 +555,6 @@ exports.handlePushMessage = function(req, res) {
     } else {
         type = message.TYPE || null;
     }
-    console.log('type=%j',type);
     
     switch (type) {
     case null:
@@ -563,22 +562,27 @@ exports.handlePushMessage = function(req, res) {
         console.warn("Unrecognized type: " + type);
         break;
     case 'QUESTION':
+        console.log('Adding question...');
         error = game.addQuestion(message);
         break;
     case 'QUESTION_PIC':
+        console.log('Adding question(p)...');
         error = game.addQuestion(message);
         break;
     case 'ANSWER':
         error = game.registerAnswerByMessage(message);
         break;
     case 'HAIL':
+        console.log('Adding student...');
         error = game.studentsWrapper.addStudent(message);
         break;
     case 'RE_TAKE':
+        console.log('Retaking...');
         game.setCurrentMessage(message);
         error = game.retake();
         break;
     case 'RESET':
+        console.log('-Reset session-');
         game.setCurrentMessage({ TYPE: 'RESET'});
         break;
     default:
