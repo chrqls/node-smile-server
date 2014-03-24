@@ -279,7 +279,7 @@ exports.handleStartMakeQuestionPut = function(req, res) {
     game.setCurrentMessage(MESSAGE_START_MAKE_QUESTION);
 
     //
-    // Extract Teacher specific Sesssion Data
+    // Extract Teacher specific Session Data
     //
     // teacherName : <Any text or numerical name>
     // sessionName : <Any text or numerical name>
@@ -414,7 +414,7 @@ exports.handleStudentPut = function(req, res) {
 
 exports.handleResultsGet = function(req, res) {
     var results = game.calculateResults();
-    
+
     return res.sendJSON(HTTP_STATUS_OK, results);
 };
 
@@ -543,14 +543,20 @@ exports.handleCsvPushQuestions = function(req, res) {
 //
 
 exports.handlePushMessage = function(req, res) {
+    
     var message = req.body;
-    game.registerMessage(message);
-    var type = message.TYPE || null;
-    if (type.indexOf("RE_TAKE") != -1) { // XXX What the heck is this?
-        type = 'RE_TAKE';
-    }
-    // console.log(message);
+    var type = null;
     var error = null;
+
+    game.registerMessage(message);
+
+    if(JSON.stringify(message).indexOf("TYPE:'RE_TAKE'") != -1) {
+        type = 'RE_TAKE';
+    } else {
+        type = message.TYPE || null;
+    }
+    console.log('type=%j',type);
+    
     switch (type) {
     case null:
         // Ignoring the message does not have a type
@@ -622,7 +628,14 @@ exports.createSessionFromTeacherApp = function(req, res) {
 exports.handlePushMsgPost = function(req, res) {
     var message = req.body.MSG;
     try {
-        req.body = JSON.parse(message);
+        if(message != undefined) {
+            req.body = JSON.parse(message);
+        } else { 
+            // RE_TAKE case: reparing RE_TAKE request...
+            for (var key in req.body) {
+                req.body = key;
+            }
+        }
         exports.handlePushMessage(req, res);
     } catch (e) {
         res.handleError("Can't parse Incoming JSON");
