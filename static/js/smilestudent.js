@@ -645,9 +645,15 @@ function doSMSG() {
     }, success: function(data) {
         if (data) {
             msg = data["TYPE"];
+
             // console.log(data); // XXX Remove debug
             if (msg === "START_MAKE") {
-                if (SMILESTATE !== 3) {
+                
+                if (SMILESTATE == 5) {
+                    alert('yes !!!');
+                    statechange(5, 3);
+                } 
+                else if (SMILESTATE !== 3) {
                     statechange(2, 3);
                 }
             }
@@ -879,27 +885,26 @@ function statechange(from, to, data, cb) {
         if (to == 2) {
 
             return;
-            
-            /// TODO >> remove comment or delete
-            /*
-            SMILESTATE = 2;
-            console.log('SMILESTATE = 2');
-            var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["2"].id + '"]');
+        }
+        if (to == 3) { // Enter Make Questions Phase
+
+            console.log('CODE CODE CODE CODE CODE CODE');
+
+            SMILESTATE = 3;
+            $('div#inquiry-form-area').unblock();
+            var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["3"].id + '"]');
             if ($next) {
-                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["2"].label + ' phase.', 2500);
+                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["3"].label + ' phase.', 2500);
                 console.log('go to href = ' + $next.attr('href'));
-                $('#logoutarea').show();
-                // Note, we won't disable the login screen, user can click back to it
                 $next.removeClass('disabled');
                 var a = $next[0]; // get the dom obj
                 var evt = document.createEvent('MouseEvents');
                 evt.initEvent('click', true, true);
+                GlobalViewModel.sessionstatemsg("Start Making Questions until the teacher is ready to start Answering Questions")
                 a.dispatchEvent(evt);
             }
-            */
-            ///
-
-        } // Not sure why this would happen
+        }
+        // Not sure why this would happen
         if (to == 5) { // Enter Show Results Phase
             // Ignore
         }
