@@ -13,6 +13,9 @@ HTTP_STATUS_OK = '200';
 var MESSAGE_START_MAKE_QUESTION = {
     'TYPE' : 'START_MAKE'
 };
+var MESSAGE_RETAKE = {
+    'TYPE' : 'RE_TAKE'
+};
 var MESSAGE_WAIT_CONNECT = {
     'TYPE' : 'WAIT_CONNECT'
 };
@@ -548,11 +551,11 @@ exports.handlePushMessage = function(req, res) {
     var type = null;
     var error = null;
 
-    game.registerMessage(message);
-
     if(JSON.stringify(message).indexOf("TYPE:'RE_TAKE'") != -1) {
         type = 'RE_TAKE';
+        game.registerMessage(MESSAGE_RETAKE);
     } else {
+        game.registerMessage(message);
         type = message.TYPE || null;
     }
     
@@ -578,7 +581,6 @@ exports.handlePushMessage = function(req, res) {
         break;
     case 'RE_TAKE':
         console.log('Retaking...');
-        game.setCurrentMessage(message);
         error = game.retake();
         break;
     case 'RESET':
