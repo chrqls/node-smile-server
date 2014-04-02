@@ -650,7 +650,6 @@ function doSMSG() {
             if (msg === "START_MAKE") {
                 
                 if (SMILESTATE == 5) {
-                    alert('yes !!!');
                     statechange(5, 3);
                 } 
                 else if (SMILESTATE !== 3) {
@@ -888,7 +887,8 @@ function statechange(from, to, data, cb) {
         }
         if (to == 3) { // Enter Make Questions Phase
 
-            console.log('CODE CODE CODE CODE CODE CODE');
+            // Disable the popup "please wait for students answering questions"
+            $('div#answer-form-area').unblock();
 
             SMILESTATE = 3;
             $('div#inquiry-form-area').unblock();
