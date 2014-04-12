@@ -49,7 +49,7 @@ var SMILEROUTES = {
     "getresults": "/smile/student/%s/result"
 };
 
-var VERSION = '1.0.4';
+var VERSION = '1.0.5';
 
 //
 // 1 - login screen
@@ -648,10 +648,10 @@ function doSMSG() {
 
             // console.log(data); // XXX Remove debug
             if (msg === "START_MAKE") {
-                
+
                 if (SMILESTATE == 5) {
                     statechange(5, 3);
-                } 
+                }
                 else if (SMILESTATE !== 3) {
                     statechange(2, 3);
                 }
