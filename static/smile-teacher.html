@@ -56,8 +56,7 @@
 		<div class="row">
 			<div class="large-9 small-9 columns">
 				<h3>
-					SMILE Teacher
-					<span data-bind="text: version"></span>
+					SMILE Teacher <span data-bind="text: version"></span>
 				</h3>
 
 				<div class="row">
@@ -75,31 +74,73 @@
       									
       									<section class="active">
        						 				
-        									<div class="content" data-slug="login-pane1" data-section-content>
+        									<div class="content" data-slug="create-session" data-section-content>
           										<!-- NICE DEBUG TRICK -->
 												<!-- KO:<span data-bind="text: ko.toJSON($data)"></span>
 												<form action="return false;"> -->
 
 												<label>Teacher Name</label>
-												<input data-bind='value: teacher_name, valueUpdate: "afterkeydown"' type="text" placeholder="Teacher Name (default: Default Teacher)" />
+												<input data-bind='value: teacher_name, valueUpdate: "afterkeydown"' type="text" placeholder="Default Teacher" />
 												<label>Session Name</label>
-												<input data-bind='value: session_name, valueUpdate: "afterkeydown"' type="text" placeholder="Session Name (default: Default Session)" />
+												<input data-bind='value: session_name, valueUpdate: "afterkeydown"' type="text" placeholder="Default Session" />
 												<label>Group Name</label>
-												<input data-bind='value: group_name, valueUpdate: "afterkeydown"' type="text" placeholder="Group Name (default: Default Group)" />
+												<input data-bind='value: group_name, valueUpdate: "afterkeydown"' type="text" placeholder="Default Group" />
 
 												<ul class="button-group even two-up">
 													<li>
-														<a href="#" data-bind='click: doLogin, disable: hasSubmitted'
-															class="button">Submit</a>
+														<a href="#" data-bind='click: createSession'
+															class="button">Next</a>
 													</li>
 													<li>
-														<a href="#" data-bind='click: doLoginReset' class="button">Reset</a>
+														<a href="#" data-bind='click: resetSessionValues' class="button">Reset</a>
 													</li>
 												</ul>
 												</form>
         									</div>
       									</section>
 
+
+      									<section>
+       						 				
+        									<div class="content" data-slug="recover-session" data-section-content>
+												<ul class="button-group even two-up">
+													<li>
+														<a href="#" data-bind='click: recoverSession' class="button">Recovering session</a>
+													</li>
+												</ul>
+												</form>
+        									</div>
+      									</section>
+
+      									<section>
+       						 				
+        									<div class="content" data-slug="chooseActivityFlow" data-section-content>
+												<ul class="button-group even two-up">
+													<li>
+														<a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a>
+													</li>
+													<li>
+														<a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a>
+													</li>
+												</ul>
+												</form>
+        									</div>
+      									</section>
+
+      									<!--section>
+       						 				
+        									<div class="content" data-slug="chooseActivityFlow" data-section-content>
+												<ul class="button-group even two-up">
+													<li>
+														<a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a>
+													</li>
+													<li>
+														<a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a>
+													</li>
+												</ul>
+												</form>
+        									</div>
+      									</section-->
     								</div>
 								</nav>
 							</div>
@@ -111,9 +152,8 @@
 				<!-- <div data-bind="with: logindata"> -->
 				<div id="login-info">
 					<h4>
-						Instructions for
-						<div data-bind="text: ip_server" id="ip_server">Teacher</div>
-
+						Instructions for 
+						<div data-bind="text: teacher_name">Teacher</div>
 					</h4>
 					
 					<p><img src="images/jamsj_slim.png" />
