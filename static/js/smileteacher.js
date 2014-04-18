@@ -95,12 +95,10 @@ GlobalViewModel.createSession = function() {
         
         error: function(xhr, text, err) {
             smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
-            //GlobalViewModel.hasSubmitted(false); // Reset this so clicks will work
         }, 
         success: function(data) {
             smileAlert('#globalstatus', 'Success ('+self.teacher_name()+','+self.session_name()+','+self.group_name()+')', 'green', 5000);
-            // Move to state 2 now
-            //SMILESTATE = '2';
+            switchSection('div[data-slug=chooseActivityFlow]');
         }
     });
 
@@ -110,6 +108,18 @@ GlobalViewModel.createSession = function() {
 GlobalViewModel.recoverSession = function() {
 
     smileAlert('#globalstatus', 'Session recovered', 'green', 5000);
+    return false;
+}
+
+GlobalViewModel.startMakingQuestions = function() {
+
+    smileAlert('#globalstatus', 'Start making questions', 'green', 5000);
+    return false;
+}
+
+GlobalViewModel.usePreparedQuestions = function() {
+
+    smileAlert('#globalstatus', 'Load iqsets', 'green', 5000);
     return false;
 }
 
@@ -147,8 +157,9 @@ GlobalViewModel.initializePage = function() {
 
             // If a session is already running, we replace the session values fields by a "recovering session" button
             if(data.indexOf('SessionID') !== -1 ){
-                $('div[data-slug=create-session]').parent().removeClass('active');
-                $('div[data-slug=recover-session]').parent().addClass('active');
+                //$('div[data-slug=create-session]').parent().removeClass('active');
+                //$('div[data-slug=recover-session]').parent().addClass('active');
+                switchSection('div[data-slug=recover-session]');
             }
         }
     });
@@ -164,10 +175,14 @@ $(document).ready(function() {
 });
 
 // NEEDED
-
 function foobar() {
+    smileAlert('#globalstatus', 'Not yet implemented', 'blue',5000);
+}
+
+function switchSection(newSection) {
     
-    return false;
+    $('section.active').removeClass('active');
+    $(newSection).parent().addClass('active');
 }
 
 //
