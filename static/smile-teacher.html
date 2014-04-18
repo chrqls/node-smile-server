@@ -75,7 +75,7 @@
       									
       									<section class="active">
        						 				
-        									<div class="content" data-slug="login-pane1" data-section-content>
+        									<div class="content" data-slug="create-session" data-section-content>
           										<!-- NICE DEBUG TRICK -->
 												<!-- KO:<span data-bind="text: ko.toJSON($data)"></span>
 												<form action="return false;"> -->
@@ -89,11 +89,24 @@
 
 												<ul class="button-group even two-up">
 													<li>
-														<a href="#" data-bind='click: doLogin, disable: hasSubmitted'
-															class="button">Submit</a>
+														<a href="#" data-bind='click: createSession'
+															class="button">Next</a>
 													</li>
 													<li>
-														<a href="#" data-bind='click: doLoginReset' class="button">Reset</a>
+														<a href="#" data-bind='click: resetSessionValues' class="button">Reset</a>
+													</li>
+												</ul>
+												</form>
+        									</div>
+      									</section>
+
+
+      									<section>
+       						 				
+        									<div class="content" data-slug="recover-session" data-section-content>
+												<ul class="button-group even two-up">
+													<li>
+														<a href="#" data-bind='click: recoverSession' class="button">Recovering session</a>
 													</li>
 												</ul>
 												</form>

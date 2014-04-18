@@ -28,11 +28,11 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '1.0.1';
-var SMILESTATE = "1";
+var VERSION = '0.0.2';
+//var SMILESTATE = "1";
 var SMILEROUTES = {
     "currentmessage": "/smile/currentmessage",
-    "checkserver": "/smile/",
+    "all": "/smile/all",
     "createsession": "/smile/createsession"
 };
 
@@ -67,11 +67,10 @@ var GlobalViewModel = {
     teacher_name: ko.observable(""),
     session_name: ko.observable(""),
     group_name: ko.observable(""),
-    hasSubmitted: ko.observable(false),
     version: ko.observable(VERSION)
 };
 
-GlobalViewModel.doLogin = function() {
+GlobalViewModel.createSession = function() {
     var self = this;
     
     if (!self.teacher_name() || self.teacher_name() === "") {
@@ -86,46 +85,90 @@ GlobalViewModel.doLogin = function() {
         
         self.group_name('Default Group'); 
     }
-
-    if (!self.hasSubmitted()) {
-        console.log('doLogin');
-        smileAlert('#globalstatus', 'Logging in ('+self.teacher_name()+','+self.teacher_name()+','+self.teacher_name()+')', 'green', 5000);
-        doSmileLogin();
-    }
-
-    self.hasSubmitted(true);
+    
+    $.ajax({ 
+        cache: false, 
+        type: "POST", 
+        dataType: "text", 
+        url: SMILEROUTES["createsession"], 
+        data: {"teacherName":GlobalViewModel.teacher_name,"groupName":GlobalViewModel.group_name,"sessionName":GlobalViewModel.session_name}, 
+        
+        error: function(xhr, text, err) {
+            smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+            //GlobalViewModel.hasSubmitted(false); // Reset this so clicks will work
+        }, 
+        success: function(data) {
+            smileAlert('#globalstatus', 'Success ('+self.teacher_name()+','+self.session_name()+','+self.group_name()+')', 'green', 5000);
+            // Move to state 2 now
+            //SMILESTATE = '2';
+        }
+    });
 
     return false;
 }
 
+GlobalViewModel.recoverSession = function() {
 
-GlobalViewModel.doLoginReset = function() {
+    smileAlert('#globalstatus', 'Session recovered', 'green', 5000);
+    return false;
+}
+
+
+GlobalViewModel.resetSessionValues = function() {
 
     this.teacher_name("");
     this.session_name("");
     this.group_name("");
-    this.hasSubmitted(false);
 
     //
     // XXX This is silly, fix this, cleanup the object model and reset the state
     // For now just reload the page
     //
-    window.location.href = window.location.pathname;
-    window.location.reload(true);
+    //window.location.href = window.location.pathname;
+    //window.location.reload(true);
     return false;
 }
 
+GlobalViewModel.initializePage = function() {
+
+    //var alreadyRunning = false;
+
+    $.ajax({ 
+        cache: false, 
+        type: "GET", 
+        dataType: "text", 
+        url: SMILEROUTES["all"], 
+        data: {}, 
+        
+        error: function(xhr, text, err) {
+            smileAlert('#globalstatus', 'Unable to call /smile/all.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+        }, 
+        success: function(data) {
+
+            // If a session is already running, we replace the session values fields by a "recovering session" button
+            if(data.indexOf('SessionID') !== -1 ){
+                $('div[data-slug=create-session]').parent().removeClass('active');
+                $('div[data-slug=recover-session]').parent().addClass('active');
+            }
+        }
+    });
+}
 
 $(document).ready(function() {
     
-    //
     // Init Data Model
-    //
     ko.applyBindings(GlobalViewModel);
+
+    GlobalViewModel.initializePage();
 
 });
 
 // NEEDED
+
+function foobar() {
+    
+    return false;
+}
 
 //
 // App functions
@@ -169,27 +212,4 @@ function smileAlert(targetid, text, alerttype, lifetime) {
             $(targetid).find('.alert-box').fadeOut().remove();
         }, lifetime)
     }
-}
-
-function doSmileLogin() {
-    
-    var clientip;
-    
-    $.ajax({ 
-        cache: false, 
-        type: "POST", 
-        dataType: "text", 
-        url: SMILEROUTES["createsession"], 
-        data: {"teacherName":GlobalViewModel.teacher_name,"groupName":GlobalViewModel.group_name,"sessionName":GlobalViewModel.session_name}, 
-        
-        error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to login.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
-            GlobalViewModel.hasSubmitted(false); // Reset this so clicks will work
-        }, 
-        success: function(data) {
-            smileAlert('#globalstatus', 'Successfully logged in', 'green', 10000);
-            // Move to state 2 now
-            SMILESTATE = '2';
-        }
-    });
 }
