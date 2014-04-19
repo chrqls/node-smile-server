@@ -33,9 +33,18 @@ var VERSION = '0.0.2';
 var SMILEROUTES = {
     "currentmessage": "/smile/currentmessage",
     "all": "/smile/all",
+    "iqsets": "/smile/iqsets",
+    "iqset": "/smile/iqset/",
     "createsession": "/smile/createsession"
 };
 
+var IQSet = function(title,teacherName,groupName,date) {
+    var self = this;
+    self.sessionName = title;
+    self.teacherName = teacherName;
+    self.groupName = groupName;
+    self.date = date;
+}
 
 //
 // KO Extenders
@@ -67,30 +76,24 @@ var GlobalViewModel = {
     teacher_name: ko.observable(""),
     session_name: ko.observable(""),
     group_name: ko.observable(""),
+    iqsets: ko.observableArray([]),
+    iqsetToLoad: ko.observable(''),
     version: ko.observable(VERSION)
 };
 
 GlobalViewModel.createSession = function() {
+    
     var self = this;
     
-    if (!self.teacher_name() || self.teacher_name() === "") {
-        
-        self.teacher_name('Default Teacher'); 
-    }
-    if (!self.session_name() || self.session_name() === "") {
-        
-        self.session_name('Default Session'); 
-    }
-    if (!self.group_name() || self.group_name() === "") {
-        
-        self.group_name('Default Group'); 
-    }
+    if (!self.teacher_name() || self.teacher_name() === "") { self.teacher_name('Default Teacher'); }
+    if (!self.session_name() || self.session_name() === "") { self.session_name('Default Session'); }
+    if (!self.group_name() || self.group_name() === "")     { self.group_name('Default Group');  }
     
     $.ajax({ 
         cache: false, 
         type: "POST", 
         dataType: "text", 
-        url: SMILEROUTES["createsession"], 
+        url: SMILEROUTES["createsession"],
         data: {"teacherName":GlobalViewModel.teacher_name,"groupName":GlobalViewModel.group_name,"sessionName":GlobalViewModel.session_name}, 
         
         error: function(xhr, text, err) {
@@ -98,7 +101,7 @@ GlobalViewModel.createSession = function() {
         }, 
         success: function(data) {
             smileAlert('#globalstatus', 'Success ('+self.teacher_name()+','+self.session_name()+','+self.group_name()+')', 'green', 5000);
-            switchSection('div[data-slug=chooseActivityFlow]');
+            switchSection('div[data-slug=choose-activity-flow]');
         }
     });
 
@@ -119,9 +122,44 @@ GlobalViewModel.startMakingQuestions = function() {
 
 GlobalViewModel.usePreparedQuestions = function() {
 
-    smileAlert('#globalstatus', 'Load iqsets', 'green', 5000);
+    //smileAlert('#globalstatus', 'Load iqsets', 'green', 5000);
+
+    switchSection('div[data-slug=choose-an-iqset]');
+
+    $.ajax({ 
+        cache: false, 
+        type: "GET", 
+        dataType: "text", 
+        url: SMILEROUTES["iqsets"], 
+        data: {}, 
+        
+        error: function(xhr, text, err) {
+            smileAlert('#globalstatus', 'Unable to call /smile/all.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+        }, 
+        
+        success: function(data) {
+
+            var dataObject = JSON.parse(data);
+            var iqsets = dataObject.rows;
+
+            for (i = 0; i < dataObject.total_rows; i++) {
+
+                GlobalViewModel.iqsets.push(
+                    new IQSet(
+                        iqsets[i].value[0],
+                        iqsets[i].value[1],
+                        iqsets[i].value[2],
+                        iqsets[i].key.substr(0, 10)
+                    )
+                );
+                //smileAlert('#globalstatus', iqsets[i].value[0], 'blue', 7000);
+            }
+        }
+    });
+
     return false;
 }
+
 
 
 GlobalViewModel.resetSessionValues = function() {
@@ -157,8 +195,6 @@ GlobalViewModel.initializePage = function() {
 
             // If a session is already running, we replace the session values fields by a "recovering session" button
             if(data.indexOf('SessionID') !== -1 ){
-                //$('div[data-slug=create-session]').parent().removeClass('active');
-                //$('div[data-slug=recover-session]').parent().addClass('active');
                 switchSection('div[data-slug=recover-session]');
             }
         }
