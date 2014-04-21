@@ -38,12 +38,13 @@ var SMILEROUTES = {
     "createsession": "/smile/createsession"
 };
 
-var IQSet = function(title,teacherName,groupName,date) {
-    var self = this;
-    self.sessionName = title;
-    self.teacherName = teacherName;
-    self.groupName = groupName;
-    self.date = date;
+var IQSet = function(id,title,teacherName,groupName,date) {
+    //var self = this;
+    this.id = id;
+    this.sessionName = title;
+    this.teacherName = teacherName;
+    this.groupName = groupName;
+    this.date = date;
 }
 
 //
@@ -83,11 +84,11 @@ var GlobalViewModel = {
 
 GlobalViewModel.createSession = function() {
     
-    var self = this;
+    //var self = this;
     
-    if (!self.teacher_name() || self.teacher_name() === "") { self.teacher_name('Default Teacher'); }
-    if (!self.session_name() || self.session_name() === "") { self.session_name('Default Session'); }
-    if (!self.group_name() || self.group_name() === "")     { self.group_name('Default Group');  }
+    if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Default Teacher'); }
+    if (!this.session_name() || this.session_name() === "") { this.session_name('Default Session'); }
+    if (!this.group_name() || this.group_name() === "")     { this.group_name('Default Group');  }
     
     $.ajax({ 
         cache: false, 
@@ -100,7 +101,7 @@ GlobalViewModel.createSession = function() {
             smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
         }, 
         success: function(data) {
-            smileAlert('#globalstatus', 'Success ('+self.teacher_name()+','+self.session_name()+','+self.group_name()+')', 'green', 5000);
+            smileAlert('#globalstatus', 'Success ('+GlobalViewModel.teacher_name()+','+GlobalViewModel.session_name()+','+GlobalViewModel.group_name()+')', 'green', 5000);
             switchSection('div[data-slug=choose-activity-flow]');
         }
     });
@@ -146,6 +147,7 @@ GlobalViewModel.usePreparedQuestions = function() {
 
                 GlobalViewModel.iqsets.push(
                     new IQSet(
+                        i,
                         iqsets[i].value[0],
                         iqsets[i].value[1],
                         iqsets[i].value[2],

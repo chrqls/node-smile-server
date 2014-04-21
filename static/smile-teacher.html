@@ -130,8 +130,11 @@
 												
 												<div data-bind="foreach: iqsets" >
 												    <div>
-											    		<input type="radio" name="optionsGroup" data-bind="attr: {value: sessionName}, checked: $root.iqsetToLoad" />
+											    		<input type="radio" name="optionsGroup" data-bind="attr: {value: id}, checked: $root.iqsetToLoad" />
 												    	<span data-bind="text: sessionName"></span>
+												    	(<span data-bind="text: teacherName"></span>,
+												    	<span data-bind="text: groupName"></span>,
+												    	<span data-bind="text: date"></span>)
 													</div>    
 												</div>
 
