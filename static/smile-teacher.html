@@ -95,7 +95,6 @@
 														<a href="#" data-bind='click: resetSessionValues' class="button">Reset</a>
 													</li>
 												</ul>
-												</form>
         									</div>
       									</section>
 
@@ -108,13 +107,12 @@
 														<a href="#" data-bind='click: recoverSession' class="button">Recovering session</a>
 													</li>
 												</ul>
-												</form>
         									</div>
       									</section>
 
       									<section>
        						 				
-        									<div class="content" data-slug="chooseActivityFlow" data-section-content>
+        									<div class="content" data-slug="choose-activity-flow" data-section-content>
 												<ul class="button-group even two-up">
 													<li>
 														<a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a>
@@ -122,25 +120,27 @@
 													<li>
 														<a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a>
 													</li>
-												</ul>
-												</form>
+												</ul>	
         									</div>
       									</section>
 
-      									<!--section>
+      									<section>
        						 				
-        									<div class="content" data-slug="chooseActivityFlow" data-section-content>
-												<ul class="button-group even two-up">
-													<li>
-														<a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a>
-													</li>
-													<li>
-														<a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a>
-													</li>
-												</ul>
-												</form>
+        									<div class="content" data-slug="choose-an-iqset" data-section-content>
+												
+												<div data-bind="foreach: iqsets" >
+												    <div>
+											    		<input type="radio" name="optionsGroup" data-bind="attr: {value: id}, checked: $root.iqsetToLoad" />
+												    	<span data-bind="text: sessionName"></span>
+												    	(<span data-bind="text: teacherName"></span>,
+												    	<span data-bind="text: groupName"></span>,
+												    	<span data-bind="text: date"></span>)
+													</div>    
+												</div>
+
+
         									</div>
-      									</section-->
+      									</section>
     								</div>
 								</nav>
 							</div>

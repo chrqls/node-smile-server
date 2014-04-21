@@ -118,9 +118,7 @@ exports.handleDeleteIQSet = function(req, res) {
 exports.handlePostNewIQSet = function(req, res) {
     
     console.log("\n\n[BODY of json request]");
-    console.log("\t>> %j\n", req.body);
-    console.log("[HEADERS of json request]");
-    console.log("\t>> %j\n\n", req.headers);
+    console.log("%j\n", req.body);
 
     var headers = req.headers;
     var iqset;
@@ -136,21 +134,9 @@ exports.handlePostNewIQSet = function(req, res) {
             iqset = req.body;
         }
 
-        if (!iqset.title) {
-            // iqset.title = iqdoc.date + "-IQSet";
-        }
-
-        if (!iqset.teachername) {
-            // iqset.teachername = "Teacher";
-        }
-
-        if (!iqset.groupname) {
-            // iqset.groupname = "General";
-        }
-
-        if (!iqset.iqdata) {
-            isValid = false;
-        }
+        // Adding values of the current session before saving the IQSet
+        iqset.teachername = game.teacherName;
+        iqset.groupname = game.groupName;
 
         if (isValid === true) {
             //
@@ -165,7 +151,6 @@ exports.handlePostNewIQSet = function(req, res) {
                     // 1. Get the original index of the image
                     // 2. Change the PICURL to match the new index 
                     //
-                    
                     if (iqset.iqdata[i].PICURL) {
                         // /smile/questionview/1.jpg
                         var tmpidx = parseInt(iqset.iqdata[i].PICURL.split('/')[3].split('.')[0], 10);
