@@ -87,25 +87,17 @@
 												<input data-bind='value: group_name, valueUpdate: "afterkeydown"' type="text" placeholder="Default Group" />
 
 												<ul class="button-group even two-up">
-													<li>
-														<a href="#" data-bind='click: createSession'
-															class="button">Next</a>
-													</li>
-													<li>
-														<a href="#" data-bind='click: resetSessionValues' class="button">Reset</a>
-													</li>
+													<li><a href="#" data-bind='click: createSession' class="button">Next</a></li>
+													<li><a href="#" data-bind='click: resetSessionValues' class="button">Reset</a></li>
 												</ul>
         									</div>
       									</section>
-
 
       									<section>
        						 				
         									<div class="content" data-slug="recover-session" data-section-content>
 												<ul class="button-group even two-up">
-													<li>
-														<a href="#" data-bind='click: recoverSession' class="button">Recovering session</a>
-													</li>
+													<li><a href="#" data-bind='click: recoverSession' class="button">Recovering session</a></li>
 												</ul>
         									</div>
       									</section>
@@ -114,12 +106,8 @@
        						 				
         									<div class="content" data-slug="choose-activity-flow" data-section-content>
 												<ul class="button-group even two-up">
-													<li>
-														<a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a>
-													</li>
-													<li>
-														<a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a>
-													</li>
+													<li><a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a></li>
+													<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a></li>
 												</ul>	
         									</div>
       									</section>
@@ -130,16 +118,32 @@
 												
 												<div data-bind="foreach: iqsets" >
 												    <div>
-											    		<input type="radio" name="optionsGroup" data-bind="attr: {value: id}, checked: $root.iqsetToLoad" />
+											    		<input type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
 												    	<span data-bind="text: sessionName"></span>
 												    	(<span data-bind="text: teacherName"></span>,
 												    	<span data-bind="text: groupName"></span>,
 												    	<span data-bind="text: date"></span>)
 													</div>    
 												</div>
-
-
+												<ul class="button-group even two-up">
+													<li><a href="#" data-bind='click: startMakingQuestionsWithIQSet' class="button">Load</a></li>
+												</ul>	
         									</div>
+      									</section>
+
+      									<section>
+       						 				
+        									<div class="content" data-slug="list-questions" data-section-content>
+												
+												<div data-bind="foreach: questions" >
+												    <div>
+											    		<input type="checkbox" name="questionsToSave" data-bind="attr: {value: position}, checked: $root.position" />
+												    	<span data-bind="text: author"></span>
+													</div>    
+												</div>
+												
+        									</div>
+        								
       									</section>
     								</div>
 								</nav>
@@ -149,12 +153,10 @@
 				</div>
 			</div>
 			<div class="large-3 small-3 columns">
-				<!-- <div data-bind="with: logindata"> -->
 				<div id="login-info">
-					<h4>
-						Instructions for 
-						<div data-bind="text: teacher_name">Teacher</div>
-					</h4>
+					Teacher: <span data-bind="text: teacher_name"></span><br>
+					Session: <span data-bind="text: session_name"></span><br>
+					Group: <span data-bind="text: group_name"></span>
 					
 					<p><img src="images/jamsj_slim.png" />
 				</div>

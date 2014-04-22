@@ -28,8 +28,8 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.0.2';
-//var SMILESTATE = "1";
+var VERSION = '0.1.2';
+
 var SMILEROUTES = {
     "currentmessage": "/smile/currentmessage",
     "all": "/smile/all",
@@ -38,18 +38,47 @@ var SMILEROUTES = {
     "createsession": "/smile/createsession"
 };
 
-var IQSet = function(id,title,teacherName,groupName,date) {
-    //var self = this;
+/* --------
+    MODELS
+   -------- */
+
+var Question = function(position,urlImage,author,question,answer,options,ip,type) {
+
+    this.position = position;
+    this.urlImage = urlImage;
+    this.author = author;
+    this.question = question;
+    this.answer = answer;
+    this.options = options;
+    this.ip = ip;
+    this.type = type;
+}
+
+var IQSet = function(position,id,title,teacherName,groupName,date) {
+
+    this.position = position;
     this.id = id;
     this.sessionName = title;
     this.teacherName = teacherName;
     this.groupName = groupName;
     this.date = date;
+    this.questions = [];
 }
 
-//
-// KO Extenders
-//
+var GlobalViewModel = {
+    teacher_name: ko.observable(""),
+    session_name: ko.observable(""),
+    group_name: ko.observable(""),
+    iqsets: ko.observableArray([]),
+    position: ko.observable(''),
+    questions: ko.observableArray([]),
+    version: ko.observable(VERSION)
+};
+
+/* --------------
+    KO EXTENDERS
+   -------------- */
+
 // This adds the required extender for validation
 ko.extenders.required = function(target, overrideMessage) {
     //add some sub-observables to our observable
@@ -72,19 +101,10 @@ ko.extenders.required = function(target, overrideMessage) {
     return target;
 };
 
-
-var GlobalViewModel = {
-    teacher_name: ko.observable(""),
-    session_name: ko.observable(""),
-    group_name: ko.observable(""),
-    iqsets: ko.observableArray([]),
-    iqsetToLoad: ko.observable(''),
-    version: ko.observable(VERSION)
-};
-
+/* ---------
+    ACTIONS
+   --------- */
 GlobalViewModel.createSession = function() {
-    
-    //var self = this;
     
     if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Default Teacher'); }
     if (!this.session_name() || this.session_name() === "") { this.session_name('Default Session'); }
@@ -101,7 +121,6 @@ GlobalViewModel.createSession = function() {
             smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
         }, 
         success: function(data) {
-            smileAlert('#globalstatus', 'Success ('+GlobalViewModel.teacher_name()+','+GlobalViewModel.session_name()+','+GlobalViewModel.group_name()+')', 'green', 5000);
             switchSection('div[data-slug=choose-activity-flow]');
         }
     });
@@ -121,9 +140,56 @@ GlobalViewModel.startMakingQuestions = function() {
     return false;
 }
 
-GlobalViewModel.usePreparedQuestions = function() {
+GlobalViewModel.startMakingQuestionsWithIQSet = function() {
+    
+    $.ajax({ 
+        cache: false, 
+        type: "GET", 
+        dataType: "text", 
+        url: SMILEROUTES["iqset"]+GlobalViewModel.iqsets()[GlobalViewModel.position()].id, 
+        data: {}, 
+        
+        error: function(xhr, text, err) {
+            smileAlert('#globalstatus', 'Unable to call /smile/iqset/{key}.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+        }, 
+        
+        success: function(data) {
 
-    //smileAlert('#globalstatus', 'Load iqsets', 'green', 5000);
+            var iqset = JSON.parse(data);
+            var iqdata = iqset.iqdata;
+
+            for (i = 0; i < iqdata.length; i++) {
+
+                var options = [];
+                options.push(iqdata[i].O1,iqdata[i].O2,iqdata[i].O3,iqdata[i].O4);
+
+                GlobalViewModel.questions.push(
+                    new Question(
+                        i,
+                        iqdata[i].PICURL,
+                        iqdata[i].NAME,
+                        iqdata[i].Q,
+                        iqdata[i].A,
+                        options,
+                        iqdata[i].IP,
+                        iqdata[i].TYPE
+                    )
+                );
+            }
+
+            GlobalViewModel.title_iqset = iqset.title;
+
+            //smileAlert('#globalstatus', 'title_iqset='+GlobalViewModel.title_iqset, 'blue', 15000);
+            //smileAlert('#globalstatus', 'questions='+GlobalViewModel.questions()[0].author, 'blue', 5000);
+        }
+    });
+
+    switchSection('div[data-slug=list-questions]');
+
+    return false;
+}
+
+GlobalViewModel.usePreparedQuestions = function() {
 
     switchSection('div[data-slug=choose-an-iqset]');
 
@@ -135,7 +201,7 @@ GlobalViewModel.usePreparedQuestions = function() {
         data: {}, 
         
         error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to call /smile/all.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+            smileAlert('#globalstatus', 'Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
         }, 
         
         success: function(data) {
@@ -148,13 +214,13 @@ GlobalViewModel.usePreparedQuestions = function() {
                 GlobalViewModel.iqsets.push(
                     new IQSet(
                         i,
+                        iqsets[i].id,
                         iqsets[i].value[0],
                         iqsets[i].value[1],
                         iqsets[i].value[2],
                         iqsets[i].key.substr(0, 10)
                     )
                 );
-                //smileAlert('#globalstatus', iqsets[i].value[0], 'blue', 7000);
             }
         }
     });
@@ -162,26 +228,18 @@ GlobalViewModel.usePreparedQuestions = function() {
     return false;
 }
 
-
-
 GlobalViewModel.resetSessionValues = function() {
 
     this.teacher_name("");
     this.session_name("");
     this.group_name("");
-
-    //
-    // XXX This is silly, fix this, cleanup the object model and reset the state
-    // For now just reload the page
-    //
     //window.location.href = window.location.pathname;
     //window.location.reload(true);
     return false;
 }
 
+// Displays directly a "Recovering Session" button if a session is already running
 GlobalViewModel.initializePage = function() {
-
-    //var alreadyRunning = false;
 
     $.ajax({ 
         cache: false, 
@@ -209,23 +267,17 @@ $(document).ready(function() {
     ko.applyBindings(GlobalViewModel);
 
     GlobalViewModel.initializePage();
-
 });
 
-// NEEDED
-function foobar() {
-    smileAlert('#globalstatus', 'Not yet implemented', 'blue',5000);
-}
+/* ---------
+    UTILITY
+   --------- */
 
 function switchSection(newSection) {
-    
     $('section.active').removeClass('active');
     $(newSection).parent().addClass('active');
 }
 
-//
-// App functions
-//
 // alerttype
 //  - by default, none is required if you don't intend to use lifetime
 //  - trace : use the stacktrace in the error message
@@ -242,21 +294,15 @@ function smileAlert(targetid, text, alerttype, lifetime) {
         %s \
         <a href="" class="close">&times;</a> \
         </div>';
-    if (!alerttype) {
-        alerttype = defaultalert;
-    } else if (alerttype === 'trace') {
-        alerttype = redalert;
-        var trace = printStackTrace();
-        text = text + ' : ' + trace;
-    } else if (alerttype === 'red') {
-        alerttype = redalert;
-    } else if (alerttype === 'blue') {
-        alerttype = bluealert;
-    } else if (alerttype === 'green') {
-        alerttype = greenalert;
-    } else {
-        alerttype = defaultalert;
-    }
+    
+    if (!alerttype)                 { alerttype = defaultalert; } 
+    else if (alerttype === 'trace') { alerttype = redalert; 
+                                      text += ' : ' + printStackTrace(); } 
+    else if (alerttype === 'red')   { alerttype = redalert; } 
+    else if (alerttype === 'blue')  { alerttype = bluealert; } 
+    else if (alerttype === 'green') { alerttype = greenalert; } 
+    else                            { alerttype = defaultalert; }
+    
     if (targetid) {
         $(targetid).append(sprintf(formatstr, alerttype, text));
     }
