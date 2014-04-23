@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.1.2';
+var VERSION = '0.1.5';
 
 var SMILEROUTES = {
     "currentmessage": "/smile/currentmessage",
@@ -54,7 +54,7 @@ var Question = function(position,urlImage,author,question,answer,options,ip,type
     this.type = type;
 }
 
-var IQSet = function(position,id,title,teacherName,groupName,date) {
+var IQSet = function(position,id,title,teacherName,groupName,date,size) {
 
     this.position = position;
     this.id = id;
@@ -63,7 +63,10 @@ var IQSet = function(position,id,title,teacherName,groupName,date) {
     this.groupName = groupName;
     this.date = date;
     this.questions = [];
+    this.size = size;
 }
+
+var TEMP_IQSET = new IQSet();
 
 var GlobalViewModel = {
     teacher_name: ko.observable(""),
@@ -211,16 +214,33 @@ GlobalViewModel.usePreparedQuestions = function() {
 
             for (i = 0; i < dataObject.total_rows; i++) {
 
-                GlobalViewModel.iqsets.push(
-                    new IQSet(
-                        i,
-                        iqsets[i].id,
-                        iqsets[i].value[0],
-                        iqsets[i].value[1],
-                        iqsets[i].value[2],
-                        iqsets[i].key.substr(0, 10)
-                    )
+                // Getting the values accessible from /smile/iqsets
+                TEMP_IQSET = new IQSet(
+                    i,
+                    iqsets[i].id,
+                    iqsets[i].value[0],
+                    iqsets[i].value[1],
+                    iqsets[i].value[2],
+                    iqsets[i].key.substr(0, 10)
                 );
+
+                // Getting the values accessible from /smile/iqset/{id} (for now, the size)          
+                $.ajax({ 
+                    cache: false, 
+                    type: "GET", 
+                    dataType: "text", 
+                    url: SMILEROUTES["iqset"]+iqsets[i].id, 
+                    data: {}, 
+                    error: function(xhr, text, err) { smileAlert('#globalstatus', 'Unable to ajax in ajax.', 'trace'); }, 
+                    
+                    success: function(data) {
+                        var iqset = JSON.parse(data);
+                        TEMP_IQSET.size = iqset.iqdata.length;
+
+                        // The IQSet is ready, we can add it to the list
+                        GlobalViewModel.iqsets.push(TEMP_IQSET);
+                    }
+                });
             }
         }
     });
@@ -277,6 +297,42 @@ function switchSection(newSection) {
     $('section.active').removeClass('active');
     $(newSection).parent().addClass('active');
 }
+
+function sleep(seconds) {
+
+    var now = new Date();
+    var desiredTime = new Date().setSeconds(now.getSeconds() + seconds);
+    while (now < desiredTime) { now = new Date(); }
+}
+
+GlobalViewModel.foobar = function() {
+
+    smileAlert('#globalstatus', 'CACHE='+TEMP_IQSET.size, 'blue',5000);
+}
+
+/*
+function getJsonIQSet(id) {
+    
+    var jsonIQSet = '';
+
+    $.ajax({ 
+        cache: false, 
+        type: "GET", 
+        dataType: "text", 
+        url: SMILEROUTES["iqset"]+id, 
+        data: {}, 
+        error:  function(xhr, text, err) { smileAlert('#globalstatus', 'Unable to ajax in ajax.', 'trace'); }, 
+        success: function(data) { 
+            jsonIQSet = JSON.parse(data); 
+            
+        }
+    });
+
+    while(jsonIQSet === '') { var lol = 'lol'; }
+smileAlert('#globalstatus', 'A la sortie >> '+jsonIQSet, 'blue',5000);
+    return jsonIQSet;
+}
+*/
 
 // alerttype
 //  - by default, none is required if you don't intend to use lifetime

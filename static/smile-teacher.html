@@ -119,6 +119,7 @@
 												<div data-bind="foreach: iqsets" >
 												    <div>
 											    		<input type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
+											    		[<span data-bind="text: size"></span>]
 												    	<span data-bind="text: sessionName"></span>
 												    	(<span data-bind="text: teacherName"></span>,
 												    	<span data-bind="text: groupName"></span>,
