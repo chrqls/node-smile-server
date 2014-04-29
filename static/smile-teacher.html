@@ -113,14 +113,12 @@
       									</section>
 
       									<section>
-       						 				
         									<div class="content" data-slug="choose-an-iqset" data-section-content>
-												
 												<div data-bind="foreach: iqsets" >
 												    <div>
 											    		<input type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
 											    		<input type="hidden" name="id" data-bind="attr: {value: id}" />
-											    		<a id="more" onclick="previewIQSet()" data-bind="attr: {name: id}" class="tiny round button more">more</a>
+											    		<a id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">more</a>
 												    	<span data-bind="text: sessionName"></span>
 												    	(<span data-bind="text: teacherName"></span>,
 												    	<span data-bind="text: groupName"></span>,
@@ -129,18 +127,12 @@
 												</div>
 												<ul class="button-group even two-up">
 													<li><a href="#" data-bind='click: startMakingQuestionsWithIQSet' class="button">Load</a></li>
-													<!--
-													<li><a href="#" data-bind='click: foobar' class="button">FINAL</a></li>
-													<li><a href="#" data-bind='click: addFakeIQSet' class="button">ADD</a></li>
-													-->
 												</ul>	
         									</div>
       									</section>
 
       									<section>
-       						 				
         									<div class="content" data-slug="list-questions" data-section-content>
-												
 												<div data-bind="foreach: questions" >
 												    <div>
 											    		<input type="checkbox" name="questionsToSave" data-bind="attr: {value: position}, checked: $root.position" />
@@ -148,13 +140,26 @@
 												    	<span data-bind="text: author"></span> - 
 												    	<span data-bind="text: ip"></span> - 
 												    	<span data-bind="text: type"></span>
-												    	
 													</div>    
 												</div>
-												
         									</div>
-        								
       									</section>
+
+      									<section>
+        									<div class="content" data-slug="preview-iqset" data-section-content>
+
+        										<!--div data-bind="text: title"></div-->
+												<div data-bind="foreach: questions_to_preview" >
+												    <div>
+												    	<span data-bind="text: question"></span> <span data-bind="text: answer"></span>
+													</div>    
+												</div>
+												<ul class="button-group even two-up">
+													<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Back</a></li>
+												</ul>
+        									</div>
+      									</section>
+
     								</div>
 								</nav>
 							</div>
