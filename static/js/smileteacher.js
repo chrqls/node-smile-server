@@ -41,8 +41,8 @@ var SMILEROUTES = {
 };
 
 var TEMP_IQSET = '';
-var TEMP_IQSETS = [];
-var TEMP_POSITION = 0;
+//var TEMP_IQSETS = [];
+//var TEMP_POSITION = 0;
 
 /* --------
     MODELS
@@ -75,18 +75,26 @@ var IQSet = function(position,id,title,teacherName,groupName,date) {
 
 
 var GlobalViewModel = {
+
+    version: ko.observable(VERSION),
+
+    // Session values
     teacher_name: ko.observable(""),
     session_name: ko.observable(""),
     group_name: ko.observable(""),
+
+    // Use prepared questions
     iqsets: ko.observableArray([]),
     
     // Preview IQSet
     iqset_to_preview: ko.observable(''),
     questions_to_preview: ko.observableArray([]),
 
+    // Used when an object is selected in a list (an IQSet, a Question, etc...)
     position: ko.observable(''),
-    questions: ko.observableArray([]),
-    version: ko.observable(VERSION)
+
+    // Start making questions
+    questions: ko.observableArray([])
 };
 
 /* --------------
@@ -119,7 +127,7 @@ ko.extenders.required = function(target, overrideMessage) {
     ACTIONS
    --------- */
 
-// Displays directly a "Recovering Session" button if a session is already running
+// Displays directly a "Recovering Session" button if a session is already running (instead of the session values fields)
 GlobalViewModel.initializePage = function() {
 
     $.ajax({ 
@@ -134,9 +142,8 @@ GlobalViewModel.initializePage = function() {
         }, 
         success: function(data) {
 
-            // If a session is already running, we replace the session values fields by a "recovering session" button
-            if(data.indexOf('SessionID') !== -1 ){
-                switchSection('div[data-slug=recover-session]');
+            if(data.indexOf('SessionID') !== -1) {
+                switchSection('recover-session');
             }
         }
     });
@@ -169,7 +176,7 @@ GlobalViewModel.createSession = function() {
             smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
         }, 
         success: function(data) {
-            switchSection('div[data-slug=choose-activity-flow]');
+            switchSection('choose-activity-flow');
         }
     });
 
@@ -179,8 +186,7 @@ GlobalViewModel.createSession = function() {
 GlobalViewModel.usePreparedQuestions = function() {
 
     // Refresh 
-    //GlobalViewModel.iqsets = [];
-    switchSection('div[data-slug=choose-an-iqset]');
+    switchSection('choose-an-iqset');
 
     $.ajax({ 
         cache: false, 
@@ -269,7 +275,7 @@ GlobalViewModel.usePreparedQuestions = function() {
 
 function previewIQSet(idIQSet) {
 
-    var iqset = JSON.parse(getJsonIQSet(idIQSet));
+    var iqset = JSON.parse(getIQSet(idIQSet));
     var iqdata = iqset.iqdata;
     GlobalViewModel.questions_to_preview.removeAll();
 
@@ -291,17 +297,9 @@ function previewIQSet(idIQSet) {
             )
         );
     }
-    ///
 
-    //smileAlert('#globalstatus', 'iqset='+iqset, 'blue', 7000);
+    switchSection('preview-iqset');
 
-    //GlobalViewModel.iqset_to_preview = iqset;
-    //GlobalViewModel.questions_to_preview = iqset.iqdata;
-
-    //alert(iqset.iqdata);
-
-    switchSection('div[data-slug=preview-iqset]');
-    
 }
 
 GlobalViewModel.recoverSession = function() {
@@ -356,7 +354,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
         }
     });
 
-    switchSection('div[data-slug=list-questions]');
+    switchSection('list-questions');
 
     return false;
 }
@@ -367,10 +365,6 @@ $(document).ready(function() {
     ko.applyBindings(GlobalViewModel);
 
     GlobalViewModel.initializePage();
-
-    // TEMP
-    var essai = getJsonIQSet('342E5328-BA65-437D-ABCA-BE1A735E3D49');
-    smileAlert('#globalstatus', 'essai='+essai, 'blue', 7000);
 });
 
 /* ---------
@@ -379,14 +373,7 @@ $(document).ready(function() {
 
 function switchSection(newSection) {
     $('section.active').removeClass('active');
-    $(newSection).parent().addClass('active');
-}
-
-function sleep(seconds) {
-
-    var now = new Date();
-    var desiredTime = new Date().setSeconds(now.getSeconds() + seconds);
-    while (now < desiredTime) { now = new Date(); }
+    $('div[data-slug='+newSection+']').parent().addClass('active');
 }
 
 GlobalViewModel.foobar = function() {
@@ -394,7 +381,7 @@ GlobalViewModel.foobar = function() {
     smileAlert('#globalstatus', 'GlobalViewModel.iqsets.length='+GlobalViewModel.iqsets.total_rows, 'blue', 15000);
 }
 
-function getJsonIQSet(id) {
+function getIQSet(id) {
 
     $.ajax({ 
         cache: false, 
@@ -409,7 +396,6 @@ function getJsonIQSet(id) {
         }, 
         
         success: function(data) {
-
             TEMP_IQSET = data;
         }
     });
