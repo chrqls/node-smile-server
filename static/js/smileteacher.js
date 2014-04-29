@@ -31,16 +31,18 @@
 var VERSION = '0.1.5';
 
 var SMILEROUTES = {
-    "currentmessage": "/smile/currentmessage",
+    //"currentmessage": "/smile/currentmessage",
     "all": "/smile/all",
     "iqsets": "/smile/iqsets",
     "iqset": "/smile/iqset/",
-    "createsession": "/smile/createsession"
+    "question":"/smile/question",
+    "createsession": "/smile/createsession",
+    "startmakequestion":"startmakequestion"
 };
 
-var TEMP_IQSETS = [];
-var TEMP_POSITION = 0;
-//var READY = false;
+var TEMP_IQSET = '';
+//var TEMP_IQSETS = [];
+//var TEMP_POSITION = 0;
 
 /* --------
     MODELS
@@ -73,13 +75,26 @@ var IQSet = function(position,id,title,teacherName,groupName,date) {
 
 
 var GlobalViewModel = {
+
+    version: ko.observable(VERSION),
+
+    // Session values
     teacher_name: ko.observable(""),
     session_name: ko.observable(""),
     group_name: ko.observable(""),
+
+    // Use prepared questions
     iqsets: ko.observableArray([]),
+    
+    // Preview IQSet
+    iqset_to_preview: ko.observable(''),
+    questions_to_preview: ko.observableArray([]),
+
+    // Used when an object is selected in a list (an IQSet, a Question, etc...)
     position: ko.observable(''),
-    questions: ko.observableArray([]),
-    version: ko.observable(VERSION)
+
+    // Start making questions
+    questions: ko.observableArray([])
 };
 
 /* --------------
@@ -112,7 +127,7 @@ ko.extenders.required = function(target, overrideMessage) {
     ACTIONS
    --------- */
 
-// Displays directly a "Recovering Session" button if a session is already running
+// Displays directly a "Recovering Session" button if a session is already running (instead of the session values fields)
 GlobalViewModel.initializePage = function() {
 
     $.ajax({ 
@@ -127,9 +142,8 @@ GlobalViewModel.initializePage = function() {
         }, 
         success: function(data) {
 
-            // If a session is already running, we replace the session values fields by a "recovering session" button
-            if(data.indexOf('SessionID') !== -1 ){
-                switchSection('div[data-slug=recover-session]');
+            if(data.indexOf('SessionID') !== -1) {
+                switchSection('recover-session');
             }
         }
     });
@@ -162,7 +176,7 @@ GlobalViewModel.createSession = function() {
             smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
         }, 
         success: function(data) {
-            switchSection('div[data-slug=choose-activity-flow]');
+            switchSection('choose-activity-flow');
         }
     });
 
@@ -171,9 +185,8 @@ GlobalViewModel.createSession = function() {
 
 GlobalViewModel.usePreparedQuestions = function() {
 
-    switchSection('div[data-slug=choose-an-iqset]');
-
-
+    // Refresh 
+    switchSection('choose-an-iqset');
 
     $.ajax({ 
         cache: false, 
@@ -191,7 +204,9 @@ GlobalViewModel.usePreparedQuestions = function() {
             var dataObject = JSON.parse(data);
             var iqsets = dataObject.rows;
 
-            TEMP_POSITION = 0;
+            //TEMP_POSITION = 0;
+
+            GlobalViewModel.iqsets.removeAll();
 
             for (i = 0; i < dataObject.total_rows; i++) {
 
@@ -258,15 +273,33 @@ GlobalViewModel.usePreparedQuestions = function() {
     return false;
 }
 
-function previewIQSet() {
-    
-    // Do something
-    //alert($(this).parent().find('input[name=id]').attr('value'));
-    
-    //smileAlert('#globalstatus', '1st attempt='+$(this).val(), 'blue', 10000);
-    smileAlert('#globalstatus', '1st attempt='+$(this).attr('name'), 'blue', 10000); // should display the string 'id'
-    smileAlert('#globalstatus', '2nd attempt='+$(this).attr('value'), 'blue', 10000); // should display a very long id
-    smileAlert('#globalstatus', '3rd attempt='+$(this).parent().find('input[type=hidden]').attr('name'), 'blue', 10000); // should display a very long id
+function previewIQSet(idIQSet) {
+
+    var iqset = JSON.parse(getIQSet(idIQSet));
+    var iqdata = iqset.iqdata;
+    GlobalViewModel.questions_to_preview.removeAll();
+
+    for (i = 0; i < iqdata.length; i++) {
+
+        var options = [];
+        options.push(iqdata[i].O1,iqdata[i].O2,iqdata[i].O3,iqdata[i].O4);
+
+        GlobalViewModel.questions_to_preview.push(
+            new Question(
+                i,
+                iqdata[i].PICURL,
+                iqdata[i].NAME,
+                iqdata[i].Q,
+                iqdata[i].A,
+                options,
+                iqdata[i].IP,
+                iqdata[i].TYPE
+            )
+        );
+    }
+
+    switchSection('preview-iqset');
+
 }
 
 GlobalViewModel.recoverSession = function() {
@@ -321,7 +354,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
         }
     });
 
-    switchSection('div[data-slug=list-questions]');
+    switchSection('list-questions');
 
     return false;
 }
@@ -332,11 +365,6 @@ $(document).ready(function() {
     ko.applyBindings(GlobalViewModel);
 
     GlobalViewModel.initializePage();
-
-    $('#more').click(function () {
-
-        alert('test');
-    });
 });
 
 /* ---------
@@ -345,52 +373,36 @@ $(document).ready(function() {
 
 function switchSection(newSection) {
     $('section.active').removeClass('active');
-    $(newSection).parent().addClass('active');
-}
-
-function sleep(seconds) {
-
-    var now = new Date();
-    var desiredTime = new Date().setSeconds(now.getSeconds() + seconds);
-    while (now < desiredTime) { now = new Date(); }
+    $('div[data-slug='+newSection+']').parent().addClass('active');
 }
 
 GlobalViewModel.foobar = function() {
 
-    //smileAlert('#globalstatus', 'TEMP_IQSETS='+TEMP_IQSETS.length, 'blue', 15000);
     smileAlert('#globalstatus', 'GlobalViewModel.iqsets.length='+GlobalViewModel.iqsets.total_rows, 'blue', 15000);
 }
 
-GlobalViewModel.addFakeIQSet = function() {
-
-    GlobalViewModel.iqsets.push(
-        new IQSet(i,'blabla','name','teacher','group','date',0)
-    );
-}
-
-/*
-function getJsonIQSet(id) {
-    
-    var jsonIQSet = '';
+function getIQSet(id) {
 
     $.ajax({ 
         cache: false, 
         type: "GET", 
         dataType: "text", 
         url: SMILEROUTES["iqset"]+id, 
+        async: false,
         data: {}, 
-        error:  function(xhr, text, err) { smileAlert('#globalstatus', 'Unable to ajax in ajax.', 'trace'); }, 
-        success: function(data) { 
-            jsonIQSet = JSON.parse(data); 
-            
+        
+        error: function(xhr, text, err) {
+            smileAlert('#globalstatus', 'Unable to call /smile/iqset/{key}', 'trace',8000);
+        }, 
+        
+        success: function(data) {
+            TEMP_IQSET = data;
         }
     });
 
-    while(jsonIQSet === '') { var lol = 'lol'; }
-smileAlert('#globalstatus', 'A la sortie >> '+jsonIQSet, 'blue',5000);
-    return jsonIQSet;
+    return TEMP_IQSET;
 }
-*/
+
 
 // alerttype
 //  - by default, none is required if you don't intend to use lifetime
