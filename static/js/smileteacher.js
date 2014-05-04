@@ -129,6 +129,8 @@ ko.extenders.required = function(target, overrideMessage) {
 // Displays directly a "Recovering Session" button if a session is already running (instead of the session values fields)
 GlobalViewModel.synchronizeWithServer = function() {
 
+    GlobalViewModel.questions.removeAll();
+
     // We get the /smile/all
     var dataAll = JSON.parse(smile_all());
     var section = 'create-session';
