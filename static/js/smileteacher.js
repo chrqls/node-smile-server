@@ -44,9 +44,10 @@ var SMILEROUTES = {
     MODELS
    -------- */
 
-var Question = function(position,urlImage,author,question,answer,options,ip,type) {
+var Question = function(sessionID,urlImage,author,question,answer,options,ip,type) {
 
-    this.position = position;
+    //this.position = position;
+    this.session_id = sessionID;
     this.urlImage = urlImage;
     this.author = author;
     this.question = question;
@@ -86,13 +87,13 @@ var GlobalViewModel = {
 
     // Start making questions
     position: ko.observable(''),
-    id_questions: ko.observable(''),
+    //id_questions: ko.observable(''),
     //students: ko.observableArray([]),
     questions: ko.observableArray([]),
 
 
     // Detail of a question
-    question_detail: ko.observable([])
+    question_detail: ko.observableArray([])
 };
 
 /* --------------
@@ -284,7 +285,7 @@ function previewIQSet(idIQSet) {
 
         GlobalViewModel.questions_to_preview.push(
             new Question(
-                i,
+                'any',
                 iqdata[i].PICURL,
                 iqdata[i].NAME,
                 iqdata[i].Q,
@@ -300,50 +301,45 @@ function previewIQSet(idIQSet) {
 
 }
 
-function viewQuestionDetail(position) {
+function viewQuestionDetail(sessionID) {
 
-    var iqset = JSON.parse(smile_iqset(ID_IQSET));
-    var iqdata = iqset.iqdata;
-    smileAlert('#globalstatus', 'iqdata[position]='+iqdata[position], 'green', 5000);
-    /*
     GlobalViewModel.question_detail.removeAll();
 
-    var options = [];
-    options.push(
-        iqdata[position].O1,
-        iqdata[position].O2,
-        iqdata[position].O3,
-        iqdata[position].O4
-    );
+    // We get the /smile/all
+    var dataAll = JSON.parse(smile_all());
 
-    GlobalViewModel.question_detail.push(
-        new Question(
-            position,
-            iqdata[position].PICURL,
-            iqdata[position].NAME,
-            iqdata[position].Q,
-            iqdata[position].A,
-            options,
-            iqdata[position].IP,
-            iqdata[position].TYPE
-        )
-    );
-*/
+    for (i = 0; i < dataAll.length; i++) {
+
+        if(dataAll[i].SessionID === sessionID) {
+
+            var options = [];
+            options.push(
+                dataAll[i].O1,
+                dataAll[i].O2,
+                dataAll[i].O3,
+                dataAll[i].O4
+            );
+
+            GlobalViewModel.question_detail.push(
+                new Question(
+                    dataAll[i].SessionID,
+                    dataAll[i].PICURL,
+                    dataAll[i].NAME,
+                    dataAll[i].Q,
+                    dataAll[i].A,
+                    options,
+                    dataAll[i].IP,
+                    dataAll[i].TYPE
+                )
+            );
+
+        }
+    }
+
+    //smileAlert('#globalstatus', 'iqdata[position]='+iqdata[position], 'green', 5000);
 
     switchSection('question-detail');
 }
-
-/*
-GlobalViewModel.recoverSession = function() {
-
-    // We get the /smile/all
-    // var dataAll = JSON.parse(smile_all());
-
-    smileAlert('#globalstatus', 'Session recovered ('+GlobalViewModel.session_name+', '+GlobalViewModel.teacher_name+')', 'green', 5000);
-
-    return false;
-}
-*/
 
 GlobalViewModel.startMakingQuestions = function() {
 
@@ -419,7 +415,7 @@ function addQuestion(question) {
 
     GlobalViewModel.questions.push(
         new Question(
-            i,
+            question.SessionID,
             question.PICURL,
             question.NAME,
             question.Q,
