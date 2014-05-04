@@ -433,15 +433,15 @@ function addQuestion(question) {
 
 function postMessage(type,values) {
 
-    switch(values.TYPE) {
+    switch(type) {
 
-        case 'SESSION_VALUES':
+        case 'session':
 
             $.ajax({ 
                 cache: false, 
                 type: "POST", 
                 dataType: "text", 
-                url: SMILEROUTES[type],
+                url: SMILEROUTES['session'],
                 data: {
                     "TYPE":"SESSION_VALUES",
                     "teacherName":GlobalViewModel.teacher_name,
@@ -458,13 +458,13 @@ function postMessage(type,values) {
             });
             break;
 
-        case 'START_MAKE':
+        case 'startmake':
 
             $.ajax({ 
                 cache: false, 
                 type: "POST", 
                 dataType: "text", 
-                url: SMILEROUTES[type],
+                url: SMILEROUTES['startmake'],
                 data: { "TYPE":"START_MAKE" }, 
                 
                 error: function(xhr, text, err) {
@@ -473,8 +473,7 @@ function postMessage(type,values) {
                 success: function(data) {}
             });
 
-        case 'QUESTION':
-        case 'QUESTION_PIC':
+        case 'question':
 
             var options = [];
             options.push(values.O1,values.O2,values.O3,values.O4);
@@ -483,7 +482,7 @@ function postMessage(type,values) {
                 cache: false, 
                 type: "POST", 
                 dataType: "text", 
-                url: SMILEROUTES[type],
+                url: SMILEROUTES['question'],
                 async: false,
 
                 data: {
@@ -506,8 +505,6 @@ function postMessage(type,values) {
             });
             break;
     }
-
-    
 }
 
 function smile_all() {
