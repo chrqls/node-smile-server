@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.3.0';
+var VERSION = '0.3.1';
 
 var SMILEROUTES = {
     //"currentmessage": "/smile/currentmessage",
@@ -82,7 +82,6 @@ var GlobalViewModel = {
     iqsets: ko.observableArray([]),
     
     // Preview IQSet
-    //iqset_to_preview: ko.observable(''),
     questions_to_preview: ko.observableArray([]),
 
     // Start making questions
@@ -162,6 +161,18 @@ GlobalViewModel.synchronizeWithServer = function() {
     switchSection(section);
 }
 
+GlobalViewModel.createSession = function() {
+    
+    if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Default Teacher'); }
+    if (!this.session_name() || this.session_name() === "") { this.session_name('Default Session'); }
+    if (!this.group_name() || this.group_name() === "")     { this.group_name('Default Group');  }
+    
+    // Send session values to server
+    postMessage('session');
+
+    return false;
+}
+
 GlobalViewModel.resetSessionValues = function() {
 
     this.teacher_name('');
@@ -172,14 +183,12 @@ GlobalViewModel.resetSessionValues = function() {
     return false;
 }
 
-GlobalViewModel.createSession = function() {
-    
-    if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Default Teacher'); }
-    if (!this.session_name() || this.session_name() === "") { this.session_name('Default Session'); }
-    if (!this.group_name() || this.group_name() === "")     { this.group_name('Default Group');  }
-    
-    // Send session values to server
-    postMessage('session');
+GlobalViewModel.startMakingQuestions = function() {
+
+    // Send start make phase to server
+    postMessage('startmake');
+
+    switchSection('list-questions');
 
     return false;
 }
@@ -274,6 +283,8 @@ GlobalViewModel.usePreparedQuestions = function() {
     return false;
 }
 
+
+
 function previewIQSet(idIQSet) {
 
     var iqset = JSON.parse(smile_iqset(idIQSet));
@@ -301,56 +312,6 @@ function previewIQSet(idIQSet) {
 
     switchSection('preview-iqset');
 
-}
-
-function viewQuestionDetail(sessionID) {
-
-    GlobalViewModel.question_detail.removeAll();
-
-    // We get the /smile/all
-    var dataAll = JSON.parse(smile_all());
-
-    for (i = 0; i < dataAll.length; i++) {
-
-        if(dataAll[i].SessionID === sessionID) {
-
-            var options = [];
-            options.push(
-                dataAll[i].O1,
-                dataAll[i].O2,
-                dataAll[i].O3,
-                dataAll[i].O4
-            );
-
-            GlobalViewModel.question_detail.push(
-                new Question(
-                    dataAll[i].SessionID,
-                    dataAll[i].PICURL,
-                    dataAll[i].NAME,
-                    dataAll[i].Q,
-                    dataAll[i].A,
-                    options,
-                    dataAll[i].IP,
-                    dataAll[i].TYPE
-                )
-            );
-
-        }
-    }
-
-    //smileAlert('#globalstatus', 'iqdata[position]='+iqdata[position], 'green', 5000);
-
-    switchSection('question-detail');
-}
-
-GlobalViewModel.startMakingQuestions = function() {
-
-    // Send start make phase to server
-    postMessage('startmake');
-
-    switchSection('list-questions');
-
-    return false;
 }
 
 GlobalViewModel.startMakingQuestionsWithIQSet = function() {
@@ -386,6 +347,44 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     switchSection('list-questions');
 
     return false;
+}
+
+function detailQuestion(sessionID) {
+
+    // We remove the previous question detailed to put the new one
+    GlobalViewModel.question_detail.removeAll();
+
+    // We get the /smile/all
+    var dataAll = JSON.parse(smile_all());
+
+    for (i = 0; i < dataAll.length; i++) {
+
+        // If the question is still in session, we load the details
+        if(dataAll[i].SessionID === sessionID) {
+
+            var options = [];
+            options.push(
+                dataAll[i].O1,
+                dataAll[i].O2,
+                dataAll[i].O3,
+                dataAll[i].O4
+            );
+
+            GlobalViewModel.question_detail.push(
+                new Question(
+                    dataAll[i].SessionID,
+                    dataAll[i].PICURL,
+                    dataAll[i].NAME,
+                    dataAll[i].Q,
+                    dataAll[i].A,
+                    options,
+                    dataAll[i].IP,
+                    dataAll[i].TYPE
+                )
+            );
+        }
+    }
+    switchSection('question-detail');
 }
 
 $(document).ready(function() {
