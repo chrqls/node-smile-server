@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.1.5';
+var VERSION = '0.3.1';
 
 var SMILEROUTES = {
     //"currentmessage": "/smile/currentmessage",
@@ -36,21 +36,18 @@ var SMILEROUTES = {
     "iqsets": "/smile/iqsets",
     "iqset": "/smile/iqset/",
     "question":"/smile/question",
-    "createsession": "/smile/createsession",
-    "startmakequestion":"startmakequestion"
+    "session": "/smile/createsession",
+    "startmake":"/smile/startmakequestion"
 };
-
-var TEMP_IQSET = '';
-//var TEMP_IQSETS = [];
-//var TEMP_POSITION = 0;
 
 /* --------
     MODELS
    -------- */
 
-var Question = function(position,urlImage,author,question,answer,options,ip,type) {
+var Question = function(sessionID,urlImage,author,question,answer,options,ip,type) {
 
-    this.position = position;
+    //this.position = position;
+    this.session_id = sessionID;
     this.urlImage = urlImage;
     this.author = author;
     this.question = question;
@@ -72,29 +69,30 @@ var IQSet = function(position,id,title,teacherName,groupName,date) {
     //this.size = size;
 }
 
-
-
 var GlobalViewModel = {
 
     version: ko.observable(VERSION),
 
     // Session values
-    teacher_name: ko.observable(""),
-    session_name: ko.observable(""),
-    group_name: ko.observable(""),
+    teacher_name: ko.observable(''),
+    session_name: ko.observable(''),
+    group_name: ko.observable(''),
 
     // Use prepared questions
     iqsets: ko.observableArray([]),
     
     // Preview IQSet
-    iqset_to_preview: ko.observable(''),
     questions_to_preview: ko.observableArray([]),
 
-    // Used when an object is selected in a list (an IQSet, a Question, etc...)
-    position: ko.observable(''),
-
     // Start making questions
-    questions: ko.observableArray([])
+    position: ko.observable(''),
+    //id_questions: ko.observable(''),
+    //students: ko.observableArray([]),
+    questions: ko.observableArray([]),
+
+
+    // Detail of a question
+    question_detail: ko.observableArray([])
 };
 
 /* --------------
@@ -128,35 +126,39 @@ ko.extenders.required = function(target, overrideMessage) {
    --------- */
 
 // Displays directly a "Recovering Session" button if a session is already running (instead of the session values fields)
-GlobalViewModel.initializePage = function() {
+GlobalViewModel.synchronizeWithServer = function() {
 
-    $.ajax({ 
-        cache: false, 
-        type: "GET", 
-        dataType: "text", 
-        url: SMILEROUTES["all"], 
-        data: {}, 
+    GlobalViewModel.questions.removeAll();
+
+    // We get the /smile/all
+    var dataAll = JSON.parse(smile_all());
+    var section = 'create-session';
+
+    for(i=0; i<dataAll.length; i++) {
+
+        switch (dataAll[i].TYPE) {
         
-        error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to call /smile/all.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
-        }, 
-        success: function(data) {
+            case 'SESSION_VALUES':
+                GlobalViewModel.session_name(dataAll[i].sessionName);
+                GlobalViewModel.group_name(dataAll[i].groupName);
+                GlobalViewModel.teacher_name(dataAll[i].teacherName);
+                section = 'choose-activity-flow';
+                break;
 
-            if(data.indexOf('SessionID') !== -1) {
-                switchSection('recover-session');
-            }
+            case 'START_MAKE':
+                section = 'list-questions';
+                break;
+
+            case 'QUESTION':
+            case 'QUESTION_PIC':
+                addQuestion(dataAll[i]);
+                section = 'list-questions';
+                break;
+
+            default: break;
         }
-    });
-}
-
-GlobalViewModel.resetSessionValues = function() {
-
-    this.teacher_name("");
-    this.session_name("");
-    this.group_name("");
-    //window.location.href = window.location.pathname;
-    //window.location.reload(true);
-    return false;
+    }
+    switchSection(section);
 }
 
 GlobalViewModel.createSession = function() {
@@ -165,20 +167,28 @@ GlobalViewModel.createSession = function() {
     if (!this.session_name() || this.session_name() === "") { this.session_name('Default Session'); }
     if (!this.group_name() || this.group_name() === "")     { this.group_name('Default Group');  }
     
-    $.ajax({ 
-        cache: false, 
-        type: "POST", 
-        dataType: "text", 
-        url: SMILEROUTES["createsession"],
-        data: {"teacherName":GlobalViewModel.teacher_name,"groupName":GlobalViewModel.group_name,"sessionName":GlobalViewModel.session_name}, 
-        
-        error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
-        }, 
-        success: function(data) {
-            switchSection('choose-activity-flow');
-        }
-    });
+    // Send session values to server
+    postMessage('session');
+
+    return false;
+}
+
+GlobalViewModel.resetSessionValues = function() {
+
+    this.teacher_name('');
+    this.session_name('');
+    this.group_name('');
+    //window.location.href = window.location.pathname;
+    //window.location.reload(true);
+    return false;
+}
+
+GlobalViewModel.startMakingQuestions = function() {
+
+    // Send start make phase to server
+    postMessage('startmake');
+
+    switchSection('list-questions');
 
     return false;
 }
@@ -273,9 +283,11 @@ GlobalViewModel.usePreparedQuestions = function() {
     return false;
 }
 
+
+
 function previewIQSet(idIQSet) {
 
-    var iqset = JSON.parse(getIQSet(idIQSet));
+    var iqset = JSON.parse(smile_iqset(idIQSet));
     var iqdata = iqset.iqdata;
     GlobalViewModel.questions_to_preview.removeAll();
 
@@ -286,7 +298,7 @@ function previewIQSet(idIQSet) {
 
         GlobalViewModel.questions_to_preview.push(
             new Question(
-                i,
+                'any',
                 iqdata[i].PICURL,
                 iqdata[i].NAME,
                 iqdata[i].Q,
@@ -302,20 +314,9 @@ function previewIQSet(idIQSet) {
 
 }
 
-GlobalViewModel.recoverSession = function() {
-
-    smileAlert('#globalstatus', 'Session recovered', 'green', 5000);
-    return false;
-}
-
-GlobalViewModel.startMakingQuestions = function() {
-
-    smileAlert('#globalstatus', 'Start making questions', 'green', 5000);
-    return false;
-}
-
 GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     
+    //GlobalViewModel.questions.removeAll();
     $.ajax({ 
         cache: false, 
         type: "GET", 
@@ -334,23 +335,12 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
 
             for (i = 0; i < iqdata.length; i++) {
 
-                var options = [];
-                options.push(iqdata[i].O1,iqdata[i].O2,iqdata[i].O3,iqdata[i].O4);
+                // We add the question on client side
+                addQuestion(iqdata[i]);
 
-                GlobalViewModel.questions.push(
-                    new Question(
-                        i,
-                        iqdata[i].PICURL,
-                        iqdata[i].NAME,
-                        iqdata[i].Q,
-                        iqdata[i].A,
-                        options,
-                        iqdata[i].IP,
-                        iqdata[i].TYPE
-                    )
-                );
+                // Same job on server side
+                postMessage('question',iqdata[i]);
             }
-            //GlobalViewModel.title_iqset = iqset.title;
         }
     });
 
@@ -359,12 +349,50 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     return false;
 }
 
+function detailQuestion(sessionID) {
+
+    // We remove the previous question detailed to put the new one
+    GlobalViewModel.question_detail.removeAll();
+
+    // We get the /smile/all
+    var dataAll = JSON.parse(smile_all());
+
+    for (i = 0; i < dataAll.length; i++) {
+
+        // If the question is still in session, we load the details
+        if(dataAll[i].SessionID === sessionID) {
+
+            var options = [];
+            options.push(
+                dataAll[i].O1,
+                dataAll[i].O2,
+                dataAll[i].O3,
+                dataAll[i].O4
+            );
+
+            GlobalViewModel.question_detail.push(
+                new Question(
+                    dataAll[i].SessionID,
+                    dataAll[i].PICURL,
+                    dataAll[i].NAME,
+                    dataAll[i].Q,
+                    dataAll[i].A,
+                    options,
+                    dataAll[i].IP,
+                    dataAll[i].TYPE
+                )
+            );
+        }
+    }
+    switchSection('question-detail');
+}
+
 $(document).ready(function() {
     
     // Init Data Model
     ko.applyBindings(GlobalViewModel);
 
-    GlobalViewModel.initializePage();
+    GlobalViewModel.synchronizeWithServer();
 });
 
 /* ---------
@@ -381,7 +409,123 @@ GlobalViewModel.foobar = function() {
     smileAlert('#globalstatus', 'GlobalViewModel.iqsets.length='+GlobalViewModel.iqsets.total_rows, 'blue', 15000);
 }
 
-function getIQSet(id) {
+function addQuestion(question) {
+
+    var options = [];
+    options.push(question.O1,question.O2,question.O3,question.O4);
+
+    GlobalViewModel.questions.push(
+        new Question(
+            question.SessionID,
+            question.PICURL,
+            question.NAME,
+            question.Q,
+            question.A,
+            options,
+            question.IP,
+            question.TYPE
+        )
+    );
+}
+
+function postMessage(type,values) {
+
+    switch(type) {
+
+        case 'session':
+
+            $.ajax({ 
+                cache: false, 
+                type: "POST", 
+                dataType: "text", 
+                url: SMILEROUTES['session'],
+                data: {
+                    "TYPE":"SESSION_VALUES",
+                    "teacherName":GlobalViewModel.teacher_name,
+                    "groupName":GlobalViewModel.group_name,
+                    "sessionName":GlobalViewModel.session_name
+                }, 
+                
+                error: function(xhr, text, err) {
+                    smileAlert('#globalstatus', 'Unable to send SESSION_VALUES to server', 'trace');
+                }, 
+                success: function(data) {
+                    switchSection('choose-activity-flow');
+                }
+            });
+            break;
+
+        case 'startmake':
+
+            $.ajax({ 
+                cache: false, 
+                type: "POST", 
+                dataType: "text", 
+                url: SMILEROUTES['startmake'],
+                data: { "TYPE":"START_MAKE" }, 
+                
+                error: function(xhr, text, err) {
+                    smileAlert('#globalstatus', 'Unable to send START_MAKE phase', 'trace');
+                }, 
+                success: function(data) {}
+            });
+
+        case 'question':
+
+            var options = [];
+            options.push(values.O1,values.O2,values.O3,values.O4);
+
+            $.ajax({ 
+                cache: false, 
+                type: "POST", 
+                dataType: "text", 
+                url: SMILEROUTES['question'],
+                async: false,
+
+                data: {
+                    "TYPE":values.TYPE,
+                    "IP":values.IP,
+                    "NAME":values.NAME,
+                    "O1":options[0],
+                    "O2":options[1],
+                    "O3":options[2],
+                    "O4":options[3],
+                    "Q":values.Q,
+                    "SessionID":Date.now(),
+                    "A":values.A
+                },
+                
+                error: function(xhr, text, err) {
+                    smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+                }, 
+                success: function(data) { }
+            });
+            break;
+    }
+}
+
+function smile_all() {
+
+    var all;
+
+    $.ajax({ 
+        cache: false, 
+        type: "GET", 
+        dataType: "text", 
+        url: SMILEROUTES["all"], 
+        async: false,
+        data: {}, 
+        error: function(xhr, text, err) {
+            smileAlert('#globalstatus', 'Unable to call /smile/all', 'trace',8000);
+        }, 
+        success: function(data) { all = data; }
+    });
+    return all;
+}
+
+function smile_iqset(id) {
+
+    var iqset;
 
     $.ajax({ 
         cache: false, 
@@ -389,18 +533,13 @@ function getIQSet(id) {
         dataType: "text", 
         url: SMILEROUTES["iqset"]+id, 
         async: false,
-        data: {}, 
-        
+        data: {},  
         error: function(xhr, text, err) {
             smileAlert('#globalstatus', 'Unable to call /smile/iqset/{key}', 'trace',8000);
         }, 
-        
-        success: function(data) {
-            TEMP_IQSET = data;
-        }
+        success: function(data) { iqset = data; }
     });
-
-    return TEMP_IQSET;
+    return iqset;
 }
 
 

@@ -99,15 +99,6 @@
 
       									<section>
        						 				
-        									<div class="content" data-slug="recover-session" data-section-content>
-												<ul class="button-group even two-up">
-													<li><a href="#" data-bind='click: recoverSession' class="button">Recovering session</a></li>
-												</ul>
-        									</div>
-      									</section>
-
-      									<section>
-       						 				
         									<div class="content" data-slug="choose-activity-flow" data-section-content>
 												<ul class="button-group even two-up">
 													<li><a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a></li>
@@ -122,7 +113,7 @@
 												    <tr>
 											    		<td>
 										    				<input type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
-											    			<input type="hidden" name="id" data-bind="attr: {value: id}" />
+											    			<!--input type="hidden" name="id" data-bind="attr: {value: id}" /-->
 											    			<a id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
 												    		<span data-bind="text: sessionName"></span>
 												    	</td>
@@ -143,13 +134,19 @@
         									<div class="content" data-slug="list-questions" data-section-content>
 												<div data-bind="foreach: questions" >
 												    <div>
-											    		<input type="checkbox" name="questionsToSave" data-bind="attr: {value: position}, checked: $root.position" />
-												    	<span data-bind="text: position"></span> - 
-												    	<span data-bind="text: author"></span> - 
-												    	<span data-bind="text: ip"></span> - 
-												    	<span data-bind="text: type"></span>
+											    		<input type="checkbox" name="text: id_questions" data-bind="checked: $root.id_questions" />
+											    		<a id="more" onclick="detailQuestion(this.name)" data-bind="attr: {name: session_id}" class="tiny round button more">+</a>
+												    	<span style="color:#888;font-size:14px;font-style:italic"data-bind="text: question"></span>
+												    	<span style="color:#444;font-size:12px">
+	                                                       	(<span data-bind="text: author"></span>,<span data-bind="text: ip"></span>)
+											    		</span>
+											    		<span data-bind="if: type==='QUESTION_PIC'" style="color:#E22">P</span>
 													</div>    
 												</div>
+
+												<ul class="button-group even two-up">
+													<li><a href="#" data-bind='click: foobar' class="button">Save</a></li>
+												</ul>
         									</div>
       									</section>
 
@@ -166,11 +163,38 @@
 														    	<span style="color:blue;font-style:italic" data-bind="text: $data"></span>
 															</div>    
 														</div>
-														<span style="color:green;font-style:italic">Answer:</span><span style="color:green;font-style:italic" data-bind="text: answer"></span>
+														<span style="color:green;font-style:italic;font-size:12px">
+																Answer: <span data-bind="text: answer"></span>
+														</span>
 													</div>    
 												</div>
 												<ul class="button-group even two-up">
 													<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Back</a></li>
+												</ul>
+        									</div>
+      									</section>
+
+      									<section>
+        									<div class="content" data-slug="question-detail" data-section-content>
+
+        										<div data-bind="foreach: question_detail" >
+												    <div style="margin-bottom:15px">
+												    	<span style="font-weight:bold" data-bind="text: question"></span>
+
+												    	<div data-bind="foreach: options" >
+														    <div>
+														    	<span style="color:blue;font-style:italic" data-bind="text: $data"></span>
+															</div>    
+														</div>
+														<span style="color:green;font-style:italic;font-size:12px">
+																Answer: <span data-bind="text: answer"></span>
+														</span>
+													</div>    
+												</div>
+												
+												<ul class="button-group even two-up">
+													<li><a href="#" data-bind='click: synchronizeWithServer' class="button">Back</a></li>
+													<li><a href="#" data-bind='click: synchronizeWithServer' class="button alert">Delete</a></li>
 												</ul>
         									</div>
       									</section>
