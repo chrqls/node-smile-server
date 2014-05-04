@@ -610,7 +610,7 @@ exports.createSessionFromTeacherApp = function(req, res) {
             game.groupName = req.body.groupName;
         }
 
-        game.setCurrentMessage({"teacherName":game.teacherName,"groupName":game.groupName,"sessionName":game.sessionName});
+        game.setCurrentMessage({"TYPE":"SESSION_VALUES","teacherName":game.teacherName,"groupName":game.groupName,"sessionName":game.sessionName});
 
     } catch (e) {
         res.handleError("Can't parse Incoming JSON in createSessionFromTeacherApp method");
