@@ -35,9 +35,10 @@ var SMILEROUTES = {
     "all": "/smile/all",
     "iqsets": "/smile/iqsets",
     "iqset": "/smile/iqset/",
-    "question":"/smile/question",
+    "question": "/smile/question",
     "session": "/smile/createsession",
-    "startmake":"/smile/startmakequestion"
+    "startmake": "/smile/startmakequestion",
+    "deletequestion": "/smile/deletequestion/"
 };
 
 /* --------
@@ -387,6 +388,51 @@ function detailQuestion(sessionID) {
     switchSection('question-detail');
 }
 
+function confirmDeletion(sessionID) {
+    //smileAlert('#globalstatus', 'position=='+sessionID, 'green'); 
+    $('input[name=sessionIDtoDelete]').val(sessionID);
+    switchSection('confirm-deletion');
+}
+
+GlobalViewModel.removeQuestionFromSession = function() {
+
+    var positionOfcurrentQuestion = -1;
+
+    var dataAll = JSON.parse(smile_all());
+
+    for (i = 0; i < dataAll.length; i++) {
+
+        // If the question is still in session, we load the details
+        if(dataAll[i].TYPE === 'QUESTION' || dataAll[i].TYPE === 'QUESTION_PIC') {
+
+            positionOfcurrentQuestion++;
+
+            if(dataAll[i].SessionID === $('input[name=sessionIDtoDelete]').val()) {
+
+                var urlDeletingQuestion = SMILEROUTES['deletequestion']+positionOfcurrentQuestion+'.json';
+
+                smileAlert('#globalstatus', 'url=='+urlDeletingQuestion, 'green'); 
+
+                $.ajax({ 
+                    cache: false, 
+                    type: "POST", 
+                    dataType: "text", 
+                    url: urlDeletingQuestion,
+                    data: {}, 
+                    
+                    error: function(xhr, text, err) {
+                        smileAlert('#globalstatus', 'Unable to remove question from session', 'trace');
+                    }, 
+                    success: function(data) {
+                        switchSection('list-questions');
+                    }
+                });
+
+            }
+        }
+    }
+}
+
 $(document).ready(function() {
     
     // Init Data Model
@@ -405,8 +451,7 @@ function switchSection(newSection) {
 }
 
 GlobalViewModel.foobar = function() {
-
-    smileAlert('#globalstatus', 'GlobalViewModel.iqsets.length='+GlobalViewModel.iqsets.total_rows, 'blue', 15000);
+    smileAlert('#globalstatus', 'foobar', 'blue', 15000);
 }
 
 function addQuestion(question) {
