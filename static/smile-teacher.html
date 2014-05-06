@@ -186,15 +186,34 @@
 														    	<span style="color:blue;font-style:italic" data-bind="text: $data"></span>
 															</div>    
 														</div>
+														
+														
+														<img data-bind="attr:{src: urlImage}" >
+
 														<span style="color:green;font-style:italic;font-size:12px">
 																Answer: <span data-bind="text: answer"></span>
+																Position: <span data-bind="text: session_id"></span>
 														</span>
-													</div>    
+													</div>
+													<ul class="button-group even two-up">
+														<li><a href="#" onclick="confirmDeletion(this.name)" data-bind="attr: {name: session_id}" class="button alert">Delete</a></li>
+													</ul>    
 												</div>
 												
 												<ul class="button-group even two-up">
 													<li><a href="#" data-bind='click: synchronizeWithServer' class="button">Back</a></li>
-													<li><a href="#" data-bind='click: synchronizeWithServer' class="button alert">Delete</a></li>
+												</ul>
+        									</div>
+      									</section>
+
+      									<section>
+        									<div class="content" data-slug="confirm-deletion" data-section-content>
+
+        										Remove the question from session?
+        										<input type="hidden" name="sessionIDtoDelete" value="" />
+												<ul class="button-group even two-up">
+													<li><a href="#" data-bind='click: removeQuestionFromSession' class="button alert">Confirm</a></li>
+													<li><a href="#" data-bind='click: synchronizeWithServer' class="button">Cancel</a></li>
 												</ul>
         									</div>
       									</section>
