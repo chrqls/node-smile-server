@@ -293,6 +293,7 @@ js.get('/smile/questionview/:id_result.html', routes.handleQuestionResultHtmlGet
 js.get('/smile/questionview/:id.html', routes.handleQuestionHtmlGet, true);
 js.get('/smile/questionview/:id.json', routes.handleQuestionJSONGet, true);
 js.delete('/smile/questionview/:id.json', routes.handleQuestionJSONDelete, true);
+js.post('/smile/deletequestion/:id.json', routes.handleQuestionJSONDelete, true);
 js.get('/smile/questionview/:id.jpg', routes.handleQuestionImageGet, true);
 
 // Compatibility with newer SMILE Student MULTILANG
