@@ -775,6 +775,8 @@ exports.handleQuestionJSONDelete = function(req, res) {
     var questionNumber = parseInt(req.id, 10);
     var question = game.questions.getList()[questionNumber];
 
+    console.log('THIS IS A TEST TO DELETE A QUESTION');
+
     //
     // Is the Question ID existing
     //
