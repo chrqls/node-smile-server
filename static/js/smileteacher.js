@@ -29,7 +29,6 @@
  **/
 
 var VERSION = '0.3.1';
-
 var SMILEROUTES = {
     //"currentmessage": "/smile/currentmessage",
     "all": "/smile/all",
@@ -38,7 +37,7 @@ var SMILEROUTES = {
     "question": "/smile/question",
     "session": "/smile/createsession",
     "startmake": "/smile/startmakequestion",
-    "deletequestion": "/smile/deletequestion/"
+    "deletequestion": "/smile/questionview/"
 };
 
 /* --------
@@ -317,12 +316,15 @@ function previewIQSet(idIQSet) {
 
 GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     
+    switchSection('list-questions');
+
     //GlobalViewModel.questions.removeAll();
     $.ajax({ 
         cache: false, 
         type: "GET", 
         dataType: "text", 
         url: SMILEROUTES["iqset"]+GlobalViewModel.iqsets()[GlobalViewModel.position()].id, 
+        async: false,
         data: {}, 
         
         error: function(xhr, text, err) {
@@ -344,10 +346,8 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
             }
         }
     });
-
-    switchSection('list-questions');
-
-    return false;
+    
+    postMessage('startmake');
 }
 
 function detailQuestion(sessionID) {
@@ -415,8 +415,9 @@ GlobalViewModel.removeQuestionFromSession = function() {
 
                 $.ajax({ 
                     cache: false, 
-                    type: "POST", 
-                    dataType: "text", 
+                    type: "DELETE", 
+                    //dataType: "text",
+                    contentType: "application/json", 
                     url: urlDeletingQuestion,
                     data: {}, 
                     
@@ -508,6 +509,7 @@ function postMessage(type,values) {
                 dataType: "text", 
                 url: SMILEROUTES['startmake'],
                 data: { "TYPE":"START_MAKE" }, 
+                async: false,
                 
                 error: function(xhr, text, err) {
                     smileAlert('#globalstatus', 'Unable to send START_MAKE phase', 'trace');
@@ -517,24 +519,21 @@ function postMessage(type,values) {
 
         case 'question':
 
-            var options = [];
-            options.push(values.O1,values.O2,values.O3,values.O4);
-
             $.ajax({ 
                 cache: false, 
                 type: "POST", 
                 dataType: "text", 
                 url: SMILEROUTES['question'],
-                async: false,
+                //async: false,
 
                 data: {
                     "TYPE":values.TYPE,
                     "IP":values.IP,
                     "NAME":values.NAME,
-                    "O1":options[0],
-                    "O2":options[1],
-                    "O3":options[2],
-                    "O4":options[3],
+                    "O1":values.O1,
+                    "O2":values.O2,
+                    "O3":values.O3,
+                    "O4":values.O4,
                     "Q":values.Q,
                     "SessionID":Date.now(),
                     "A":values.A
