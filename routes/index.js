@@ -264,6 +264,7 @@ exports.handleSmileRootGet = function(req, res) {
 };
 
 exports.handleStartMakeQuestionPut = function(req, res) {
+
     game.setCurrentMessage(MESSAGE_START_MAKE_QUESTION);
 
     //
@@ -774,8 +775,6 @@ exports.handleQuestionJSONGet = function(req, res) {
 exports.handleQuestionJSONDelete = function(req, res) {
     var questionNumber = parseInt(req.id, 10);
     var question = game.questions.getList()[questionNumber];
-
-    console.log('THIS IS A TEST TO DELETE A QUESTION');
 
     //
     // Is the Question ID existing
