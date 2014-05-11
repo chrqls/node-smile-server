@@ -92,7 +92,7 @@
 
 												<ul class="button-group even two-up">
 													<li><a href="#" data-bind='click: createSession' class="button">Next</a></li>
-													<li><a href="#" data-bind='click: resetSessionValues' class="button">Reset</a></li>
+													<li><a href="#" data-bind='click: resetSession' class="button">Reset</a></li>
 												</ul>
         									</div>
       									</section>
@@ -145,6 +145,7 @@
 												</div>
 
 												<ul class="button-group even two-up">
+													<li><a href="#" data-bind='click: resetSession' class="button">Quit</a></li>
 													<li><a href="#" data-bind='click: foobar' class="button">Save</a></li>
 												</ul>
         									</div>
@@ -188,11 +189,10 @@
 														</div>
 														
 														
-														<img data-bind="attr:{src: urlImage}" >
+														<p><img data-bind="attr:{src: urlImage}" ></p>
 
 														<span style="color:green;font-style:italic;font-size:12px">
 																Answer: <span data-bind="text: answer"></span>
-																Position: <span data-bind="text: session_id"></span>
 														</span>
 													</div>
 													<ul class="button-group even two-up">

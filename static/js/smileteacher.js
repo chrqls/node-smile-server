@@ -32,6 +32,7 @@ var VERSION = '0.3.1';
 var SMILEROUTES = {
     //"currentmessage": "/smile/currentmessage",
     "all": "/smile/all",
+    "reset": "/smile/reset",
     "iqsets": "/smile/iqsets",
     "iqset": "/smile/iqset/",
     "question": "/smile/question",
@@ -173,14 +174,17 @@ GlobalViewModel.createSession = function() {
     return false;
 }
 
-GlobalViewModel.resetSessionValues = function() {
-
+GlobalViewModel.resetSession = function() {
+    
     this.teacher_name('');
     this.session_name('');
     this.group_name('');
+    
+    // Reset the session on server
+    postMessage('reset');
+
     //window.location.href = window.location.pathname;
     //window.location.reload(true);
-    return false;
 }
 
 GlobalViewModel.startMakingQuestions = function() {
@@ -478,7 +482,29 @@ function postMessage(type,values) {
 
     switch(type) {
 
+        case 'reset':
+
+            $.ajax({ 
+                cache: false, 
+                type: "GET", 
+                dataType: "text", 
+                //contentType: "application/json", 
+                url: SMILEROUTES['reset'],
+                data: {}, 
+                async: false,
+                
+                error: function(xhr, text, err) {
+                    smileAlert('#globalstatus', 'Unable to reset', 'trace');
+                }, 
+                success: function(data) {
+                    switchSection('create-session');
+                }
+            });
+            break;
+
         case 'session':
+
+        //smileAlert('#globalstatus', 'WTFFFFFF', 'green',6000);
 
             $.ajax({ 
                 cache: false, 
@@ -516,6 +542,7 @@ function postMessage(type,values) {
                 }, 
                 success: function(data) {}
             });
+            break;
 
         case 'question':
 
