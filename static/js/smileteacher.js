@@ -322,7 +322,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     
     switchSection('list-questions');
 
-    //GlobalViewModel.questions.removeAll();
+    GlobalViewModel.questions.removeAll();
     $.ajax({ 
         cache: false, 
         type: "GET", 
