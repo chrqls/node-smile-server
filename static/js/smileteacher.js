@@ -451,8 +451,8 @@ $(document).ready(function() {
    --------- */
 
 function switchSection(newSection) {
-    $('section.active').removeClass('active');
-    $('div[data-slug='+newSection+']').parent().addClass('active');
+    $('section.visible').removeClass('visible').addClass('hidden');
+    $('div[smile='+newSection+']').parent().addClass('visible').removeClass('hidden');
 }
 
 GlobalViewModel.foobar = function() {
@@ -563,7 +563,8 @@ function postMessage(type,values) {
                     "O4":values.O4,
                     "Q":values.Q,
                     "SessionID":Date.now(),
-                    "A":values.A
+                    "A":values.A,
+                    "PICURL":values.PICURL
                 },
                 
                 error: function(xhr, text, err) {

@@ -822,6 +822,7 @@ exports.handleQuestionJSONDelete = function(req, res) {
 };
 
 exports.handleQuestionImageGet = function(req, res) {
+
     var questionNumber = parseInt(req.id, 10);
     var question = game.questions.getList()[questionNumber];
     if (!question) {
@@ -830,6 +831,7 @@ exports.handleQuestionImageGet = function(req, res) {
     if (question.TYPE != "QUESTION_PIC") {
         return res.handleError(js.JumboError.notFound('Question does not have picture: ' + questionNumber));
     }
+    console.log('CRASH AT THIS MOMENT>>'+game.questions.getQuestionPicture(questionNumber));
     var dataBuffer = new Buffer(game.questions.getQuestionPicture(questionNumber), 'base64');
     res.writeHead(200, {
         'Content-Type' : 'image/jpeg',

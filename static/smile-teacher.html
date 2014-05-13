@@ -1,44 +1,47 @@
 <!DOCTYPE html>
 
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+
 <!--[if lt IE 7]>
-<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+	<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
 <!--[if IE 7]>
-<html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+	<html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
 <!--[if IE 8]>
-<html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!-->
+	<html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]>   <!-->
 <html lang="en">
 <!--<![endif]-->
+
 <head>
-<meta charset="utf-8" />
-<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+	<meta charset="utf-8" />
+	<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 
-<!-- Set the viewport width to device width for mobile -->
-<meta name="viewport" content="width=device-width" />
+	<!-- Set the viewport width to device width for mobile -->
+	<meta name="viewport" content="width=device-width" />
 
-<title>SMILE Teacher Web</title>
+	<title>SMILE Teacher Web</title>
 
-<!-- Included CSS Files -->
-<!-- Combine and Compress These CSS Files -->
-<link rel="stylesheet" href="css/foundation.css">
-<link rel="stylesheet" href="css/app.css">
-<link rel="stylesheet" href="css/checkbox-style.css">
-<link rel="stylesheet" href="css/rating.css" />
-<link rel="stylesheet" href="css/fineuploader-3.5.0.css" />
+	<!-- CSS -->
+	<link rel="stylesheet" href="css/foundation.css">
+	<link rel="stylesheet" href="css/app.css">
+	<link rel="stylesheet" href="css/checkbox-style.css">
+	<link rel="stylesheet" href="css/rating.css" />
+	<link rel="stylesheet" href="css/fineuploader-3.5.0.css" />
 
-<script src="js/custom.modernizr.js"></script>
+	<script src="js/custom.modernizr.js"></script>
 
-<!-- IE Fix for HTML5 Tags -->
-<!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+	<!-- IE Fix for HTML5 Tags -->
+	<!--[if lt IE 9]>
+	    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
 
-<style>
-	
-</style>
-
+	<style>
+		section.hidden {
+			display:none;
+		}
+	</style>
 </head>
+
 <body>
 
 	<!-- container -->
@@ -63,6 +66,7 @@
 					SMILE Teacher <span data-bind="text: version"></span>
 				</h3>
 
+				<!-- Smile alert -->
 				<div class="row">
 					<div class="large-8 small-8 columns">
 						<div id="globalstatus"></div>
@@ -70,19 +74,21 @@
 				</div>
 				<div class="row">
 					<div class="large-12 small-12 columns">
+						
 						<div class="panel">
-							<div class="nav-container">
+							<div>
 								<!-- login-pane1Tab -> start-pane1Tab -> makeq-panelTab -> answerq-panelTab -> results-panelTab -->
 								<nav>
+									
+									<!--
 									<div class="section-container vertical-tabs" data-section="vertical-tabs">
-      									
-      									<section class="active">
-       						 				
-        									<div class="content" data-slug="create-session" data-section-content>
-          										<!-- NICE DEBUG TRICK -->
-												<!-- KO:<span data-bind="text: ko.toJSON($data)"></span>
-												<form action="return false;"> -->
+										<div class="content" data-slug="create-session" data-section-content>
+									-->
 
+      								<div>	
+
+      									<section class="visible">
+        									<div smile="create-session">
 												<label>Teacher Name</label>
 												<input data-bind='value: teacher_name, valueUpdate: "afterkeydown"' type="text" placeholder="Default Teacher" />
 												<label>Session Name</label>
@@ -97,9 +103,9 @@
         									</div>
       									</section>
 
-      									<section>
+      									<section class="hidden">
        						 				
-        									<div class="content" data-slug="choose-activity-flow" data-section-content>
+        									<div smile="choose-activity-flow">
 												<ul class="button-group even two-up">
 													<li><a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a></li>
 													<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a></li>
@@ -107,8 +113,8 @@
         									</div>
       									</section>
 
-      									<section>
-        									<div class="content" data-slug="choose-an-iqset" data-section-content>
+      									<section class="hidden">
+        									<div smile="choose-an-iqset">
 												<table data-bind="foreach: iqsets" >
 												    <tr>
 											    		<td>
@@ -117,10 +123,8 @@
 											    			<a id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
 												    		<span data-bind="text: sessionName"></span>
 												    	</td>
-												    	<td>
-												    		(<span data-bind="text: teacherName"></span>,
-												    		<span data-bind="text: groupName"></span>)
-												    	</td>
+												    	<td><span data-bind="text: teacherName"></span></td>
+											    		<td><span data-bind="text: groupName"></span></td>
 												    	<td><span data-bind="text: date"></span></td>
 													</tr>    
 												</table>
@@ -130,8 +134,8 @@
         									</div>
       									</section>
 
-      									<section>
-        									<div class="content" data-slug="list-questions" data-section-content>
+      									<section class="hidden">
+        									<div smile="list-questions">
 												<div data-bind="foreach: questions" >
 												    <div>
 											    		<input type="checkbox" name="text: id_questions" data-bind="checked: $root.id_questions" />
@@ -144,6 +148,25 @@
 													</div>    
 												</div>
 
+				
+
+
+
+
+<dl class="tabs" data-tab>
+	<dd class="active"><a href="#panel2-1">Students</a></dd>
+	<dd><a href="#panel2-2">Questions</a></dd>
+</dl>
+<div class="tabs-content"> 
+	<div class="content active" id="panel-1"><p>Students panel content goes here...</p></div> 
+	<div class="content" id="panel-2"><p>Questions panel content goes here...</p></div> 
+</div>
+
+
+
+
+
+
 												<ul class="button-group even two-up">
 													<li><a href="#" data-bind='click: resetSession' class="button">Quit</a></li>
 													<li><a href="#" data-bind='click: foobar' class="button">Save</a></li>
@@ -151,8 +174,8 @@
         									</div>
       									</section>
 
-      									<section>
-        									<div class="content" data-slug="preview-iqset" data-section-content>
+      									<section class="hidden">
+        									<div smile="preview-iqset">
 
         										<!--div data-bind="text: title"></div-->
 												<div data-bind="foreach: questions_to_preview" >
@@ -175,8 +198,8 @@
         									</div>
       									</section>
 
-      									<section>
-        									<div class="content" data-slug="question-detail" data-section-content>
+      									<section class="hidden">
+        									<div smile="question-detail">
 
         										<div data-bind="foreach: question_detail" >
 												    <div style="margin-bottom:15px">
@@ -189,7 +212,9 @@
 														</div>
 														
 														
-														<p><img data-bind="attr:{src: urlImage}" ></p>
+														<p><img data-bind="attr:{src: urlImage}" >
+<span style="font-weight:bold" data-bind="text: urlImage"></span>
+														</p>
 
 														<span style="color:green;font-style:italic;font-size:12px">
 																Answer: <span data-bind="text: answer"></span>
@@ -206,8 +231,8 @@
         									</div>
       									</section>
 
-      									<section>
-        									<div class="content" data-slug="confirm-deletion" data-section-content>
+      									<section class="hidden">
+        									<div smile="confirm-deletion">
 
         										Remove the question from session?
         										<input type="hidden" name="sessionIDtoDelete" value="" />
