@@ -28,9 +28,9 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.4.1';
+var VERSION = '0.4.3';
+
 var SMILEROUTES = {
-    //"currentmessage": "/smile/currentmessage",
     "all": "/smile/all",
     "reset": "/smile/reset",
     "iqsets": "/smile/iqsets",
@@ -44,6 +44,11 @@ var SMILEROUTES = {
 /* --------
     MODELS
    -------- */
+var Student = function(name,ip) {
+
+    this.name = name;
+    this.ip = ip;
+}
 
 var Question = function(sessionID,urlImage,author,question,answer,options,ip,type) {
 
@@ -83,12 +88,12 @@ var GlobalViewModel = {
     iqsets: ko.observableArray([]),
     
     // Preview IQSet
-    questions_to_preview: ko.observableArray([]),
+    iqset_to_preview: ko.observableArray([]),
 
     // Start making questions
     position: ko.observable(''),
     //id_questions: ko.observable(''),
-    //students: ko.observableArray([]),
+    students: ko.observableArray([]),
     questions: ko.observableArray([]),
 
 
@@ -289,20 +294,31 @@ GlobalViewModel.usePreparedQuestions = function() {
     return false;
 }
 
-
-
 function previewIQSet(idIQSet) {
 
+    // With 'idIQSet', we extract the data of the IQSet from server
     var iqset = JSON.parse(smile_iqset(idIQSet));
     var iqdata = iqset.iqdata;
-    GlobalViewModel.questions_to_preview.removeAll();
+    
+    GlobalViewModel.iqset_to_preview.removeAll();
 
+    // We affect these data to an iqset 
+    var iqsetToPreview = new IQSet(
+        'any',
+        'any', 
+        iqset.title,
+        iqset.teachername,
+        iqset.groupname,
+        iqset.date.substr(0, 10)
+    );
+
+    // Adding to this IQSet the list of questions
     for (i = 0; i < iqdata.length; i++) {
 
         var options = [];
         options.push(iqdata[i].O1,iqdata[i].O2,iqdata[i].O3,iqdata[i].O4);
 
-        GlobalViewModel.questions_to_preview.push(
+        iqsetToPreview.questions.push(
             new Question(
                 'any',
                 iqdata[i].PICURL,
@@ -316,8 +332,10 @@ function previewIQSet(idIQSet) {
         );
     }
 
-    switchSection('preview-iqset');
+    // We finally load the iqset to preview
+    GlobalViewModel.iqset_to_preview.push(iqsetToPreview);
 
+    switchSection('preview-iqset');
 }
 
 GlobalViewModel.startMakingQuestionsWithIQSet = function() {
@@ -455,10 +473,8 @@ function switchSection(newSection) {
     $('div[smile='+newSection+']').parent().addClass('visible').removeClass('hidden');
 }
 
-GlobalViewModel.foobar = function() {
-    smileAlert('#globalstatus', 'foobar', 'blue', 15000);
-}
-
+// Should I really have this skeleton? or directly having the add________ in the loop synchronizing everytime ?
+// Same question for the future addStudent(student)
 function addQuestion(question) {
 
     var options = [];
@@ -503,8 +519,6 @@ function postMessage(type,values) {
             break;
 
         case 'session':
-
-        //smileAlert('#globalstatus', 'WTFFFFFF', 'green',6000);
 
             $.ajax({ 
                 cache: false, 

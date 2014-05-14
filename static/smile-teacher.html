@@ -41,7 +41,7 @@
 		}
 		div[smile=list-of-iqsets] td {
 			border: black solid 0;
-			padding: 0;
+			padding: 0 10px;
 		}
 	</style>
 </head>
@@ -64,8 +64,10 @@
 				<hr />
 			</div>
 		</div>
+
 		<div class="row">
 			<div class="large-9 small-9 columns">
+				
 				<h3>
 					SMILE Teacher <span data-bind="text: version"></span>
 				</h3>
@@ -76,12 +78,13 @@
 						<div id="globalstatus"></div>
 					</div>
 				</div>
+
 				<div class="row">
 					<div class="large-12 small-12 columns">
 						
 						<div class="panel">
 							<div>
-								<!-- login-pane1Tab -> start-pane1Tab -> makeq-panelTab -> answerq-panelTab -> results-panelTab -->
+
 								<nav>
 									
 									<!--
@@ -93,9 +96,9 @@
 
       									<section class="visible">
         									<div smile="create-session">
-												<input data-bind='value: teacher_name, valueUpdate: "afterkeydown"' type="text" placeholder="Teacher" />
-												<input data-bind='value: session_name, valueUpdate: "afterkeydown"' type="text" placeholder="Session" />
-												<input data-bind='value: group_name, valueUpdate: "afterkeydown"' type="text" placeholder="Group" />
+												<input type="text" data-bind='value: teacher_name, valueUpdate: "afterkeydown"' placeholder="Teacher" />
+												<input type="text" data-bind='value: session_name, valueUpdate: "afterkeydown"' placeholder="Session" />
+												<input type="text" data-bind='value: group_name, valueUpdate: "afterkeydown"' placeholder="Group" />
 
 												<ul class="button-group radius even-2">
 													<li><a href="#" data-bind='click: resetSession' class="secondary button">Reset</a></li>
@@ -121,10 +124,10 @@
 										    				<input style="margin:0" type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
 											    			<a style="margin:0" id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
 												    	</td>
-											    		<td><span data-bind="text: sessionName"></span></td>
-												    	<td><span data-bind="text: teacherName"></span></td>
-											    		<td><span data-bind="text: groupName"></span></td>
-												    	<td><span data-bind="text: date"></span></td>
+											    		<td style="font-weight:bold"><span data-bind="text: sessionName"></span></td>
+												    	<td style="color:#444"><span data-bind="text: teacherName"></span></td>
+											    		<td style="color:#777"><span data-bind="text: groupName"></span></td>
+												    	<td style="color:#AAA"><span data-bind="text: date"></span></td>
 													</tr>    
 												</table>
 												
@@ -139,10 +142,21 @@
         									<div smile="general-board">
 												
 												<div class="section-container tabs" data-section="tabs">
+													
 													<section class="active">
 														<p class="title" data-section-title><a href="#">Students</a></p>
-														<div class="content" data-section-content><p>Students panel content goes here.</p></div>
+														<div class="content" data-section-content>
+															<p>Students panel content goes here.</p>
+
+															<div data-bind="foreach: students" >
+															    <div>
+															    	<span style="color:#222" data-bind="text: name"></span>
+															    	<span style="color:#888" data-bind="text: ip"></span>
+																</div>    
+															</div>
+														</div>
 													</section>
+													
 													<section>
 														<p class="title" data-section-title><a href="#">Questions</a></p>
 														<div class="content" data-section-content>
@@ -157,37 +171,42 @@
 														    		<span data-bind="if: type==='QUESTION_PIC'" style="color:#E22">P</span>
 																</div>    
 															</div>
-															<a href="#" data-bind='click: foobar' class="tiny button">Save</a>
+															<a href="#" data-bind='click: synchronizeWithServer' class="tiny button">Save</a>
 														</div>
 													</section>
+
 												</div>
 
 												<a href="#" data-bind='click: resetSession' class="large button secondary expand">Quit</a>
-
-												<ul class="button-group even two-up">
-													<li></li>
-													<li></li>
-												</ul>
         									</div>
       									</section>
 
       									<section class="hidden">
         									<div smile="preview-iqset">
 
-        										<!--div data-bind="text: title"></div-->
-												<div data-bind="foreach: questions_to_preview" >
-												    <div style="margin-bottom:15px">
-												    	<span style="font-weight:bold" data-bind="text: question"></span>
+        										<div data-bind="foreach: iqset_to_preview" >
+	        											
+        											<div style="color:#D22;font-size:12px">
+	        											<span data-bind="text: teacherName"></span>,
+	        											<span data-bind="text: groupName"></span>,
+	        											<span data-bind="text: date"></span>
+        											</div>
+        											<h4><span data-bind="text: sessionName"></span></h4>
+        											
+													<div data-bind="foreach: questions" >
+													    <div style="margin-bottom:15px">
+													    	<span style="font-weight:bold" data-bind="text: question"></span>
+													    	<span style="color:green;font-style:italic;font-size:12px">
+																	(answer: <span data-bind="text: answer"></span>)
+															</span>
 
-												    	<div data-bind="foreach: options" >
-														    <div>
-														    	<span style="color:blue;font-style:italic" data-bind="text: $data"></span>
-															</div>    
-														</div>
-														<span style="color:green;font-style:italic;font-size:12px">
-																Answer: <span data-bind="text: answer"></span>
-														</span>
-													</div>    
+													    	<div data-bind="foreach: options" >
+															    <div>
+															    	<span style="color:blue;font-style:italic" data-bind="text: $data"></span>
+																</div>    
+															</div>
+														</div>    
+													</div>
 												</div>
 												<ul class="button-group even two-up">
 													<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Back</a></li>
@@ -268,41 +287,22 @@
 				<p class="copyright">© 2012‐2013 SMILE Consortium, Inc., a 501c3 Non-Profit</p>
 			</div>
 		</div>
-		<!-- div: row -->
 	</div>
 	<!-- container -->
 
 
-	<!-- Included JS Files -->
-	<!-- Included JS Files -->
-	<script>
-	  /* document.write('<script src=' +
-	  ('__proto__' in {} ? 'js/zepto' : 'js/jquery') +
-	  '.js><\/script>') */
-	</script>
 	<script src="js/jquery.js"></script>
-	<!--
-	  <script src="js/jquery.js"></script>
-	  <script src="js/jquery.foundation.reveal.js"></script>
-	  <script src="js/jquery.foundation.orbit.js"></script>
-	  <script src="js/jquery.foundation.navigation.js"></script>
-	  <script src="js/jquery.foundation.buttons.js"></script>
-	  <script src="js/jquery.foundation.tabs.js"></script>
-	  <script src="js/jquery.foundation.forms.js"></script>
-	  <script src="js/jquery.foundation.tooltips.js"></script>
-	  <script src="js/jquery.foundation.accordion.js"></script>
-	  <script src="js/jquery.placeholder.js"></script>
-	  <script src="js/jquery.foundation.alerts.js"></script>
-	-->    
+
 	<!-- End Combine and Compress These JS Files -->
 	<script src="js/foundation.min.js"></script>
 	<script src="js/foundation.section.js"></script>
 	<script src="js/foundation.reveal.js"></script>
-	<!-- <script src="js/app.js"></script> -->
+
 	<!-- Switch to minified version after development -->
 	<script type='text/javascript' src='js/knockout-2.1.0.debug.js'></script>
 	<script type='text/javascript' src='js/underscore-1.3.3.js'></script>
 	<script type='text/javascript' src='js/async-0.1.22.js'></script>
+	
 	<!-- Got this from: http://www.diveintojavascript.com/projects/javascript-sprintf -->
 	<script type='text/javascript' src='js/sprintf-0.7-beta1.js'></script>
 	<script type='text/javascript' src='js/smileteacher.js'></script>
@@ -310,10 +310,8 @@
 	<script type='text/javascript' src='js/jquery.blockUI-2.66.0.js'></script>
 	<script type="text/javascript" src="js/rating.js"></script>
 	<script type="text/javascript" src="js/jquery.fineuploader-3.5.0.js"></script> 
-	<!-- <script type="text/javascript" src="js/jquery.fineuploader-3.5.0.min.js"></script> -->
 	<script>
-	// jQuery.noConflict();
-	$(document).foundation();
+		$(document).foundation();
 	</script>
 
 </body>
