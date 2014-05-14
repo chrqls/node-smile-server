@@ -28,10 +28,11 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.3.1';
+var VERSION = '0.4.3';
+
 var SMILEROUTES = {
-    //"currentmessage": "/smile/currentmessage",
     "all": "/smile/all",
+    "reset": "/smile/reset",
     "iqsets": "/smile/iqsets",
     "iqset": "/smile/iqset/",
     "question": "/smile/question",
@@ -43,6 +44,11 @@ var SMILEROUTES = {
 /* --------
     MODELS
    -------- */
+var Student = function(name,ip) {
+
+    this.name = name;
+    this.ip = ip;
+}
 
 var Question = function(sessionID,urlImage,author,question,answer,options,ip,type) {
 
@@ -82,12 +88,12 @@ var GlobalViewModel = {
     iqsets: ko.observableArray([]),
     
     // Preview IQSet
-    questions_to_preview: ko.observableArray([]),
+    iqset_to_preview: ko.observableArray([]),
 
     // Start making questions
     position: ko.observable(''),
     //id_questions: ko.observable(''),
-    //students: ko.observableArray([]),
+    students: ko.observableArray([]),
     questions: ko.observableArray([]),
 
 
@@ -146,13 +152,13 @@ GlobalViewModel.synchronizeWithServer = function() {
                 break;
 
             case 'START_MAKE':
-                section = 'list-questions';
+                section = 'general-board';
                 break;
 
             case 'QUESTION':
             case 'QUESTION_PIC':
                 addQuestion(dataAll[i]);
-                section = 'list-questions';
+                section = 'general-board';
                 break;
 
             default: break;
@@ -163,9 +169,9 @@ GlobalViewModel.synchronizeWithServer = function() {
 
 GlobalViewModel.createSession = function() {
     
-    if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Default Teacher'); }
-    if (!this.session_name() || this.session_name() === "") { this.session_name('Default Session'); }
-    if (!this.group_name() || this.group_name() === "")     { this.group_name('Default Group');  }
+    if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Unknown'); }
+    if (!this.session_name() || this.session_name() === "") { this.session_name('Unspecified'); }
+    if (!this.group_name() || this.group_name() === "")     { this.group_name('General');  }
     
     // Send session values to server
     postMessage('session');
@@ -173,14 +179,19 @@ GlobalViewModel.createSession = function() {
     return false;
 }
 
-GlobalViewModel.resetSessionValues = function() {
-
+GlobalViewModel.resetSession = function() {
+    
     this.teacher_name('');
     this.session_name('');
     this.group_name('');
+    
+    // Reset the session on server
+    postMessage('reset');
+
+    GlobalViewModel.questions.removeAll();
+
     //window.location.href = window.location.pathname;
     //window.location.reload(true);
-    return false;
 }
 
 GlobalViewModel.startMakingQuestions = function() {
@@ -188,7 +199,7 @@ GlobalViewModel.startMakingQuestions = function() {
     // Send start make phase to server
     postMessage('startmake');
 
-    switchSection('list-questions');
+    switchSection('general-board');
 
     return false;
 }
@@ -196,7 +207,7 @@ GlobalViewModel.startMakingQuestions = function() {
 GlobalViewModel.usePreparedQuestions = function() {
 
     // Refresh 
-    switchSection('choose-an-iqset');
+    switchSection('list-of-iqsets');
 
     $.ajax({ 
         cache: false, 
@@ -283,20 +294,31 @@ GlobalViewModel.usePreparedQuestions = function() {
     return false;
 }
 
-
-
 function previewIQSet(idIQSet) {
 
+    // With 'idIQSet', we extract the data of the IQSet from server
     var iqset = JSON.parse(smile_iqset(idIQSet));
     var iqdata = iqset.iqdata;
-    GlobalViewModel.questions_to_preview.removeAll();
+    
+    GlobalViewModel.iqset_to_preview.removeAll();
 
+    // We affect these data to an iqset 
+    var iqsetToPreview = new IQSet(
+        'any',
+        'any', 
+        iqset.title,
+        iqset.teachername,
+        iqset.groupname,
+        iqset.date.substr(0, 10)
+    );
+
+    // Adding to this IQSet the list of questions
     for (i = 0; i < iqdata.length; i++) {
 
         var options = [];
         options.push(iqdata[i].O1,iqdata[i].O2,iqdata[i].O3,iqdata[i].O4);
 
-        GlobalViewModel.questions_to_preview.push(
+        iqsetToPreview.questions.push(
             new Question(
                 'any',
                 iqdata[i].PICURL,
@@ -310,15 +332,14 @@ function previewIQSet(idIQSet) {
         );
     }
 
-    switchSection('preview-iqset');
+    // We finally load the iqset to preview
+    GlobalViewModel.iqset_to_preview.push(iqsetToPreview);
 
+    switchSection('preview-iqset');
 }
 
 GlobalViewModel.startMakingQuestionsWithIQSet = function() {
-    
-    switchSection('list-questions');
 
-    //GlobalViewModel.questions.removeAll();
     $.ajax({ 
         cache: false, 
         type: "GET", 
@@ -348,6 +369,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     });
     
     postMessage('startmake');
+    this.synchronizeWithServer();
 }
 
 function detailQuestion(sessionID) {
@@ -425,7 +447,7 @@ GlobalViewModel.removeQuestionFromSession = function() {
                         smileAlert('#globalstatus', 'Unable to remove question from session', 'trace');
                     }, 
                     success: function(data) {
-                        switchSection('list-questions');
+                        switchSection('general-board');
                     }
                 });
 
@@ -447,14 +469,12 @@ $(document).ready(function() {
    --------- */
 
 function switchSection(newSection) {
-    $('section.active').removeClass('active');
-    $('div[data-slug='+newSection+']').parent().addClass('active');
+    $('section.visible').removeClass('visible').addClass('hidden');
+    $('div[smile='+newSection+']').parent().addClass('visible').removeClass('hidden');
 }
 
-GlobalViewModel.foobar = function() {
-    smileAlert('#globalstatus', 'foobar', 'blue', 15000);
-}
-
+// Should I really have this skeleton? or directly having the add________ in the loop synchronizing everytime ?
+// Same question for the future addStudent(student)
 function addQuestion(question) {
 
     var options = [];
@@ -477,6 +497,26 @@ function addQuestion(question) {
 function postMessage(type,values) {
 
     switch(type) {
+
+        case 'reset':
+
+            $.ajax({ 
+                cache: false, 
+                type: "GET", 
+                dataType: "text", 
+                //contentType: "application/json", 
+                url: SMILEROUTES['reset'],
+                data: {}, 
+                async: false,
+                
+                error: function(xhr, text, err) {
+                    smileAlert('#globalstatus', 'Unable to reset', 'trace');
+                }, 
+                success: function(data) {
+                    switchSection('create-session');
+                }
+            });
+            break;
 
         case 'session':
 
@@ -516,6 +556,7 @@ function postMessage(type,values) {
                 }, 
                 success: function(data) {}
             });
+            break;
 
         case 'question':
 
@@ -536,7 +577,8 @@ function postMessage(type,values) {
                     "O4":values.O4,
                     "Q":values.Q,
                     "SessionID":Date.now(),
-                    "A":values.A
+                    "A":values.A,
+                    "PICURL":values.PICURL
                 },
                 
                 error: function(xhr, text, err) {

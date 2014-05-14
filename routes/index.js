@@ -488,11 +488,15 @@ exports.handleAllMessagesGet = function(req, res) {
 reset = function() {
     oldGame = game;
     game = new Game(); // XXX Point to ponder, do we need to save before we destroy the server?
-    game.setCurrentMessage({ TYPE: 'RESET' , TIMESTAMP: (new Date()).toUTCString(), EXPIRY: 1500});
+    //game.setCurrentMessage({});
+    //game.setCurrentMessage({ TYPE: 'RESET' , TIMESTAMP: (new Date()).toUTCString(), EXPIRY: 1500});
+    
+    /*
     setTimeout(function() {
         // Remove RESET
         game.setCurrentMessage({});
     }, 2000);
+    */
 };
 
 exports.handleResetGet = function(req, res) {
@@ -818,6 +822,7 @@ exports.handleQuestionJSONDelete = function(req, res) {
 };
 
 exports.handleQuestionImageGet = function(req, res) {
+
     var questionNumber = parseInt(req.id, 10);
     var question = game.questions.getList()[questionNumber];
     if (!question) {
@@ -826,6 +831,7 @@ exports.handleQuestionImageGet = function(req, res) {
     if (question.TYPE != "QUESTION_PIC") {
         return res.handleError(js.JumboError.notFound('Question does not have picture: ' + questionNumber));
     }
+    console.log('CRASH AT THIS MOMENT>>'+game.questions.getQuestionPicture(questionNumber));
     var dataBuffer = new Buffer(game.questions.getQuestionPicture(questionNumber), 'base64');
     res.writeHead(200, {
         'Content-Type' : 'image/jpeg',
