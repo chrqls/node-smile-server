@@ -39,6 +39,10 @@
 		section.hidden {
 			display:none;
 		}
+		div[smile=list-of-iqsets] td {
+			border: black solid 0;
+			padding: 0;
+		}
 	</style>
 </head>
 
@@ -89,12 +93,9 @@
 
       									<section class="visible">
         									<div smile="create-session">
-												<label>Teacher Name</label>
-												<input data-bind='value: teacher_name, valueUpdate: "afterkeydown"' type="text" placeholder="Default Teacher" />
-												<label>Session Name</label>
-												<input data-bind='value: session_name, valueUpdate: "afterkeydown"' type="text" placeholder="Default Session" />
-												<label>Group Name</label>
-												<input data-bind='value: group_name, valueUpdate: "afterkeydown"' type="text" placeholder="Default Group" />
+												<input data-bind='value: teacher_name, valueUpdate: "afterkeydown"' type="text" placeholder="Teacher" />
+												<input data-bind='value: session_name, valueUpdate: "afterkeydown"' type="text" placeholder="Session" />
+												<input data-bind='value: group_name, valueUpdate: "afterkeydown"' type="text" placeholder="Group" />
 
 												<ul class="button-group radius even-2">
 													<li><a href="#" data-bind='click: resetSession' class="secondary button">Reset</a></li>
@@ -117,11 +118,10 @@
 												<table data-bind="foreach: iqsets" >
 												    <tr>
 											    		<td>
-										    				<input type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
-											    			<!--input type="hidden" name="id" data-bind="attr: {value: id}" /-->
-											    			<a id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
-												    		<span data-bind="text: sessionName"></span>
+										    				<input style="margin:0" type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
+											    			<a style="margin:0" id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
 												    	</td>
+											    		<td><span data-bind="text: sessionName"></span></td>
 												    	<td><span data-bind="text: teacherName"></span></td>
 											    		<td><span data-bind="text: groupName"></span></td>
 												    	<td><span data-bind="text: date"></span></td>

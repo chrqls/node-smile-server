@@ -164,9 +164,9 @@ GlobalViewModel.synchronizeWithServer = function() {
 
 GlobalViewModel.createSession = function() {
     
-    if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Default Teacher'); }
-    if (!this.session_name() || this.session_name() === "") { this.session_name('Default Session'); }
-    if (!this.group_name() || this.group_name() === "")     { this.group_name('Default Group');  }
+    if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Unknown'); }
+    if (!this.session_name() || this.session_name() === "") { this.session_name('Unspecified'); }
+    if (!this.group_name() || this.group_name() === "")     { this.group_name('General');  }
     
     // Send session values to server
     postMessage('session');
