@@ -96,17 +96,16 @@
 												<label>Group Name</label>
 												<input data-bind='value: group_name, valueUpdate: "afterkeydown"' type="text" placeholder="Default Group" />
 
-												<ul class="button-group even two-up">
+												<ul class="button-group radius even-2">
+													<li><a href="#" data-bind='click: resetSession' class="secondary button">Reset</a></li>
 													<li><a href="#" data-bind='click: createSession' class="button">Next</a></li>
-													<li><a href="#" data-bind='click: resetSession' class="button">Reset</a></li>
 												</ul>
         									</div>
       									</section>
 
-      									<section class="hidden">
-       						 				
+      									<section class="hidden">   						 				
         									<div smile="choose-activity-flow">
-												<ul class="button-group even two-up">
+												<ul class="button-group radius even-2">
 													<li><a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a></li>
 													<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a></li>
 												</ul>	
@@ -114,7 +113,7 @@
       									</section>
 
       									<section class="hidden">
-        									<div smile="choose-an-iqset">
+        									<div smile="list-of-iqsets">
 												<table data-bind="foreach: iqsets" >
 												    <tr>
 											    		<td>
@@ -128,48 +127,46 @@
 												    	<td><span data-bind="text: date"></span></td>
 													</tr>    
 												</table>
-												<ul class="button-group even two-up">
-													<li><a href="#" data-bind='click: startMakingQuestionsWithIQSet' class="button">Load</a></li>
+												
+												<ul class="button-group radius even-2">
+													<li><a href="#" data-bind='click: synchronizeWithServer' class="button secondary expand">Back</a></li>
+													<li><a href="#" data-bind='click: startMakingQuestionsWithIQSet' class="success button expand">Load</a></li>
 												</ul>	
         									</div>
       									</section>
 
       									<section class="hidden">
-        									<div smile="list-questions">
-												<div data-bind="foreach: questions" >
-												    <div>
-											    		<input type="checkbox" name="text: id_questions" data-bind="checked: $root.id_questions" />
-											    		<a id="more" onclick="detailQuestion(this.name)" data-bind="attr: {name: session_id}" class="tiny round button more">+</a>
-												    	<span style="color:#888;font-size:14px;font-style:italic"data-bind="text: question"></span>
-												    	<span style="color:#444;font-size:12px">
-	                                                       	(<span data-bind="text: author"></span>,<span data-bind="text: ip"></span>)
-											    		</span>
-											    		<span data-bind="if: type==='QUESTION_PIC'" style="color:#E22">P</span>
-													</div>    
+        									<div smile="general-board">
+												
+												<div class="section-container tabs" data-section="tabs">
+													<section class="active">
+														<p class="title" data-section-title><a href="#">Students</a></p>
+														<div class="content" data-section-content><p>Students panel content goes here.</p></div>
+													</section>
+													<section>
+														<p class="title" data-section-title><a href="#">Questions</a></p>
+														<div class="content" data-section-content>
+															<div data-bind="foreach: questions" >
+															    <div>
+														    		<input type="checkbox" name="text: id_questions" data-bind="checked: $root.id_questions" />
+														    		<a id="more" onclick="detailQuestion(this.name)" data-bind="attr: {name: session_id}" class="tiny round button more">+</a>
+															    	<span style="color:#888;font-size:14px;font-style:italic"data-bind="text: question"></span>
+															    	<span style="color:#444;font-size:12px">
+				                                                       	(<span data-bind="text: author"></span>,<span data-bind="text: ip"></span>)
+														    		</span>
+														    		<span data-bind="if: type==='QUESTION_PIC'" style="color:#E22">P</span>
+																</div>    
+															</div>
+															<a href="#" data-bind='click: foobar' class="tiny button">Save</a>
+														</div>
+													</section>
 												</div>
 
-				
-
-
-
-
-<dl class="tabs" data-tab>
-	<dd class="active"><a href="#panel2-1">Students</a></dd>
-	<dd><a href="#panel2-2">Questions</a></dd>
-</dl>
-<div class="tabs-content"> 
-	<div class="content active" id="panel-1"><p>Students panel content goes here...</p></div> 
-	<div class="content" id="panel-2"><p>Questions panel content goes here...</p></div> 
-</div>
-
-
-
-
-
+												<a href="#" data-bind='click: resetSession' class="large button secondary expand">Quit</a>
 
 												<ul class="button-group even two-up">
-													<li><a href="#" data-bind='click: resetSession' class="button">Quit</a></li>
-													<li><a href="#" data-bind='click: foobar' class="button">Save</a></li>
+													<li></li>
+													<li></li>
 												</ul>
         									</div>
       									</section>

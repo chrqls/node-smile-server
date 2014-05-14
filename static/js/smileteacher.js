@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.3.1';
+var VERSION = '0.4.1';
 var SMILEROUTES = {
     //"currentmessage": "/smile/currentmessage",
     "all": "/smile/all",
@@ -147,13 +147,13 @@ GlobalViewModel.synchronizeWithServer = function() {
                 break;
 
             case 'START_MAKE':
-                section = 'list-questions';
+                section = 'general-board';
                 break;
 
             case 'QUESTION':
             case 'QUESTION_PIC':
                 addQuestion(dataAll[i]);
-                section = 'list-questions';
+                section = 'general-board';
                 break;
 
             default: break;
@@ -183,6 +183,8 @@ GlobalViewModel.resetSession = function() {
     // Reset the session on server
     postMessage('reset');
 
+    GlobalViewModel.questions.removeAll();
+
     //window.location.href = window.location.pathname;
     //window.location.reload(true);
 }
@@ -192,7 +194,7 @@ GlobalViewModel.startMakingQuestions = function() {
     // Send start make phase to server
     postMessage('startmake');
 
-    switchSection('list-questions');
+    switchSection('general-board');
 
     return false;
 }
@@ -200,7 +202,7 @@ GlobalViewModel.startMakingQuestions = function() {
 GlobalViewModel.usePreparedQuestions = function() {
 
     // Refresh 
-    switchSection('choose-an-iqset');
+    switchSection('list-of-iqsets');
 
     $.ajax({ 
         cache: false, 
@@ -319,10 +321,7 @@ function previewIQSet(idIQSet) {
 }
 
 GlobalViewModel.startMakingQuestionsWithIQSet = function() {
-    
-    switchSection('list-questions');
 
-    GlobalViewModel.questions.removeAll();
     $.ajax({ 
         cache: false, 
         type: "GET", 
@@ -352,6 +351,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     });
     
     postMessage('startmake');
+    this.synchronizeWithServer();
 }
 
 function detailQuestion(sessionID) {
@@ -429,7 +429,7 @@ GlobalViewModel.removeQuestionFromSession = function() {
                         smileAlert('#globalstatus', 'Unable to remove question from session', 'trace');
                     }, 
                     success: function(data) {
-                        switchSection('list-questions');
+                        switchSection('general-board');
                     }
                 });
 
