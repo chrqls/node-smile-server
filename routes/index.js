@@ -118,9 +118,7 @@ exports.handleDeleteIQSet = function(req, res) {
 exports.handlePostNewIQSet = function(req, res) {
     
     console.log("\n\n[BODY of json request]");
-    console.log("\t>> %j\n", req.body);
-    console.log("[HEADERS of json request]");
-    console.log("\t>> %j\n\n", req.headers);
+    console.log("%j\n", req.body);
 
     var headers = req.headers;
     var iqset;
@@ -136,21 +134,9 @@ exports.handlePostNewIQSet = function(req, res) {
             iqset = req.body;
         }
 
-        if (!iqset.title) {
-            // iqset.title = iqdoc.date + "-IQSet";
-        }
-
-        if (!iqset.teachername) {
-            // iqset.teachername = "Teacher";
-        }
-
-        if (!iqset.groupname) {
-            // iqset.groupname = "General";
-        }
-
-        if (!iqset.iqdata) {
-            isValid = false;
-        }
+        // Adding values of the current session before saving the IQSet
+        iqset.teachername = game.teacherName;
+        iqset.groupname = game.groupName;
 
         if (isValid === true) {
             //
@@ -165,7 +151,6 @@ exports.handlePostNewIQSet = function(req, res) {
                     // 1. Get the original index of the image
                     // 2. Change the PICURL to match the new index 
                     //
-                    
                     if (iqset.iqdata[i].PICURL) {
                         // /smile/questionview/1.jpg
                         var tmpidx = parseInt(iqset.iqdata[i].PICURL.split('/')[3].split('.')[0], 10);
@@ -279,6 +264,7 @@ exports.handleSmileRootGet = function(req, res) {
 };
 
 exports.handleStartMakeQuestionPut = function(req, res) {
+
     game.setCurrentMessage(MESSAGE_START_MAKE_QUESTION);
 
     //
@@ -502,11 +488,15 @@ exports.handleAllMessagesGet = function(req, res) {
 reset = function() {
     oldGame = game;
     game = new Game(); // XXX Point to ponder, do we need to save before we destroy the server?
-    game.setCurrentMessage({ TYPE: 'RESET' , TIMESTAMP: (new Date()).toUTCString(), EXPIRY: 1500});
+    //game.setCurrentMessage({});
+    //game.setCurrentMessage({ TYPE: 'RESET' , TIMESTAMP: (new Date()).toUTCString(), EXPIRY: 1500});
+    
+    /*
     setTimeout(function() {
         // Remove RESET
         game.setCurrentMessage({});
     }, 2000);
+    */
 };
 
 exports.handleResetGet = function(req, res) {
@@ -624,6 +614,9 @@ exports.createSessionFromTeacherApp = function(req, res) {
         if (req.body.groupName) {
             game.groupName = req.body.groupName;
         }
+
+        game.setCurrentMessage({"TYPE":"SESSION_VALUES","teacherName":game.teacherName,"groupName":game.groupName,"sessionName":game.sessionName});
+
     } catch (e) {
         res.handleError("Can't parse Incoming JSON in createSessionFromTeacherApp method");
     }
@@ -829,6 +822,7 @@ exports.handleQuestionJSONDelete = function(req, res) {
 };
 
 exports.handleQuestionImageGet = function(req, res) {
+
     var questionNumber = parseInt(req.id, 10);
     var question = game.questions.getList()[questionNumber];
     if (!question) {
@@ -837,6 +831,7 @@ exports.handleQuestionImageGet = function(req, res) {
     if (question.TYPE != "QUESTION_PIC") {
         return res.handleError(js.JumboError.notFound('Question does not have picture: ' + questionNumber));
     }
+    console.log('CRASH AT THIS MOMENT>>'+game.questions.getQuestionPicture(questionNumber));
     var dataBuffer = new Buffer(game.questions.getQuestionPicture(questionNumber), 'base64');
     res.writeHead(200, {
         'Content-Type' : 'image/jpeg',

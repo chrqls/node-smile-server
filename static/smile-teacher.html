@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+
+<!--[if lt IE 7]>
+	<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>
+	<html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>
+	<html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]>   <!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+	<meta charset="utf-8" />
+	<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+
+	<!-- Set the viewport width to device width for mobile -->
+	<meta name="viewport" content="width=device-width" />
+
+	<title>SMILE Teacher Web</title>
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="css/foundation.css">
+	<link rel="stylesheet" href="css/app.css">
+	<link rel="stylesheet" href="css/checkbox-style.css">
+	<link rel="stylesheet" href="css/rating.css" />
+	<link rel="stylesheet" href="css/fineuploader-3.5.0.css" />
+
+	<script src="js/custom.modernizr.js"></script>
+
+	<!-- IE Fix for HTML5 Tags -->
+	<!--[if lt IE 9]>
+	    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+
+	<style>
+		section.hidden {
+			display:none;
+		}
+		div[smile=list-of-iqsets] td,
+		div[smile=general-board] td {
+			border: black solid 0;
+			padding: 0 10px;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- container -->
+	<div class="container">
+
+		<div class="row">
+			<div class="large-12 small-12 columns">
+				<h2>SMILE Teacher <span data-bind="text: version"></span></h2>
+				<img src="images/smile.jpg" />
+				<img src="images/marvell_horiz_logo.jpg" />
+
+				<p>SMILE turns a traditional classroom into a highly interactive
+					learning environment by engaging students in critical reasoning and
+					problem solving while enabling them to generate, share, and
+					evaluate multimedia-rich inquiries.</p>
+				<hr />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="large-9 small-9 columns">
+				
+				<!-- Smile alert -->
+				<div class="row">
+					<div class="large-8 small-8 columns">
+						<div id="globalstatus"></div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="large-12 small-12 columns">
+						
+						<div class="panel">
+							<div>
+
+								<nav>
+									
+									<!--
+									<div class="section-container vertical-tabs" data-section="vertical-tabs">
+										<div class="content" data-slug="create-session" data-section-content>
+									-->
+
+      								<div>	
+
+      									<section class="visible">
+        									<div smile="create-session">
+												<input type="text" data-bind='value: teacher_name, valueUpdate: "afterkeydown"' placeholder="Teacher" />
+												<input type="text" data-bind='value: session_name, valueUpdate: "afterkeydown"' placeholder="Session" />
+												<input type="text" data-bind='value: group_name, valueUpdate: "afterkeydown"' placeholder="Group" />
+
+												<ul class="button-group radius even-2">
+													<li><a href="#" data-bind='click: resetSession' class="secondary button">Reset</a></li>
+													<li><a href="#" data-bind='click: createSession' class="button">Next</a></li>
+												</ul>
+        									</div>
+      									</section>
+
+      									<section class="hidden">   						 				
+        									<div smile="choose-activity-flow">
+												<ul class="button-group radius even-2">
+													<li><a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a></li>
+													<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a></li>
+												</ul>	
+        									</div>
+      									</section>
+
+      									<section class="hidden">
+        									<div smile="list-of-iqsets">
+												<table data-bind="foreach: iqsets" >
+												    <tr>
+											    		<td>
+										    				<input style="margin:0" type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
+											    			<a style="margin:0" id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
+												    	</td>
+											    		<td style="font-weight:bold"><span data-bind="text: sessionName"></span></td>
+												    	<td style="color:#444"><span data-bind="text: teacherName"></span></td>
+											    		<td style="color:#777"><span data-bind="text: groupName"></span></td>
+												    	<td style="color:#AAA"><span data-bind="text: date"></span></td>
+													</tr>    
+												</table>
+												
+												<ul class="button-group radius even-2">
+													<li><a href="#" data-bind='click: synchronizeWithServer' class="button secondary expand">Back</a></li>
+													<li><a href="#" data-bind='click: startMakingQuestionsWithIQSet' class="success button expand">Load</a></li>
+												</ul>	
+        									</div>
+      									</section>
+
+      									<section class="hidden">
+        									<div smile="general-board">
+												
+												<div class="section-container tabs" data-section="tabs">
+													
+													<section class="active">
+														<p class="title" data-section-title><a href="#">Students</a></p>
+														<div class="content" data-section-content>
+															<p>Students panel content goes here.</p>
+
+															<div data-bind="foreach: students" >
+															    <div>
+															    	<span style="color:#222" data-bind="text: name"></span>
+															    	<span style="color:#888" data-bind="text: ip"></span>
+																</div>    
+															</div>
+														</div>
+													</section>
+													
+													<section>
+														<p class="title" data-section-title><a href="#">Questions</a></p>
+														<div class="content" data-section-content>
+
+															<table data-bind="foreach: questions" >
+															    <tr>
+														    		<td>
+													    				<input style="margin:0" type="checkbox" name="text: id_questions" data-bind="checked: $root.id_questions" />
+														    			<a style="margin:0" id="more" onclick="detailQuestion(this.name)" data-bind="attr: {name: session_id}" class="tiny round button more">+</a>
+															    	</td>
+														    		<td style="color:#888;font-size:14px;font-style:italic"><span data-bind="text: question"></span></td>
+															    	<td style="color:#444;font-size:12px"><span data-bind="text: author"></span></td>
+														    		<td style="color:#444;font-size:12px"><span data-bind="text: ip"></span></td>
+															    	<td><span data-bind="if: type==='QUESTION_PIC'" style="color:#E22">P</span></td>
+																</tr>    
+															</table>
+
+															<a href="#" data-bind='click: synchronizeWithServer' class="tiny button">Save</a>
+														</div>
+													</section>
+
+												</div>
+
+												<a href="#" data-bind='click: resetSession' class="large button secondary expand">Quit</a>
+        									</div>
+      									</section>
+
+      									<section class="hidden">
+        									<div smile="preview-iqset">
+
+        										<div data-bind="foreach: iqset_to_preview" >
+	        											
+        											<div style="color:#D22;font-size:12px">
+	        											<span data-bind="text: teacherName"></span>,
+	        											<span data-bind="text: groupName"></span>,
+	        											<span data-bind="text: date"></span>
+        											</div>
+        											<h4><span data-bind="text: sessionName"></span></h4>
+        											
+													<div data-bind="foreach: questions" >
+													    <div style="margin-bottom:15px">
+													    	<span style="font-weight:bold" data-bind="text: question"></span>
+													    	<span style="color:green;font-style:italic;font-size:12px">
+																	(answer: <span data-bind="text: answer"></span>)
+															</span>
+
+													    	<div data-bind="foreach: options" >
+															    <div>
+															    	<span style="color:blue;font-style:italic" data-bind="text: $data"></span>
+																</div>    
+															</div>
+														</div>    
+													</div>
+												</div>
+												<ul class="button-group even two-up">
+													<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Back</a></li>
+												</ul>
+        									</div>
+      									</section>
+
+      									<section class="hidden">
+        									<div smile="question-detail">
+
+        										<div data-bind="foreach: question_detail" >
+												    <div style="margin-bottom:15px">
+												    	<span style="font-weight:bold" data-bind="text: question"></span>
+												    	<span style="color:green;font-style:italic;font-size:12px">
+																(answer: <span data-bind="text: answer"></span>)
+														</span>
+
+												    	<div data-bind="foreach: options" >
+														    <div>
+														    	<span style="color:blue;font-style:italic" data-bind="text: $data"></span>
+															</div>    
+														</div>
+														
+														<p>
+															<span style="font-weight:bold" data-bind="text: urlImage"></span><br>
+															<img data-bind="attr:{src: urlImage}">
+														</p>
+													</div>
+													<a href="#" onclick="confirmDeletion(this.name)" data-bind="attr: {name: session_id}" class="button round alert">Delete</a>    
+												</div>
+												
+												<a href="#" data-bind='click: synchronizeWithServer' class="secondary expand button">Back</a>
+        									</div>
+      									</section>
+
+      									<section class="hidden">
+        									<div smile="confirm-deletion">
+
+        										Remove the question from session?
+        										<input type="hidden" name="sessionIDtoDelete" value="" />
+												<ul class="button-group radius even-2">
+													<li><a href="#" data-bind='click: synchronizeWithServer' class="secondary button">Cancel</a></li>
+													<li><a href="#" data-bind='click: removeQuestionFromSession' class="alert button">Confirm</a></li>
+												</ul>
+        									</div>
+      									</section>
+
+    								</div>
+								</nav>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="large-3 small-3 columns">
+				<div id="login-info">
+					Teacher: <span data-bind="text: teacher_name"></span><br>
+					Session: <span data-bind="text: session_name"></span><br>
+					Group: <span data-bind="text: group_name"></span>
+					
+					<p><img src="images/jamsj_slim.png" />
+				</div>
+			</div>
+		</div>
+		<!-- div: row -->
+		<div class="row">
+			<div class="small-6 small-centered columns">
+				<a class="smile-logo regular" href="http://www.smileconsortium.org"></a>
+				<ul class="smile-links">
+					<li><a href="mailto:reply+i-23475388-c2457b2df337933075fa1a78843d843cefe305ca-64202@reply.github.com">Support</a></li>
+					<li><a onclick="alert('Help Not Implemented.  Help! visit: https://plus.google.com/u/0/communities/117391182825484902493 for more human support'); return false;" href="#">Help</a></li>
+				</ul>
+				<p class="copyright">© 2012‐2013 SMILE Consortium, Inc., a 501c3 Non-Profit</p>
+			</div>
+		</div>
+	</div>
+	<!-- container -->
+
+
+	<script src="js/jquery.js"></script>
+
+	<!-- End Combine and Compress These JS Files -->
+	<script src="js/foundation.min.js"></script>
+	<script src="js/foundation.section.js"></script>
+	<script src="js/foundation.reveal.js"></script>
+
+	<!-- Switch to minified version after development -->
+	<script type='text/javascript' src='js/knockout-2.1.0.debug.js'></script>
+	<script type='text/javascript' src='js/underscore-1.3.3.js'></script>
+	<script type='text/javascript' src='js/async-0.1.22.js'></script>
+	
+	<!-- Got this from: http://www.diveintojavascript.com/projects/javascript-sprintf -->
+	<script type='text/javascript' src='js/sprintf-0.7-beta1.js'></script>
+	<script type='text/javascript' src='js/smileteacher.js'></script>
+	<script type='text/javascript' src='js/stacktrace-min-0.4.js'></script>
+	<script type='text/javascript' src='js/jquery.blockUI-2.66.0.js'></script>
+	<script type="text/javascript" src="js/rating.js"></script>
+	<script type="text/javascript" src="js/jquery.fineuploader-3.5.0.js"></script> 
+	<script>
+		$(document).foundation();
+	</script>
+
+</body>
+</html>
