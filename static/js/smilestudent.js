@@ -49,7 +49,7 @@ var SMILEROUTES = {
     "getresults": "/smile/student/%s/result"
 };
 
-var VERSION = '1.0.4';
+var VERSION = '1.0.5';
 
 //
 // 1 - login screen
@@ -645,13 +645,21 @@ function doSMSG() {
     }, success: function(data) {
         if (data) {
             msg = data["TYPE"];
+
             // console.log(data); // XXX Remove debug
             if (msg === "START_MAKE") {
-                if (SMILESTATE !== 3) {
+
+                if (SMILESTATE == 5) {
+                    statechange(5, 3);
+                }
+                else if (SMILESTATE !== 3) {
                     statechange(2, 3);
                 }
             }
             if (msg === "WAIT_CONNECT") {
+
+                // TODO: RTC #23 >> Should we call from here a method to update the status on student app?
+                statechange(SMILESTATE, 2);
             }
 
             if (msg === "START_SOLVE") {
@@ -874,8 +882,29 @@ function statechange(from, to, data, cb) {
             return;
         } // Teacher reset game, we should logout
         if (to == 2) {
+
             return;
-        } // Not sure why this would happen
+        }
+        if (to == 3) { // Enter Make Questions Phase
+
+            // Disable the popup "please wait for students answering questions"
+            $('div#answer-form-area').unblock();
+
+            SMILESTATE = 3;
+            $('div#inquiry-form-area').unblock();
+            var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["3"].id + '"]');
+            if ($next) {
+                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["3"].label + ' phase.', 2500);
+                console.log('go to href = ' + $next.attr('href'));
+                $next.removeClass('disabled');
+                var a = $next[0]; // get the dom obj
+                var evt = document.createEvent('MouseEvents');
+                evt.initEvent('click', true, true);
+                GlobalViewModel.sessionstatemsg("Start Making Questions until the teacher is ready to start Answering Questions")
+                a.dispatchEvent(evt);
+            }
+        }
+        // Not sure why this would happen
         if (to == 5) { // Enter Show Results Phase
             // Ignore
         }

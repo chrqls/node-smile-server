@@ -13,6 +13,9 @@ HTTP_STATUS_OK = '200';
 var MESSAGE_START_MAKE_QUESTION = {
     'TYPE' : 'START_MAKE'
 };
+var MESSAGE_RETAKE = {
+    'TYPE' : 'RE_TAKE'
+};
 var MESSAGE_WAIT_CONNECT = {
     'TYPE' : 'WAIT_CONNECT'
 };
@@ -279,7 +282,7 @@ exports.handleStartMakeQuestionPut = function(req, res) {
     game.setCurrentMessage(MESSAGE_START_MAKE_QUESTION);
 
     //
-    // Extract Teacher specific Sesssion Data
+    // Extract Teacher specific Session Data
     //
     // teacherName : <Any text or numerical name>
     // sessionName : <Any text or numerical name>
@@ -414,7 +417,7 @@ exports.handleStudentPut = function(req, res) {
 
 exports.handleResultsGet = function(req, res) {
     var results = game.calculateResults();
-    
+
     return res.sendJSON(HTTP_STATUS_OK, results);
 };
 
@@ -501,7 +504,7 @@ reset = function() {
     game = new Game(); // XXX Point to ponder, do we need to save before we destroy the server?
     game.setCurrentMessage({ TYPE: 'RESET' , TIMESTAMP: (new Date()).toUTCString(), EXPIRY: 1500});
     setTimeout(function() {
-        console.log("Remove RESET");
+        // Remove RESET
         game.setCurrentMessage({});
     }, 2000);
 };
@@ -543,36 +546,45 @@ exports.handleCsvPushQuestions = function(req, res) {
 //
 
 exports.handlePushMessage = function(req, res) {
+    
     var message = req.body;
-    game.registerMessage(message);
-    var type = message.TYPE || null;
-    if (type.indexOf("RE_TAKE") != -1) { // XXX What the heck is this?
-        type = 'RE_TAKE';
-    }
-    // console.log(message);
+    var type = null;
     var error = null;
+
+    if(JSON.stringify(message).indexOf("TYPE:'RE_TAKE'") != -1) {
+        type = 'RE_TAKE';
+        game.registerMessage(MESSAGE_RETAKE);
+    } else {
+        game.registerMessage(message);
+        type = message.TYPE || null;
+    }
+    
     switch (type) {
     case null:
         // Ignoring the message does not have a type
         console.warn("Unrecognized type: " + type);
         break;
     case 'QUESTION':
+        console.log('Adding question...');
         error = game.addQuestion(message);
         break;
     case 'QUESTION_PIC':
+        console.log('Adding question(p)...');
         error = game.addQuestion(message);
         break;
     case 'ANSWER':
         error = game.registerAnswerByMessage(message);
         break;
     case 'HAIL':
+        console.log('Adding student...');
         error = game.studentsWrapper.addStudent(message);
         break;
     case 'RE_TAKE':
-        game.setCurrentMessage(message);
+        console.log('Retaking...');
         error = game.retake();
         break;
     case 'RESET':
+        console.log('-Reset session-');
         game.setCurrentMessage({ TYPE: 'RESET'});
         break;
     default:
@@ -622,7 +634,14 @@ exports.createSessionFromTeacherApp = function(req, res) {
 exports.handlePushMsgPost = function(req, res) {
     var message = req.body.MSG;
     try {
-        req.body = JSON.parse(message);
+        if(message != undefined) {
+            req.body = JSON.parse(message);
+        } else { 
+            // RE_TAKE case: reparing RE_TAKE request...
+            for (var key in req.body) {
+                req.body = key;
+            }
+        }
         exports.handlePushMessage(req, res);
     } catch (e) {
         res.handleError("Can't parse Incoming JSON");
