@@ -44,6 +44,12 @@
 			border: black solid 0;
 			padding: 0 10px;
 		}
+		.style_redRight {
+			color:#D22;
+			font-size:12px;
+			float:right;
+			text-decoration: underline;
+		}
 	</style>
 </head>
 
@@ -98,8 +104,8 @@
 												<input type="text" data-bind='value: group_name, valueUpdate: "afterkeydown"' placeholder="Group" />
 
 												<ul class="button-group radius even-2">
-													<li><a href="#" data-bind='click: resetSession' class="secondary button">Reset</a></li>
-													<li><a href="#" data-bind='click: createSession' class="button">Next</a></li>
+													<li><a href="#" data-bind='click: resetSession' class="large secondary button">Reset</a></li>
+													<li><a href="#" data-bind='click: createSession' class="large button">Next</a></li>
 												</ul>
         									</div>
       									</section>
@@ -107,8 +113,8 @@
       									<section class="hidden">   						 				
         									<div smile="choose-activity-flow">
 												<ul class="button-group radius even-2">
-													<li><a href="#" data-bind='click: startMakingQuestions' class="button">Start making questions</a></li>
-													<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Use Prepared Questions</a></li>
+													<li><a href="#" data-bind='click: startMakingQuestions' class="large button">Start making questions</a></li>
+													<li><a href="#" data-bind='click: usePreparedQuestions' class="large button">Use Prepared Questions</a></li>
 												</ul>	
         									</div>
       									</section>
@@ -125,11 +131,12 @@
 												    	<td style="color:#444"><span data-bind="text: teacherName"></span></td>
 											    		<td style="color:#777"><span data-bind="text: groupName"></span></td>
 												    	<td style="color:#AAA"><span data-bind="text: date"></span></td>
+												    	<td style="color:#CCC"><span data-bind="text: size"></span></td>
 													</tr>    
 												</table>
 												
 												<ul class="button-group radius even-2">
-													<li><a href="#" data-bind='click: synchronizeWithServer' class="button secondary expand">Back</a></li>
+													<li><a href="#" data-bind='click: redirectView' class="button secondary expand">Back</a></li>
 													<li><a href="#" data-bind='click: startMakingQuestionsWithIQSet' class="success button expand">Load</a></li>
 												</ul>	
         									</div>
@@ -139,10 +146,12 @@
         									<div smile="general-board">
 												
 												<div class="section-container tabs" data-section="tabs">
+
 													
 													<section class="active">
 														<p class="title" data-section-title><a href="#">Students</a></p>
 														<div class="content" data-section-content>
+
 															<p>Students panel content goes here.</p>
 
 															<div data-bind="foreach: students" >
@@ -171,7 +180,7 @@
 																</tr>    
 															</table>
 
-															<a href="#" data-bind='click: synchronizeWithServer' class="tiny button">Save</a>
+															<a href="#" data-bind='click: redirectView' class="tiny button">Save</a>
 														</div>
 													</section>
 
@@ -186,7 +195,7 @@
 
         										<div data-bind="foreach: iqset_to_preview" >
 	        											
-        											<div style="color:#D22;font-size:12px">
+        											<div class="style_redRight">
 	        											<span data-bind="text: teacherName"></span>,
 	        											<span data-bind="text: groupName"></span>,
 	        											<span data-bind="text: date"></span>
@@ -202,7 +211,7 @@
 
 													    	<div data-bind="foreach: options" >
 															    <div>
-															    	<span style="color:blue;font-style:italic" data-bind="text: $data"></span>
+															    	<span style="color:blue;font-style:italic;font-size:11px;border:black solid 1px" data-bind="text: $data"></span>
 																</div>    
 															</div>
 														</div>    
@@ -238,7 +247,7 @@
 													<a href="#" onclick="confirmDeletion(this.name)" data-bind="attr: {name: session_id}" class="button round alert">Delete</a>    
 												</div>
 												
-												<a href="#" data-bind='click: synchronizeWithServer' class="secondary expand button">Back</a>
+												<a href="#" data-bind='click: redirectView' class="secondary expand button">Back</a>
         									</div>
       									</section>
 
@@ -248,7 +257,7 @@
         										Remove the question from session?
         										<input type="hidden" name="sessionIDtoDelete" value="" />
 												<ul class="button-group radius even-2">
-													<li><a href="#" data-bind='click: synchronizeWithServer' class="secondary button">Cancel</a></li>
+													<li><a href="#" data-bind='click: redirectView' class="secondary button">Cancel</a></li>
 													<li><a href="#" data-bind='click: removeQuestionFromSession' class="alert button">Confirm</a></li>
 												</ul>
         									</div>
