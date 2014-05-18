@@ -159,10 +159,8 @@ GlobalViewModel.redirectView = function() {
                 break;
 
             case 'QUESTION':
-            case 'QUESTION_PIC':
-                addQuestion(dataAll[i]);
-                break;
-
+            case 'QUESTION_PIC': addQuestion(dataAll[i]); break;
+            case 'HAIL':         addStudent(dataAll[i]);  break;
             default: break;
         }
     }
@@ -189,6 +187,7 @@ GlobalViewModel.resetSession = function() {
     this.session_name('');
     this.group_name('');
     GlobalViewModel.questions.removeAll();
+    GlobalViewModel.students.removeAll();
     clearInterval(deamon_updating_board);
     
     // Reset the session on server
@@ -304,7 +303,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
             for (i = 0; i < iqdata.length; i++) {
 
                 // We add the question on client side
-                addQuestion(iqdata[i]);
+                //addQuestion(iqdata[i]);
 
                 // Same job on server side
                 postMessage('question',iqdata[i]);
@@ -379,7 +378,7 @@ GlobalViewModel.removeQuestionFromSession = function() {
 
                 var urlDeletingQuestion = SMILEROUTES['deletequestion']+positionOfcurrentQuestion+'.json';
 
-                smileAlert('#globalstatus', 'url=='+urlDeletingQuestion, 'green'); 
+                smileAlert('#globalstatus', 'Deleted', 'green',1500); 
 
                 $.ajax({ 
                     cache: false, 
@@ -414,6 +413,34 @@ $(document).ready(function() {
     UTILITY
    --------- */
 
+function smileAlert(targetid, text, alerttype, lifetime) {
+    var defaultalert = 'secondary';
+    var redalert = 'alert';
+    var bluealert = '';
+    var greenalert = 'success';
+    var formatstr = '<div class="alert-box %s"> \
+        %s \
+        <a href="" class="close">&times;</a> \
+        </div>';
+    
+    if (!alerttype)                 { alerttype = defaultalert; } 
+    else if (alerttype === 'trace') { alerttype = redalert; 
+                                      text += ' : ' + printStackTrace(); } 
+    else if (alerttype === 'red')   { alerttype = redalert; } 
+    else if (alerttype === 'blue')  { alerttype = bluealert; } 
+    else if (alerttype === 'green') { alerttype = greenalert; } 
+    else                            { alerttype = defaultalert; }
+    
+    if (targetid) {
+        $(targetid).append(sprintf(formatstr, alerttype, text));
+    }
+    if (lifetime) {
+        setInterval(function() {
+            $(targetid).find('.alert-box').fadeOut().remove();
+        }, lifetime)
+    }
+}
+
 function switchSection(newSection) {
     $('section.visible').removeClass('visible').addClass('hidden');
     $('div[smile='+newSection+']').parent().addClass('visible').removeClass('hidden');
@@ -426,7 +453,6 @@ function addQuestion(question) {
     var options = [];
     options.push(question.O1,question.O2,question.O3,question.O4);
 
-
     GlobalViewModel.questions.push(
         new Question(
             question.SessionID,
@@ -437,26 +463,22 @@ function addQuestion(question) {
             options,
             question.IP,
             question.TYPE
-        )
-    );
+    ));
+}
+function addStudent(student) {
+
+    GlobalViewModel.students.push(
+        new Student(
+            student.NAME,
+            student.IP
+    ));
 }
 
-/*
-var guid = (function() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-               .toString(16)
-               .substring(1);
-  }
-  return function() {
-    return s4()+s4()+'-'+s4()+'-'+s4()+'-'+s4()+'-'+s4()+s4()+s4();
-  };
-})();
-*/
 function updateGVM() {
 
     var dataAll = JSON.parse(smile_all());
-    var questionsOfGVM = '';
+    var GVM_questions = '';
+    var GVM_students = '';
 
     // Removing questions not present on server
     for(i=0; i<GlobalViewModel.questions().length; i++) {
@@ -464,23 +486,55 @@ function updateGVM() {
         if(!JSON.stringify(dataAll).contains('"SessionID":"'+GlobalViewModel.questions()[i].session_id+'"')) {
             GlobalViewModel.questions.remove(GlobalViewModel.questions()[i]);
         } else {
-            questionsOfGVM += JSON.stringify(GlobalViewModel.questions()[i]);
+            GVM_questions += JSON.stringify(GlobalViewModel.questions()[i]);
+        }
+    }
+    // Removing students not present on server
+    for(i=0; i<GlobalViewModel.students().length; i++) {
+
+        if(!JSON.stringify(dataAll).contains('"IP":"'+GlobalViewModel.students()[i].ip+'"')) {
+            GlobalViewModel.students.remove(GlobalViewModel.students()[i]);
+        } else {
+            GVM_students += JSON.stringify(GlobalViewModel.students()[i]);
         }
     }
 
-    // Adding questions not present on teacher webapp
+    // Adding questions and students not present on teacher webapp
     for(i=0; i<dataAll.length; i++) {
 
         if(dataAll[i].TYPE === 'QUESTION' || dataAll[i].TYPE === 'QUESTION_PIC') {
         
-            if(!questionsOfGVM.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
+            if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
                 addQuestion(dataAll[i]);
                 smileAlert('#globalstatus','New question!','',1500);
+            }
+        } else if(dataAll[i].TYPE === 'HAIL') {
+            
+            if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
+                addStudent(dataAll[i]);
+                smileAlert('#globalstatus','New student!','',1500);
             }
         }
     }
 }
 
+function typeExist(type) {
+
+    var answer = false;
+
+    // We get the /smile/all
+    var dataAll = JSON.parse(smile_all());
+
+    for(i=0; i<dataAll.length; i++) {
+        if(dataAll[i].TYPE === type) answer = true;
+    }
+    return answer;
+}
+
+/*
+        ----------
+           POST 
+        ----------*/
 function postMessage(type,values) {
 
     switch(type) {
@@ -557,6 +611,10 @@ function postMessage(type,values) {
     }
 }
 
+/*
+        ---------
+           GET 
+        ---------*/
 function smile_all() {
 
     var all;
@@ -574,19 +632,6 @@ function smile_all() {
         success: function(data) { all = data; }
     });
     return all;
-}
-
-function typeExist(type) {
-
-    var answer = false;
-
-    // We get the /smile/all
-    var dataAll = JSON.parse(smile_all());
-
-    for(i=0; i<dataAll.length; i++) {
-        if(dataAll[i].TYPE === type) answer = true;
-    }
-    return answer;
 }
 
 function smile_reset() {
@@ -648,38 +693,3 @@ function smile_iqset(id) {
     return iqset;
 }
 
-
-// alerttype
-//  - by default, none is required if you don't intend to use lifetime
-//  - trace : use the stacktrace in the error message
-//  - red : display a red color alert
-//  - blue : display a blue color alert
-//  - green : display a green color alert
-//
-function smileAlert(targetid, text, alerttype, lifetime) {
-    var defaultalert = 'secondary';
-    var redalert = 'alert';
-    var bluealert = '';
-    var greenalert = 'success';
-    var formatstr = '<div class="alert-box %s"> \
-        %s \
-        <a href="" class="close">&times;</a> \
-        </div>';
-    
-    if (!alerttype)                 { alerttype = defaultalert; } 
-    else if (alerttype === 'trace') { alerttype = redalert; 
-                                      text += ' : ' + printStackTrace(); } 
-    else if (alerttype === 'red')   { alerttype = redalert; } 
-    else if (alerttype === 'blue')  { alerttype = bluealert; } 
-    else if (alerttype === 'green') { alerttype = greenalert; } 
-    else                            { alerttype = defaultalert; }
-    
-    if (targetid) {
-        $(targetid).append(sprintf(formatstr, alerttype, text));
-    }
-    if (lifetime) {
-        setInterval(function() {
-            $(targetid).find('.alert-box').fadeOut().remove();
-        }, lifetime)
-    }
-}
