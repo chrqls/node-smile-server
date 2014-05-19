@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.5.1';
+var VERSION = '0.6.1';
 
 var SMILEROUTES = {
     "all": "/smile/all",
@@ -443,7 +443,7 @@ function smileAlert(targetid, text, alerttype, lifetime) {
 
 function switchSection(newSection) {
     $('section.visible').removeClass('visible').addClass('hidden');
-    $('div[smile='+newSection+']').parent().addClass('visible').removeClass('hidden');
+    $('section[smile='+newSection+']').addClass('visible').removeClass('hidden');
 }
 
 // Should I really have this skeleton? or directly having the add________ in the loop synchronizing everytime ?
@@ -474,9 +474,12 @@ function addStudent(student) {
     ));
 }
 
+// To recap, each time this function is called, it updates students, questions, and session values
 function updateGVM() {
 
+    // Getting /smile/all
     var dataAll = JSON.parse(smile_all());
+
     var GVM_questions = '';
     var GVM_students = '';
 
@@ -513,6 +516,12 @@ function updateGVM() {
             if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
                 addStudent(dataAll[i]);
                 smileAlert('#globalstatus','New student!','',1500);
+            }
+        } else if(dataAll[i].TYPE === 'SESSION_VALUES') {
+            if(dataAll[i].teacherName !== GlobalViewModel.teacher_name()) {
+                GlobalViewModel.teacher_name(dataAll[i].teacherName);
+                GlobalViewModel.session_name(dataAll[i].sessionName);
+                GlobalViewModel.group_name(dataAll[i].groupName);
             }
         }
     }
