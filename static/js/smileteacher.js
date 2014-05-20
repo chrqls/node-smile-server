@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.4.3';
+var VERSION = '0.6.1';
 
 var SMILEROUTES = {
     "all": "/smile/all",
@@ -40,6 +40,8 @@ var SMILEROUTES = {
     "startmake": "/smile/startmakequestion",
     "deletequestion": "/smile/questionview/"
 };
+
+var deamon_updating_board;
 
 /* --------
     MODELS
@@ -63,7 +65,7 @@ var Question = function(sessionID,urlImage,author,question,answer,options,ip,typ
     this.type = type;
 }
 
-var IQSet = function(position,id,title,teacherName,groupName,date) {
+var IQSet = function(position,id,title,teacherName,groupName,date,size) {
 
     this.position = position;
     this.id = id;
@@ -72,7 +74,7 @@ var IQSet = function(position,id,title,teacherName,groupName,date) {
     this.groupName = groupName;
     this.date = date;
     this.questions = [];
-    //this.size = size;
+    this.size = size;
 }
 
 var GlobalViewModel = {
@@ -131,8 +133,7 @@ ko.extenders.required = function(target, overrideMessage) {
     ACTIONS
    --------- */
 
-// Displays directly a "Recovering Session" button if a session is already running (instead of the session values fields)
-GlobalViewModel.synchronizeWithServer = function() {
+GlobalViewModel.redirectView = function() {
 
     GlobalViewModel.questions.removeAll();
 
@@ -153,14 +154,13 @@ GlobalViewModel.synchronizeWithServer = function() {
 
             case 'START_MAKE':
                 section = 'general-board';
+                clearInterval(deamon_updating_board);
+                deamon_updating_board = setInterval(updateGVM, 5000);
                 break;
 
             case 'QUESTION':
-            case 'QUESTION_PIC':
-                addQuestion(dataAll[i]);
-                section = 'general-board';
-                break;
-
+            case 'QUESTION_PIC': addQuestion(dataAll[i]); break;
+            case 'HAIL':         addStudent(dataAll[i]);  break;
             default: break;
         }
     }
@@ -169,14 +169,16 @@ GlobalViewModel.synchronizeWithServer = function() {
 
 GlobalViewModel.createSession = function() {
     
-    if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Unknown'); }
-    if (!this.session_name() || this.session_name() === "") { this.session_name('Unspecified'); }
-    if (!this.group_name() || this.group_name() === "")     { this.group_name('General');  }
-    
-    // Send session values to server
-    postMessage('session');
+    if(typeExist('SESSION_VALUES')) {
+        this.redirectView();
+    } else {
+        if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Unknown'); }
+        if (!this.session_name() || this.session_name() === "") { this.session_name('Unspecified'); }
+        if (!this.group_name() || this.group_name() === "")     { this.group_name('General');  }
 
-    return false;
+        // Send session values to server
+        postMessage('session');
+    }
 }
 
 GlobalViewModel.resetSession = function() {
@@ -184,114 +186,55 @@ GlobalViewModel.resetSession = function() {
     this.teacher_name('');
     this.session_name('');
     this.group_name('');
+    GlobalViewModel.questions.removeAll();
+    GlobalViewModel.students.removeAll();
+    clearInterval(deamon_updating_board);
     
     // Reset the session on server
-    postMessage('reset');
+    smile_reset();
 
-    GlobalViewModel.questions.removeAll();
-
-    //window.location.href = window.location.pathname;
-    //window.location.reload(true);
+    this.redirectView();
 }
 
 GlobalViewModel.startMakingQuestions = function() {
 
-    // Send start make phase to server
-    postMessage('startmake');
+    // If a session does not already exist, we send a 'start_make' signal to the server
+    if(!typeExist('START_MAKE')) postMessage('startmake');
 
-    switchSection('general-board');
-
-    return false;
+    this.redirectView();
 }
 
 GlobalViewModel.usePreparedQuestions = function() {
 
-    // Refresh 
-    switchSection('list-of-iqsets');
+    if(typeExist('START_MAKE')) {
+        this.redirectView();
+    } else {
 
-    $.ajax({ 
-        cache: false, 
-        type: "GET", 
-        dataType: "text", 
-        url: SMILEROUTES["iqsets"], 
-        data: {}, 
-        
-        error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
-        }, 
-        
-        success: function(data) {
+        // Redirecting view
+        switchSection('list-of-iqsets');
 
-            var dataObject = JSON.parse(data);
-            var iqsets = dataObject.rows;
+        // Getting iqsets from server
+        var dataObject = JSON.parse(smile_iqsets());
+        var iqsets = dataObject.rows;
 
-            //TEMP_POSITION = 0;
+        GlobalViewModel.iqsets.removeAll();
 
-            GlobalViewModel.iqsets.removeAll();
+        for (i=0; i < dataObject.total_rows; i++) {
 
-            for (i = 0; i < dataObject.total_rows; i++) {
+            // Getting the current iqset
+            var iqset = JSON.parse(smile_iqset(iqsets[i].id));
 
-                // Getting the values accessible from /smile/iqsets
-                /*
-                TEMP_IQSET.position = i;
-                TEMP_IQSET.id = iqsets[i].id;
-                TEMP_IQSET.sessionName = iqsets[i].value[0];
-                TEMP_IQSET.teacherName = iqsets[i].value[1];
-                TEMP_IQSET.groupName = iqsets[i].value[2];
-                TEMP_IQSET.date = iqsets[i].key.substr(0, 10);
-                */
-
-                GlobalViewModel.iqsets.push(new IQSet(
-                    i,
-                    iqsets[i].id,
-                    iqsets[i].value[0],
-                    iqsets[i].value[1],
-                    iqsets[i].value[2],
-                    iqsets[i].key.substr(0, 10)
-                ));
-
-                //smileAlert('#globalstatus', 'during push='+GlobalViewModel.iqsets.length, 'blue', 15000);
-
-                
-                /*
-                // Getting the values accessible from /smile/iqset/{id} (for now, the size)          
-                $.ajax({ 
-                    cache: false, 
-                    type: "GET", 
-                    dataType: "text", 
-                    url: SMILEROUTES["iqset"]+iqsets[i].id, 
-                    data: {}, 
-                    error: function(xhr, text, err) { smileAlert('#globalstatus', 'Unable to ajax in ajax.', 'trace'); }, 
-                    
-                    success: function(data) {
-                        var iqset = JSON.parse(data);
-
-
-                        smileAlert('#globalstatus', 'TEMP_POSITION='+TEMP_POSITION, 'green', 15000);
-                        //GlobalViewModel.iqsets[0].size = iqset.iqdata.length;
-
-                        TEMP_POSITION++;
-
-                        //smileAlert('#globalstatus', '???='+iqset.title, 'green', 15000);
-
-
-                        // The IQSet is ready, we can add it to the list
-                        //GlobalViewModel.iqsets.push(TEMP_IQSET);
-
-                        //smileAlert('#globalstatus', 'session name='+TEMP_IQSET.sessionName, 'green', 5000);
-                    }
-                });
-
-                */
-            }
+            GlobalViewModel.iqsets.push(new IQSet(
+                i,
+                iqsets[i].id,
+                iqsets[i].value[0],
+                iqsets[i].value[1],
+                iqsets[i].value[2],
+                iqsets[i].key.substr(0, 10),
+                iqset.iqdata.length
+            ));  
         }
-    });
-
-    //smileAlert('#globalstatus', 'FINAL='+GlobalViewModel.iqsets.length, 'blue', 15000);
-
-    //GlobalViewModel.iqsets = TEMP_IQSETS;
-
-    return false;
+    }
 }
 
 function previewIQSet(idIQSet) {
@@ -360,7 +303,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
             for (i = 0; i < iqdata.length; i++) {
 
                 // We add the question on client side
-                addQuestion(iqdata[i]);
+                //addQuestion(iqdata[i]);
 
                 // Same job on server side
                 postMessage('question',iqdata[i]);
@@ -369,7 +312,9 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     });
     
     postMessage('startmake');
-    this.synchronizeWithServer();
+
+    deamon_updating_board = setInterval(updateGVM, 5000);
+    this.redirectView();
 }
 
 function detailQuestion(sessionID) {
@@ -433,7 +378,7 @@ GlobalViewModel.removeQuestionFromSession = function() {
 
                 var urlDeletingQuestion = SMILEROUTES['deletequestion']+positionOfcurrentQuestion+'.json';
 
-                smileAlert('#globalstatus', 'url=='+urlDeletingQuestion, 'green'); 
+                smileAlert('#globalstatus', 'Deleted', 'green',1500); 
 
                 $.ajax({ 
                     cache: false, 
@@ -461,16 +406,44 @@ $(document).ready(function() {
     // Init Data Model
     ko.applyBindings(GlobalViewModel);
 
-    GlobalViewModel.synchronizeWithServer();
+    GlobalViewModel.redirectView();
 });
 
 /* ---------
     UTILITY
    --------- */
 
+function smileAlert(targetid, text, alerttype, lifetime) {
+    var defaultalert = 'secondary';
+    var redalert = 'alert';
+    var bluealert = '';
+    var greenalert = 'success';
+    var formatstr = '<div class="alert-box %s"> \
+        %s \
+        <a href="" class="close">&times;</a> \
+        </div>';
+    
+    if (!alerttype)                 { alerttype = defaultalert; } 
+    else if (alerttype === 'trace') { alerttype = redalert; 
+                                      text += ' : ' + printStackTrace(); } 
+    else if (alerttype === 'red')   { alerttype = redalert; } 
+    else if (alerttype === 'blue')  { alerttype = bluealert; } 
+    else if (alerttype === 'green') { alerttype = greenalert; } 
+    else                            { alerttype = defaultalert; }
+    
+    if (targetid) {
+        $(targetid).append(sprintf(formatstr, alerttype, text));
+    }
+    if (lifetime) {
+        setInterval(function() {
+            $(targetid).find('.alert-box').fadeOut().remove();
+        }, lifetime)
+    }
+}
+
 function switchSection(newSection) {
     $('section.visible').removeClass('visible').addClass('hidden');
-    $('div[smile='+newSection+']').parent().addClass('visible').removeClass('hidden');
+    $('section[smile='+newSection+']').addClass('visible').removeClass('hidden');
 }
 
 // Should I really have this skeleton? or directly having the add________ in the loop synchronizing everytime ?
@@ -490,33 +463,90 @@ function addQuestion(question) {
             options,
             question.IP,
             question.TYPE
-        )
-    );
+    ));
+}
+function addStudent(student) {
+
+    GlobalViewModel.students.push(
+        new Student(
+            student.NAME,
+            student.IP
+    ));
 }
 
+// To recap, each time this function is called, it updates students, questions, and session values
+function updateGVM() {
+
+    // Getting /smile/all
+    var dataAll = JSON.parse(smile_all());
+
+    var GVM_questions = '';
+    var GVM_students = '';
+
+    // Removing questions not present on server
+    for(i=0; i<GlobalViewModel.questions().length; i++) {
+
+        if(!JSON.stringify(dataAll).contains('"SessionID":"'+GlobalViewModel.questions()[i].session_id+'"')) {
+            GlobalViewModel.questions.remove(GlobalViewModel.questions()[i]);
+        } else {
+            GVM_questions += JSON.stringify(GlobalViewModel.questions()[i]);
+        }
+    }
+    // Removing students not present on server
+    for(i=0; i<GlobalViewModel.students().length; i++) {
+
+        if(!JSON.stringify(dataAll).contains('"IP":"'+GlobalViewModel.students()[i].ip+'"')) {
+            GlobalViewModel.students.remove(GlobalViewModel.students()[i]);
+        } else {
+            GVM_students += JSON.stringify(GlobalViewModel.students()[i]);
+        }
+    }
+
+    // Adding questions and students not present on teacher webapp
+    for(i=0; i<dataAll.length; i++) {
+
+        if(dataAll[i].TYPE === 'QUESTION' || dataAll[i].TYPE === 'QUESTION_PIC') {
+        
+            if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
+                addQuestion(dataAll[i]);
+                smileAlert('#globalstatus','New question!','',1500);
+            }
+        } else if(dataAll[i].TYPE === 'HAIL') {
+            
+            if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
+                addStudent(dataAll[i]);
+                smileAlert('#globalstatus','New student!','',1500);
+            }
+        } else if(dataAll[i].TYPE === 'SESSION_VALUES') {
+            if(dataAll[i].teacherName !== GlobalViewModel.teacher_name()) {
+                GlobalViewModel.teacher_name(dataAll[i].teacherName);
+                GlobalViewModel.session_name(dataAll[i].sessionName);
+                GlobalViewModel.group_name(dataAll[i].groupName);
+            }
+        }
+    }
+}
+
+function typeExist(type) {
+
+    var answer = false;
+
+    // We get the /smile/all
+    var dataAll = JSON.parse(smile_all());
+
+    for(i=0; i<dataAll.length; i++) {
+        if(dataAll[i].TYPE === type) answer = true;
+    }
+    return answer;
+}
+
+/*
+        ----------
+           POST 
+        ----------*/
 function postMessage(type,values) {
 
     switch(type) {
-
-        case 'reset':
-
-            $.ajax({ 
-                cache: false, 
-                type: "GET", 
-                dataType: "text", 
-                //contentType: "application/json", 
-                url: SMILEROUTES['reset'],
-                data: {}, 
-                async: false,
-                
-                error: function(xhr, text, err) {
-                    smileAlert('#globalstatus', 'Unable to reset', 'trace');
-                }, 
-                success: function(data) {
-                    switchSection('create-session');
-                }
-            });
-            break;
 
         case 'session':
 
@@ -590,6 +620,10 @@ function postMessage(type,values) {
     }
 }
 
+/*
+        ---------
+           GET 
+        ---------*/
 function smile_all() {
 
     var all;
@@ -607,6 +641,46 @@ function smile_all() {
         success: function(data) { all = data; }
     });
     return all;
+}
+
+function smile_reset() {
+
+    $.ajax({ 
+        cache: false, 
+        type: "GET", 
+        dataType: "text", 
+        //contentType: "application/json", 
+        url: SMILEROUTES['reset'],
+        data: {}, 
+        async: false,
+        
+        error: function(xhr, text, err) {
+            smileAlert('#globalstatus', 'Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, 'trace');
+        }, 
+        success: function(data) {}
+    });
+}
+
+function smile_iqsets() {
+
+    var iqsets;
+
+    $.ajax({ 
+        cache: false, 
+        type: "GET", 
+        dataType: "text", 
+        url: SMILEROUTES["iqsets"],
+        async: false,
+        data: {}, 
+        
+        error: function(xhr, text, err) {
+            smileAlert('#globalstatus', 'Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+        }, 
+        success: function(data) { 
+            iqsets = data; 
+        }
+    });
+    return iqsets;
 }
 
 function smile_iqset(id) {
@@ -628,38 +702,3 @@ function smile_iqset(id) {
     return iqset;
 }
 
-
-// alerttype
-//  - by default, none is required if you don't intend to use lifetime
-//  - trace : use the stacktrace in the error message
-//  - red : display a red color alert
-//  - blue : display a blue color alert
-//  - green : display a green color alert
-//
-function smileAlert(targetid, text, alerttype, lifetime) {
-    var defaultalert = 'secondary';
-    var redalert = 'alert';
-    var bluealert = '';
-    var greenalert = 'success';
-    var formatstr = '<div class="alert-box %s"> \
-        %s \
-        <a href="" class="close">&times;</a> \
-        </div>';
-    
-    if (!alerttype)                 { alerttype = defaultalert; } 
-    else if (alerttype === 'trace') { alerttype = redalert; 
-                                      text += ' : ' + printStackTrace(); } 
-    else if (alerttype === 'red')   { alerttype = redalert; } 
-    else if (alerttype === 'blue')  { alerttype = bluealert; } 
-    else if (alerttype === 'green') { alerttype = greenalert; } 
-    else                            { alerttype = defaultalert; }
-    
-    if (targetid) {
-        $(targetid).append(sprintf(formatstr, alerttype, text));
-    }
-    if (lifetime) {
-        setInterval(function() {
-            $(targetid).find('.alert-box').fadeOut().remove();
-        }, lifetime)
-    }
-}
