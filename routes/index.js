@@ -370,9 +370,9 @@ exports.handleStudentResultsGet = function(req, res) {
 
 exports.handleStartSolveQuestionPut = function(req, res) {
     var timeLimit = 10; // The same time limit of old implementation.
-    if (req.body.TIME_LIMIT) {
-        timeLimit = req.body.TIME_LIMIT;
-    }
+    //if (req.body.TIME_LIMIT !== undefined && req.body.TIME_LIMIT) {
+    //    timeLimit = req.body.TIME_LIMIT;
+    //}
     var numberOfQuestions = game.questions.getNumberOfQuestions();
     var rightAnswers = game.questions.getRightAnswers();
     var message = {};

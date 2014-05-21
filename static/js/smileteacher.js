@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.6.1';
+var VERSION = '0.6.2';
 
 var SMILEROUTES = {
     "all": "/smile/all",
@@ -38,6 +38,8 @@ var SMILEROUTES = {
     "question": "/smile/question",
     "session": "/smile/createsession",
     "startmake": "/smile/startmakequestion",
+    "startsolve": "/smile/startsolvequestion",
+    "seeresults": "/smile/sendshowresults",
     "deletequestion": "/smile/questionview/"
 };
 
@@ -85,6 +87,7 @@ var GlobalViewModel = {
     teacher_name: ko.observable(''),
     session_name: ko.observable(''),
     group_name: ko.observable(''),
+    status: ko.observable(''),
 
     // Use prepared questions
     iqsets: ko.observableArray([]),
@@ -158,6 +161,16 @@ GlobalViewModel.redirectView = function() {
                 deamon_updating_board = setInterval(updateGVM, 5000);
                 break;
 
+            case 'START_SOLVE':
+                $('.start_solving').addClass('hidden');
+                $('.see_results').removeClass('hidden');
+                break;
+
+            case 'START_SHOW':
+                $('.see_results').addClass('hidden');
+                $('.retake').removeClass('hidden');
+                break;
+
             case 'QUESTION':
             case 'QUESTION_PIC': addQuestion(dataAll[i]); break;
             case 'HAIL':         addStudent(dataAll[i]);  break;
@@ -169,9 +182,7 @@ GlobalViewModel.redirectView = function() {
 
 GlobalViewModel.createSession = function() {
     
-    if(typeExist('SESSION_VALUES')) {
-        this.redirectView();
-    } else {
+    if(!typeExist('SESSION_VALUES')) {
         if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Unknown'); }
         if (!this.session_name() || this.session_name() === "") { this.session_name('Unspecified'); }
         if (!this.group_name() || this.group_name() === "")     { this.group_name('General');  }
@@ -179,6 +190,7 @@ GlobalViewModel.createSession = function() {
         // Send session values to server
         postMessage('session');
     }
+    this.redirectView();
 }
 
 GlobalViewModel.resetSession = function() {
@@ -186,6 +198,7 @@ GlobalViewModel.resetSession = function() {
     this.teacher_name('');
     this.session_name('');
     this.group_name('');
+    this.status('');
     GlobalViewModel.questions.removeAll();
     GlobalViewModel.students.removeAll();
     clearInterval(deamon_updating_board);
@@ -314,6 +327,28 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     postMessage('startmake');
 
     deamon_updating_board = setInterval(updateGVM, 5000);
+    this.redirectView();
+}
+
+GlobalViewModel.startSolvingQuestions = function() {
+
+    $('.start_solving').addClass('hidden');
+    
+    postMessage('startsolve');
+    this.redirectView();
+}
+
+GlobalViewModel.seeResults = function() {
+
+    $('.see_results').addClass('hidden');
+    
+    postMessage('seeresults');
+    this.redirectView();
+}
+
+GlobalViewModel.retake = function() {
+    
+    postMessage('seeresults');
     this.redirectView();
 }
 
@@ -502,28 +537,58 @@ function updateGVM() {
         }
     }
 
-    // Adding questions and students not present on teacher webapp
+    // Update all values available on server in the GlobalViewModel
     for(i=0; i<dataAll.length; i++) {
 
-        if(dataAll[i].TYPE === 'QUESTION' || dataAll[i].TYPE === 'QUESTION_PIC') {
-        
-            if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
-                addQuestion(dataAll[i]);
-                smileAlert('#globalstatus','New question!','',1500);
-            }
-        } else if(dataAll[i].TYPE === 'HAIL') {
-            
-            if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
-                addStudent(dataAll[i]);
-                smileAlert('#globalstatus','New student!','',1500);
-            }
-        } else if(dataAll[i].TYPE === 'SESSION_VALUES') {
+        switch(dataAll[i].TYPE) {
+
+            case 'START_MAKE':  
+                GlobalViewModel.status('START_MAKE'); 
+                break;
+            case 'START_SOLVE': 
+                GlobalViewModel.status('START_SOLVE');
+                $('.see_results').removeClass('hidden');
+                break;
+            case 'START_SHOW':  
+                GlobalViewModel.status('START_SHOW');
+                $('.retake').removeClass('hidden');
+                break;
+
+            case 'SESSION_VALUES':
             if(dataAll[i].teacherName !== GlobalViewModel.teacher_name()) {
                 GlobalViewModel.teacher_name(dataAll[i].teacherName);
                 GlobalViewModel.session_name(dataAll[i].sessionName);
                 GlobalViewModel.group_name(dataAll[i].groupName);
             }
+            break;
+
+            case 'HAIL':
+            if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
+                addStudent(dataAll[i]);
+                smileAlert('#globalstatus','New student!','',1500);
+            }
+            break;
+
+            case 'QUESTION':
+            case 'QUESTION_PIC':
+            if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
+                addQuestion(dataAll[i]);
+                smileAlert('#globalstatus','New question!','',1500);
+            }
+            break;
         }
+
+        /*
+        if( === 'QUESTION' || dataAll[i].TYPE === 'QUESTION_PIC') {
+        
+            
+        } else if(dataAll[i].TYPE === 'HAIL') {
+            
+            
+        } else if(dataAll[i].TYPE === 'SESSION_VALUES') {
+            
+        }
+        */
     }
 }
 
@@ -565,9 +630,7 @@ function postMessage(type,values) {
                 error: function(xhr, text, err) {
                     smileAlert('#globalstatus', 'Unable to send SESSION_VALUES to server', 'trace');
                 }, 
-                success: function(data) {
-                    switchSection('choose-activity-flow');
-                }
+                success: function(data) {}
             });
             break;
 
@@ -583,6 +646,41 @@ function postMessage(type,values) {
                 
                 error: function(xhr, text, err) {
                     smileAlert('#globalstatus', 'Unable to send START_MAKE phase', 'trace');
+                }, 
+                success: function(data) {}
+            });
+            break;
+
+        case 'startsolve':
+
+            $.ajax({ 
+                cache: false, 
+                type: "GET", 
+                contentType: "application/json",
+                dataType: "text",
+                url: SMILEROUTES['startsolve'],
+                data: {}, 
+                //async: false,
+                
+                error: function(xhr, text, err) {
+                    smileAlert('#globalstatus', 'Unable to send START_SOLVE phase', 'trace');
+                }, 
+                success: function(data) {}
+            });
+            break;
+
+        case 'seeresults':
+
+            $.ajax({ 
+                cache: false, 
+                type: "POST", 
+                contentType: "application/json",
+                url: SMILEROUTES['seeresults'],
+                data: {}, 
+                //async: false,
+                
+                error: function(xhr, text, err) {
+                    smileAlert('#globalstatus', 'Unable to send START_SHOW phase', 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -614,7 +712,7 @@ function postMessage(type,values) {
                 error: function(xhr, text, err) {
                     smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
                 }, 
-                success: function(data) { }
+                success: function(data) {}
             });
             break;
     }
