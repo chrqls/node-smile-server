@@ -551,6 +551,7 @@ function updateGVM() {
                 break;
             case 'START_SHOW':  
                 GlobalViewModel.status('START_SHOW');
+                $('.see_results').addClass('hidden');
                 $('.retake').removeClass('hidden');
                 break;
 
@@ -673,7 +674,7 @@ function postMessage(type,values) {
 
             $.ajax({ 
                 cache: false, 
-                type: "POST", 
+                type: "GET", 
                 contentType: "application/json",
                 url: SMILEROUTES['seeresults'],
                 data: {}, 
