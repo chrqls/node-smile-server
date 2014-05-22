@@ -214,7 +214,7 @@ GlobalViewModel.startMakingQuestions = function() {
     // If a session does not already exist, we send a 'start_make' signal to the server
     if(!typeExist('START_MAKE')) postMessage('startmake');
 
-    this.redirectView();
+    location.reload();
 }
 
 GlobalViewModel.usePreparedQuestions = function() {
@@ -387,6 +387,11 @@ function detailQuestion(sessionID) {
             );
         }
     }
+
+    if(GlobalViewModel.status() !== 'START_MAKE') {
+        $('section[smile=question-detail]').find('a.delete').addClass('hidden');
+    } 
+        
     switchSection('question-detail');
 }
 

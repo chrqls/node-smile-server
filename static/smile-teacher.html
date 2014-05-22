@@ -236,16 +236,14 @@
 
 									    	<div data-bind="foreach: options" >
 											    <div>
-											    	<span style="color:blue;font-style:italic;font-size:11px;border:black solid 1px" data-bind="text: $data"></span>
+											    	<span style="color:grey;font-style:italic;font-size:11px" data-bind="text: $data"></span>
 												</div>    
 											</div>
 										</div>    
 									</div>
 								</div>
 
-								<ul class="button-group even two-up">
-									<li><a href="#" data-bind='click: usePreparedQuestions' class="button">Back</a></li>
-								</ul>
+								<a href="#" data-bind='click: usePreparedQuestions' class="expand secondary button">Back</a>
 							</section>
 
 							<section  smile="question-detail" class="hidden">
@@ -259,7 +257,7 @@
 										</span>
 
 								    	<div data-bind="foreach: options" >
-										    <div><span style="color:blue;font-style:italic" data-bind="text: $data"></span></div>    
+										    <div><span style="color:grey;font-style:italic" data-bind="text: $data"></span></div>    
 										</div>
 										
 										<p>
@@ -267,7 +265,7 @@
 											<img data-bind="attr:{src: urlImage}">
 										</p>
 									</div>
-									<a href="#" onclick="confirmDeletion(this.name)" data-bind="attr: {name: session_id}" class="alert expand button">Delete</a>    
+									<a href="#" onclick="confirmDeletion(this.name)" data-bind="attr: {name: session_id}" class="alert expand button delete">Delete</a>    
 								</div>
 								
 								<a href="#" data-bind='click: redirectView' class="secondary expand button">Back</a>
