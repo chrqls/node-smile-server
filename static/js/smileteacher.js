@@ -327,7 +327,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     postMessage('startmake');
 
     deamon_updating_board = setInterval(updateGVM, 5000);
-    this.redirectView();
+    location.reload();
 }
 
 GlobalViewModel.startSolvingQuestions = function() {
