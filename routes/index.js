@@ -834,7 +834,7 @@ exports.handleQuestionImageGet = function(req, res) {
     console.log('CRASH AT THIS MOMENT>>'+game.questions.getQuestionPicture(questionNumber));
     var dataBuffer = new Buffer(game.questions.getQuestionPicture(questionNumber), 'base64');
     res.writeHead(200, {
-        'Content-Type' : 'image/jpeg',
+        'Content-Type' : 'image/jpeg'
     });
     res.write(dataBuffer);
     res.end();

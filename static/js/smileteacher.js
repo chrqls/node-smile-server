@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.6.2';
+var VERSION = '0.6.3';
 
 var SMILEROUTES = {
     "all": "/smile/all",
@@ -139,6 +139,7 @@ ko.extenders.required = function(target, overrideMessage) {
 GlobalViewModel.redirectView = function() {
 
     GlobalViewModel.questions.removeAll();
+    GlobalViewModel.students.removeAll();
 
     // We get the /smile/all
     var dataAll = JSON.parse(smile_all());
@@ -333,22 +334,22 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
 GlobalViewModel.startSolvingQuestions = function() {
 
     $('.start_solving').addClass('hidden');
-    
     postMessage('startsolve');
+    //smileAlert('#globalstatus', 'Unable to remove question from session', 'trace');
     this.redirectView();
 }
 
 GlobalViewModel.seeResults = function() {
 
     $('.see_results').addClass('hidden');
-    
     postMessage('seeresults');
+    //smileAlert('#globalstatus', 'Unable to remove question from session', 'trace');
     this.redirectView();
 }
 
 GlobalViewModel.retake = function() {
     
-    postMessage('seeresults');
+    // postMessage('seeresults');
     this.redirectView();
 }
 
@@ -547,7 +548,10 @@ function updateGVM() {
 
         switch(dataAll[i].TYPE) {
 
-            case 'START_MAKE':  
+            case 'START_MAKE':
+                if(GlobalViewModel.students().length > 0) {
+                    $('.start_solving').removeClass('hidden');
+                }
                 GlobalViewModel.status('START_MAKE'); 
                 break;
             case 'START_SOLVE': 
@@ -571,7 +575,7 @@ function updateGVM() {
             case 'HAIL':
             if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
                 addStudent(dataAll[i]);
-                smileAlert('#globalstatus','New student!','',1500);
+                smileAlert('#globalstatus','Student: '+dataAll[i].NAME,'',1500);
             }
             break;
 
@@ -671,7 +675,9 @@ function postMessage(type,values) {
                 error: function(xhr, text, err) {
                     smileAlert('#globalstatus', 'Unable to send START_SOLVE phase', 'trace');
                 }, 
-                success: function(data) {}
+                success: function(data) {
+                    smileAlert('#globalstatus', 'Start solving questions (START_SOLVE)', 'green',3500);
+                }
             });
             break;
 
@@ -688,7 +694,9 @@ function postMessage(type,values) {
                 error: function(xhr, text, err) {
                     smileAlert('#globalstatus', 'Unable to send START_SHOW phase', 'trace');
                 }, 
-                success: function(data) {}
+                success: function(data) {
+                    smileAlert('#globalstatus', 'See result (START_SHOW)', 'green',3500);
+                }
             });
             break;
 
