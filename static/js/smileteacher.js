@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.6.4';
+var VERSION = '0.6.5';
 
 var SMILEROUTES = {
     "all": "/smile/all",
@@ -447,11 +447,31 @@ $(document).ready(function() {
     ko.applyBindings(GlobalViewModel);
 
     GlobalViewModel.redirectView();
+
+    // Selection for list of questions
+    $('table#questions tr').click(function() {
+        if($(this).hasClass('checked'))
+            $(this).removeClass('checked');
+        else
+            $(this).addClass('checked');
+    });
 });
 
 /* ---------
     UTILITY
    --------- */
+
+
+GlobalViewModel.seeContent = function() {
+
+    var content = '';
+
+    $('table#questions tr.checked').each(function( index ) {
+        content += $(this).find('input[type=hidden]').attr('name')+'|';
+    });
+
+    smileAlert('checked:'+content,7000);
+}
 
 function smileAlert(text, lifetime, alerttype, divId) {
     
@@ -595,18 +615,6 @@ function updateGVM() {
             }
             break;
         }
-
-        /*
-        if( === 'QUESTION' || dataAll[i].TYPE === 'QUESTION_PIC') {
-        
-            
-        } else if(dataAll[i].TYPE === 'HAIL') {
-            
-            
-        } else if(dataAll[i].TYPE === 'SESSION_VALUES') {
-            
-        }
-        */
     }
 }
 
