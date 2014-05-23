@@ -82,182 +82,152 @@
 
 <body>
 
-	<div id="absolute_alert" class="" style="position:fixed;z-index: 10">
-		<div class="alert-box secondary" style="margin:3px 0" data-alert="">
-			Albert L'Unique<span style="font-weight:normal"> joins the session</span>
-		</div>
+	<!-- Absolute alert container-->
+	<div id="absolute_alerts" class="" style="position:fixed;z-index: 10">
+	</div>
+		
+	<div id="logo_smile_teacher" class="row">
+		<img data-bind='click: redirectView' src="images/smile_grey_teacher.png" />
+		v<span data-bind="text: version"></span>
 	</div>
 
-	<!-- container -->
-	<div class="container">
+	<div class="row">
 
-		
-		<div id="logo_smile_teacher" class="row">
-			<img data-bind='click: redirectView' src="images/smile_grey_teacher.png" />
-			v<span data-bind="text: version"></span>
-		</div>
+		<div style="visibility:hidden" class="large-2 columns">.</div>
 
-		<div class="row">
-
-			<div style="visibility:hidden" class="large-2 columns">.</div>
-
-			<div id="board" class="large-8 columns">
-				
-				<!-- Smile alert -->
-				<div class="row">
-					<div class="large-8 small-8 columns">
-						<div id="globalstatus"></div>
-					</div>
+		<div id="board" class="large-8 columns">
+			
+			<!-- Trace smile alert -->
+			<div class="row">
+				<div class="large-8 small-8 columns">
+					<div id="globalstatus"></div>
 				</div>
+			</div>
 
-				<div class="row">
-					<div id="session_values">
-						(<span data-bind="text: teacher_name"></span>,
-						<span data-bind="text: session_name"></span>,
-						<span data-bind="text: group_name"></span>,
-						<span data-bind="text: status"></span>)
-					</div>
+			<div class="row">
+				<div id="session_values">
+					(<span data-bind="text: teacher_name"></span>,
+					<span data-bind="text: session_name"></span>,
+					<span data-bind="text: group_name"></span>,
+					<span data-bind="text: status"></span>)
 				</div>
+			</div>
 
-				<div class="row">
-					<div class="large-12 small-12 columns">
+			<div class="row">
+				<div class="large-12 small-12 columns">
+					
+					<div class="panel">
+
+						<!--
+						<div class="section-container vertical-tabs" data-section="vertical-tabs">
+							<div class="content" data-slug="create-session" data-section-content>
+						-->
+								
+						<section smile="create-session" class="visible">
+							
+							<input type="text" data-bind='value: teacher_name, valueUpdate: "afterkeydown"' placeholder="Teacher" />
+							<input type="text" data-bind='value: session_name, valueUpdate: "afterkeydown"' placeholder="Session" />
+							<input type="text" data-bind='value: group_name, valueUpdate: "afterkeydown"' placeholder="Group" />
+
+							<ul class="button-group radius even-2">
+								<li><a href="#" data-bind='click: resetSession' class="secondary button">Reset</a></li>
+								<li><a href="#" data-bind='click: createSession' class="button">Next</a></li>
+							</ul>
+						</section>
+
+						<section  smile="choose-activity-flow" class="hidden">   						 				
+							
+							<ul class="button-group radius even-2">
+								<li><a href="#" data-bind='click: startMakingQuestions' class="large button">Start making questions</a></li>
+								<li><a href="#" data-bind='click: usePreparedQuestions' class="large button">Use Prepared Questions</a></li>
+							</ul>	
+							
+						</section>
+
+						<section smile="list-of-iqsets" class="hidden">
+							
+							<table class="center_bloc" data-bind="foreach: iqsets" >
+							    <tr>
+						    		<td>
+					    				<input style="margin:0" type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
+						    			<a style="margin:0" id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
+							    	</td>
+						    		<td style="font-weight:bold"><span data-bind="text: sessionName"></span></td>
+							    	<td style="color:#444"><span data-bind="text: teacherName"></span></td>
+						    		<td style="color:#777"><span data-bind="text: groupName"></span></td>
+							    	<td style="color:#AAA"><span data-bind="text: date"></span></td>
+							    	<td style="color:#CCC"><span data-bind="text: size"></span></td>
+								</tr>    
+							</table>
+							
+							<ul class="button-group radius even-2">
+								<li><a href="#" data-bind='click: redirectView' class="button secondary expand">Back</a></li>
+								<li><a href="#" data-bind='click: startMakingQuestionsWithIQSet' class="success button expand">Load</a></li>
+							</ul>	
 						
-						<div class="panel">
+						</section>
 
-							<!--
-							<div class="section-container vertical-tabs" data-section="vertical-tabs">
-								<div class="content" data-slug="create-session" data-section-content>
-							-->
-  								
-							<section smile="create-session" class="visible">
-								
-								<input type="text" data-bind='value: teacher_name, valueUpdate: "afterkeydown"' placeholder="Teacher" />
-								<input type="text" data-bind='value: session_name, valueUpdate: "afterkeydown"' placeholder="Session" />
-								<input type="text" data-bind='value: group_name, valueUpdate: "afterkeydown"' placeholder="Group" />
-
-								<ul class="button-group radius even-2">
-									<li><a href="#" data-bind='click: resetSession' class="secondary button">Reset</a></li>
-									<li><a href="#" data-bind='click: createSession' class="button">Next</a></li>
-								</ul>
-							</section>
-
-							<section  smile="choose-activity-flow" class="hidden">   						 				
-								
-								<ul class="button-group radius even-2">
-									<li><a href="#" data-bind='click: startMakingQuestions' class="large button">Start making questions</a></li>
-									<li><a href="#" data-bind='click: usePreparedQuestions' class="large button">Use Prepared Questions</a></li>
-								</ul>	
-								
-							</section>
-
-							<section smile="list-of-iqsets" class="hidden">
-								
-								<table class="center_bloc" data-bind="foreach: iqsets" >
-								    <tr>
-							    		<td>
-						    				<input style="margin:0" type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
-							    			<a style="margin:0" id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
-								    	</td>
-							    		<td style="font-weight:bold"><span data-bind="text: sessionName"></span></td>
-								    	<td style="color:#444"><span data-bind="text: teacherName"></span></td>
-							    		<td style="color:#777"><span data-bind="text: groupName"></span></td>
-								    	<td style="color:#AAA"><span data-bind="text: date"></span></td>
-								    	<td style="color:#CCC"><span data-bind="text: size"></span></td>
-									</tr>    
-								</table>
-								
-								<ul class="button-group radius even-2">
-									<li><a href="#" data-bind='click: redirectView' class="button secondary expand">Back</a></li>
-									<li><a href="#" data-bind='click: startMakingQuestionsWithIQSet' class="success button expand">Load</a></li>
-								</ul>	
+						<section smile="general-board" class="hidden">
 							
-							</section>
+							<div class="section-container tabs" data-section="tabs">
 
-							<section smile="general-board" class="hidden">
-								
-								<div class="section-container tabs" data-section="tabs">
-
-									<section class="active">
-										<p class="title" data-section-title><a href="#">Students</a></p>
-										<div class="content" data-section-content>
-											<div data-bind="foreach: students" >
-											    <div>
-											    	<span style="color:#222" data-bind="text: name"></span>
-											    	<span style="color:#888" data-bind="text: ip"></span>
-												</div>    
-											</div>
+								<section class="active">
+									<p class="title" data-section-title><a href="#">Students</a></p>
+									<div class="content" data-section-content>
+										<div data-bind="foreach: students" >
+										    <div>
+										    	<span style="color:#222" data-bind="text: name"></span>
+										    	<span style="color:#888" data-bind="text: ip"></span>
+											</div>    
 										</div>
-									</section>
-									
-									<section>
-										<p class="title" data-section-title><a href="#">Questions</a></p>
-										<div class="content" data-section-content>
-
-											<table data-bind="foreach: questions" >
-											    <tr>
-										    		<td>
-									    				<input style="margin:0" type="checkbox" name="text: id_questions" data-bind="checked: $root.id_questions" />
-										    			<a style="margin:0" id="more" onclick="detailQuestion(this.name)" data-bind="attr: {name: session_id}" class="tiny round button more">+</a>
-											    	</td>
-										    		<td style="color:#888;font-size:14px;font-style:italic"><span data-bind="text: question"></span></td>
-											    	<td style="color:#444;font-size:12px"><span data-bind="text: author"></span></td>
-										    		<td style="color:#444;font-size:12px"><span data-bind="text: ip"></span></td>
-											    	<td><span data-bind="if: type==='QUESTION_PIC'" style="color:#E22">P</span></td>
-												</tr>    
-											</table>
-
-											<a href="#" data-bind='click: temp' class="tiny button">Save</a>
-											<a href="#" data-bind='click: temp' class="tiny button">Add</a>
-											<a href="#" data-bind='click: tempRemove' class="tiny button">Remove</a>
-										</div>
-									</section>
-
-								</div>
-
-								<ul class="button-group radius even-2">
-									<li><a href="#" data-bind='click: resetSession' class="secondary button">Quit</a></li>
-									<li><a href="#" data-bind='click: startSolvingQuestions' class="start_solving button hidden">Start solving</a></li>
-									<li><a href="#" data-bind='click: seeResults' class="see_results success button hidden">See results</a></li>
-									<li><a href="#" data-bind='click: retake' class="retake secondary button hidden">Restart</a></li>
-								</ul>
-								
-								
-							</section>
-
-							<section smile="preview-iqset" class="hidden">
-								
-								<div data-bind="foreach: iqset_to_preview" >
-										
-									<div class="style_redRight">
-										<span data-bind="text: teacherName"></span>,
-										<span data-bind="text: groupName"></span>,
-										<span data-bind="text: date"></span>
 									</div>
-									<h4><span data-bind="text: sessionName"></span></h4>
-									
-									<div data-bind="foreach: questions" >
-									    <div style="margin-bottom:15px">
-									    	<span style="font-weight:bold" data-bind="text: question"></span>
-									    	<span style="color:green;font-style:italic;font-size:12px">
-													(answer: <span data-bind="text: answer"></span>)
-											</span>
+								</section>
+								
+								<section>
+									<p class="title" data-section-title><a href="#">Questions</a></p>
+									<div class="content" data-section-content>
 
-									    	<div data-bind="foreach: options" >
-											    <div>
-											    	<span style="color:grey;font-style:italic;font-size:11px" data-bind="text: $data"></span>
-												</div>    
-											</div>
-										</div>    
+										<table data-bind="foreach: questions" >
+										    <tr>
+									    		<td>
+								    				<input style="margin:0" type="checkbox" name="text: id_questions" data-bind="checked: $root.id_questions" />
+									    			<a style="margin:0" id="more" onclick="detailQuestion(this.name)" data-bind="attr: {name: session_id}" class="tiny round button more">+</a>
+										    	</td>
+									    		<td style="color:#888;font-size:14px;font-style:italic"><span data-bind="text: question"></span></td>
+										    	<td style="color:#444;font-size:12px"><span data-bind="text: author"></span></td>
+									    		<td style="color:#444;font-size:12px"><span data-bind="text: ip"></span></td>
+										    	<td><span data-bind="if: type==='QUESTION_PIC'" style="color:#E22">P</span></td>
+											</tr>    
+										</table>
+
+										<a href="#" data-bind='click: redirectView' class="tiny button">Save</a>
 									</div>
-								</div>
+								</section>
 
-								<a href="#" data-bind='click: usePreparedQuestions' class="expand secondary button">Back</a>
-							</section>
+							</div>
 
-							<section  smile="question-detail" class="hidden">
+							<ul class="button-group radius even-2">
+								<li><a href="#" data-bind='click: resetSession' class="secondary button">Quit</a></li>
+								<li><a href="#" data-bind='click: startSolvingQuestions' class="start_solving button hidden">Start solving</a></li>
+								<li><a href="#" data-bind='click: seeResults' class="see_results success button hidden">See results</a></li>
+								<li><a href="#" data-bind='click: retake' class="retake secondary button hidden">Restart</a></li>
+							</ul>
 							
-								<div data-bind="foreach: question_detail" >
-								    
+							
+						</section>
+
+						<section smile="preview-iqset" class="hidden">
+							
+							<div data-bind="foreach: iqset_to_preview" >
+									
+								<div class="style_redRight">
+									<span data-bind="text: teacherName"></span>,
+									<span data-bind="text: groupName"></span>,
+									<span data-bind="text: date"></span>
+								</div>
+								<h4><span data-bind="text: sessionName"></span></h4>
+								
+								<div data-bind="foreach: questions" >
 								    <div style="margin-bottom:15px">
 								    	<span style="font-weight:bold" data-bind="text: question"></span>
 								    	<span style="color:green;font-style:italic;font-size:12px">
@@ -265,69 +235,91 @@
 										</span>
 
 								    	<div data-bind="foreach: options" >
-										    <div><span style="color:grey;font-style:italic" data-bind="text: $data"></span></div>    
+										    <div>
+										    	<span style="color:grey;font-style:italic;font-size:11px" data-bind="text: $data"></span>
+											</div>    
 										</div>
-										
-										<p>
-											<span style="font-weight:bold" data-bind="text: urlImage"></span><br>
-											<img data-bind="attr:{src: urlImage}">
-										</p>
-									</div>
-									<a href="#" onclick="confirmDeletion(this.name)" data-bind="attr: {name: session_id}" class="alert expand button delete">Delete</a>    
+									</div>    
 								</div>
-								
-								<a href="#" data-bind='click: redirectView' class="secondary expand button">Back</a>
-							</section>
+							</div>
 
-							<section smile="confirm-deletion" class="hidden">
+							<a href="#" data-bind='click: usePreparedQuestions' class="expand secondary button">Back</a>
+						</section>
+
+						<section  smile="question-detail" class="hidden">
+						
+							<div data-bind="foreach: question_detail" >
+							    
+							    <div style="margin-bottom:15px">
+							    	<span style="font-weight:bold" data-bind="text: question"></span>
+							    	<span style="color:green;font-style:italic;font-size:12px">
+											(answer: <span data-bind="text: answer"></span>)
+									</span>
+
+							    	<div data-bind="foreach: options" >
+									    <div><span style="color:grey;font-style:italic" data-bind="text: $data"></span></div>    
+									</div>
+									
+									<p>
+										<span style="font-weight:bold" data-bind="text: urlImage"></span><br>
+										<img data-bind="attr:{src: urlImage}">
+									</p>
+								</div>
+								<a href="#" onclick="confirmDeletion(this.name)" data-bind="attr: {name: session_id}" class="alert expand button delete">Delete</a>    
+							</div>
 							
-								Remove the question from session?
-								<input type="hidden" name="sessionIDtoDelete" value="" />
-								<ul class="button-group radius even-2">
-									<li><a href="#" data-bind='click: redirectView' class="secondary button">Cancel</a></li>
-									<li><a href="#" data-bind='click: removeQuestionFromSession' class="alert button">Confirm</a></li>
-								</ul>
-							</section>
+							<a href="#" data-bind='click: redirectView' class="secondary expand button">Back</a>
+						</section>
 
-						</div>
+						<section smile="confirm-deletion" class="hidden">
+						
+							Remove the question from session?
+							<input type="hidden" name="sessionIDtoDelete" value="" />
+							<ul class="button-group radius even-2">
+								<li><a href="#" data-bind='click: redirectView' class="secondary button">Cancel</a></li>
+								<li><a href="#" data-bind='click: removeQuestionFromSession' class="alert button">Confirm</a></li>
+							</ul>
+						</section>
+
 					</div>
 				</div>
 			</div>
-			<!-- to center the main bloc -->
-			<div class="large-2 columns"></div>
 		</div>
-
-		<div class="row">
-			<div style="visibility:hidden" class="large-2 columns">.</div>
-			<div class="large-8 columns">
-				<div style="float:left">
-					<img style="width:100px" src="images/smile.jpg" /><br>
-					<img style="width:100px" src="images/marvell_horiz_logo.jpg" />
-				</div>
-				<div style="float:right">
-					<img style="width:100px" src="images/jamsj_slim.png" />
-				</div>
-				<p style="font-size:10px">
-					SMILE turns a traditional classroom into a highly interactive
-					learning environment by engaging students in critical reasoning and
-					problem solving while enabling them to generate, share, and
-					evaluate multimedia-rich inquiries.
-				</p>
-			</div>
-			<div class="large-2 columns"></div>
-		</div>
-
-		<div class="row">
-			<div class="small-6 small-centered columns">
-				<ul class="smile-links">
-					<li><a href="http://www.smileconsortium.org"><img style="width:30px" src="../images/smile_grey_48x23.png" /></a></li>
-					<li><a href="mailto:reply+i-23475388-c2457b2df337933075fa1a78843d843cefe305ca-64202@reply.github.com">Support</a></li>
-					<li><a onclick="alert('Help Not Implemented.  Help! visit: https://plus.google.com/u/0/communities/117391182825484902493 for more human support'); return false;" href="#">Help</a></li>
-				</ul>
-				<p class="copyright">© 2012‐2014 SMILE Consortium, Inc., a 501c3 Non-Profit</p>
-			</div>
-		</div>		
+		<!-- to center the main bloc -->
+		<div class="large-2 columns"></div>
 	</div>
+
+	<div class="row">
+		<div style="visibility:hidden" class="large-2 columns">.</div>
+		<div class="large-8 columns">
+			<div style="float:left">
+				<img style="width:100px" src="images/smile.jpg" /><br>
+				<img style="width:100px" src="images/marvell_horiz_logo.jpg" />
+			</div>
+			<div style="float:right">
+				<img style="width:100px" src="images/jamsj_slim.png" />
+			</div>
+			<p style="font-size:10px">
+				SMILE turns a traditional classroom into a highly interactive
+				learning environment by engaging students in critical reasoning and
+				problem solving while enabling them to generate, share, and
+				evaluate multimedia-rich inquiries.
+			</p>
+		</div>
+		<div class="large-2 columns"></div>
+	</div>
+
+	<div class="row">
+		<div class="small-6 small-centered columns">
+			<ul class="smile-links">
+				<li><a href="http://www.smileconsortium.org"><img style="width:30px" src="../images/smile_grey_48x23.png" /></a></li>
+				<li><a href="mailto:reply+i-23475388-c2457b2df337933075fa1a78843d843cefe305ca-64202@reply.github.com">Support</a></li>
+				<li><a onclick="alert('Help Not Implemented.  Help! visit: https://plus.google.com/u/0/communities/117391182825484902493 for more human support'); return false;" href="#">Help</a></li>
+			</ul>
+			<p class="copyright">© 2012‐2014 SMILE Consortium, Inc., a 501c3 Non-Profit</p>
+		</div>
+	</div>		
+
 	<!-- container -->
 
 
