@@ -431,7 +431,7 @@ GlobalViewModel.removeQuestionFromSession = function() {
                         smileAlert('Unable to remove question from session', 15000, 'trace','#globalstatus');
                     }, 
                     success: function(data) {
-                        smileAlert('Deleted', 3000, 'green'); 
+                        smileAlert('Question deleted', 5000, 'green'); 
                         switchSection('general-board');
                     }
                 });
@@ -582,7 +582,7 @@ function updateGVM() {
             case 'HAIL':
             if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
                 addStudent(dataAll[i]);
-                smileAlert(dataAll[i].NAME+' appears!',3000);
+                smileAlert(dataAll[i].NAME+' appears!',5000);
                 
             }
             break;
@@ -591,7 +591,7 @@ function updateGVM() {
             case 'QUESTION_PIC':
             if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
                 addQuestion(dataAll[i]);
-                smileAlert('New question!',3000);
+                smileAlert('New question!',5000);
             }
             break;
         }
@@ -665,9 +665,7 @@ function postMessage(type,values) {
                 error: function(xhr, text, err) {
                     smileAlert('Unable to send START_MAKE phase', 8000, 'trace');
                 }, 
-                success: function(data) {
-                    smileAlert('Starting session...', 5000);
-                }
+                success: function(data) {}
             });
             break;
 
@@ -686,7 +684,7 @@ function postMessage(type,values) {
                     smileAlert('Unable to send START_SOLVE phase', 8000, 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('START_SOLVE sent!', 3500, 'green');
+                    smileAlert('START_SOLVE sent!', 5000, 'green');
                 }
             });
             break;
@@ -705,7 +703,7 @@ function postMessage(type,values) {
                     smileAlert('Unable to send START_SHOW phase', 8000, 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('START_SHOW sent!', 3500, 'green');
+                    smileAlert('START_SHOW sent!', 5000, 'green');
                 }
             });
             break;

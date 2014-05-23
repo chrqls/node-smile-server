@@ -172,7 +172,9 @@
 							<div class="section-container tabs" data-section="tabs">
 
 								<section class="active">
-									<p class="title" data-section-title><a href="#">Students</a></p>
+									<p class="title" data-section-title><a href="#">
+										Students (<span data-bind="text: students().length"></span>)</a>
+									</p>
 									<div class="content" data-section-content>
 										<div data-bind="foreach: students" >
 										    <div>
@@ -184,7 +186,9 @@
 								</section>
 								
 								<section>
-									<p class="title" data-section-title><a href="#">Questions</a></p>
+									<p class="title" data-section-title><a href="#">
+										Questions (<span data-bind="text: questions().length"></span>)</a>
+									</p>
 									<div class="content" data-section-content>
 
 										<table data-bind="foreach: questions" >

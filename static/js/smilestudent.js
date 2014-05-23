@@ -189,7 +189,7 @@ GlobalViewModel.doLogin = function() {
     }
     if (!self.hasSubmitted()) {
         console.log('doLogin');
-        smileAlert('#globalstatus', 'Logging in ' + self.username(), 'green', 5000);
+        //smileAlert('#globalstatus', 'Logging as ' + self.username(), 'green', 5000);
         doSmileLogin(self.clientip(), self.username(), self.realname());
     }
     self.hasSubmitted(true);
@@ -238,7 +238,7 @@ GlobalViewModel.doInquiryReset = function() {
 
 GlobalViewModel.doSubmitQ = function() {
     var self = this;
-    console.log(">>>> >>> >> > doSubmitQ");
+    //console.log(">>>> >>> >> > doSubmitQ");
     if (self.validateInquirySubmission()) {
 
 	$('#submit-inquiry-area').hide();
@@ -292,14 +292,14 @@ GlobalViewModel.doSubmitQandDone = function() {
 
 GlobalViewModel.doSaveAnswerState = function() {
     var self = this;
-    console.log(">>>>>>>>>>doSaveAnswerState");
+    //console.log(">>>>>>>>>>doSaveAnswerState");
     self.answersarray()[self.qidx()] = self.answer()[1]; // Drop the leading 'a' from the answer label
     self.ratingsarray()[self.qidx()] = self.rating();
 }
 
 GlobalViewModel.doAnswerPrevQ = function() {
     var self = this;
-    console.log(">>>>>>>>>>doAnswerPrevQ");
+    //console.log(">>>>>>>>>>doAnswerPrevQ");
     self.doSaveAnswerState();
 
     // Check if there are more questions
@@ -322,7 +322,7 @@ GlobalViewModel.doAnswerPrevQ = function() {
 
 GlobalViewModel.doAnswerNextQ = function() {
     var self = this;
-    console.log(">>>>>>>>>>doAnswerNextQ");
+    //console.log(">>>>>>>>>>doAnswerNextQ");
 
     self.doSaveAnswerState();
 
