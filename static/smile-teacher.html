@@ -82,6 +82,12 @@
 
 <body>
 
+	<div id="absolute_alert" class="" style="position:fixed;z-index: 10">
+		<div class="alert-box secondary" style="margin:3px 0" data-alert="">
+			Albert L'Unique<span style="font-weight:normal"> joins the session</span>
+		</div>
+	</div>
+
 	<!-- container -->
 	<div class="container">
 
@@ -200,7 +206,9 @@
 												</tr>    
 											</table>
 
-											<a href="#" data-bind='click: redirectView' class="tiny button">Save</a>
+											<a href="#" data-bind='click: temp' class="tiny button">Save</a>
+											<a href="#" data-bind='click: temp' class="tiny button">Add</a>
+											<a href="#" data-bind='click: tempRemove' class="tiny button">Remove</a>
 										</div>
 									</section>
 
@@ -339,7 +347,7 @@
 	<script type='text/javascript' src='js/sprintf-0.7-beta1.js'></script>
 	<script type='text/javascript' src='js/smileteacher.js'></script>
 	<script type='text/javascript' src='js/stacktrace-min-0.4.js'></script>
-	<script type='text/javascript' src='js/jquery.blockUI-2.66.0.js'></script>
+	<!--script type='text/javascript' src='js/jquery.blockUI-2.66.0.js'></script-->
 	<script type="text/javascript" src="js/rating.js"></script>
 	<script type="text/javascript" src="js/jquery.fineuploader-3.5.0.js"></script> 
 	<script>

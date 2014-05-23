@@ -306,7 +306,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
         data: {}, 
         
         error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to call /smile/iqset/{key}.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+            smileAlert('Unable to call /smile/iqset/{key}.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace', '#globalstatus');
         }, 
         
         success: function(data) {
@@ -419,7 +419,7 @@ GlobalViewModel.removeQuestionFromSession = function() {
 
                 var urlDeletingQuestion = SMILEROUTES['deletequestion']+positionOfcurrentQuestion+'.json';
 
-                smileAlert('#globalstatus', 'Deleted', 'green',1500); 
+                smileAlert('Deleted', 'green','#globalstatus', 1500); 
 
                 $.ajax({ 
                     cache: false, 
@@ -430,7 +430,7 @@ GlobalViewModel.removeQuestionFromSession = function() {
                     data: {}, 
                     
                     error: function(xhr, text, err) {
-                        smileAlert('#globalstatus', 'Unable to remove question from session', 'trace');
+                        smileAlert('Unable to remove question from session', 'trace','#globalstatus');
                     }, 
                     success: function(data) {
                         switchSection('general-board');
@@ -454,15 +454,22 @@ $(document).ready(function() {
     UTILITY
    --------- */
 
-function smileAlert(targetid, text, alerttype, lifetime) {
+GlobalViewModel.temp = function() {
+    smileAlert('test','','',2000);
+}
+GlobalViewModel.tempRemove = function() {
+    $('#absolute_alert').find('.alert-box').fadeOut().remove();
+}
+
+function smileAlert(text, alerttype, targetid, lifetime) {
+    
+    var alertID = 'id_'+Math.floor(Math.random()*99999);
+
+    // Colors
     var defaultalert = 'secondary';
     var redalert = 'alert';
     var bluealert = '';
     var greenalert = 'success';
-    var formatstr = '<div class="alert-box %s"> \
-        %s \
-        <a href="" class="close">&times;</a> \
-        </div>';
     
     if (!alerttype)                 { alerttype = defaultalert; } 
     else if (alerttype === 'trace') { alerttype = redalert; 
@@ -470,14 +477,23 @@ function smileAlert(targetid, text, alerttype, lifetime) {
     else if (alerttype === 'red')   { alerttype = redalert; } 
     else if (alerttype === 'blue')  { alerttype = bluealert; } 
     else if (alerttype === 'green') { alerttype = greenalert; } 
-    else                            { alerttype = defaultalert; }
-    
-    if (targetid) {
-        $(targetid).append(sprintf(formatstr, alerttype, text));
+
+    if(!targetid || targetid === '') {
+        targetid = '#absolute_alert';
     }
+
+    var formatstr = '<div id="%s" class="alert-box %s"> \
+        %s \
+        <a href="" class="close">&times;</a> \
+    </div>';
+
+    if (targetid) {
+        $(targetid).append(sprintf(formatstr, alertID, alerttype, text));
+    } 
+
     if (lifetime) {
         setInterval(function() {
-            $(targetid).find('.alert-box').fadeOut().remove();
+            $(targetid).find('#'+alertID).fadeOut().remove();
         }, lifetime)
     }
 }
@@ -575,7 +591,9 @@ function updateGVM() {
             case 'HAIL':
             if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
                 addStudent(dataAll[i]);
-                smileAlert('#globalstatus','Student: '+dataAll[i].NAME,'',1500);
+                //smileAlert('#globalstatus','Student: '+dataAll[i].NAME,'',1500);
+                smileAlert('Student: '+dataAll[i].NAME,'','',3000);
+                
             }
             break;
 
@@ -583,7 +601,7 @@ function updateGVM() {
             case 'QUESTION_PIC':
             if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
                 addQuestion(dataAll[i]);
-                smileAlert('#globalstatus','New question!','',1500);
+                smileAlert('New question!','','',1500);
             }
             break;
         }
@@ -618,7 +636,7 @@ function typeExist(type) {
 /*
         ----------
            POST 
-        ----------*/
+        ---------- */
 function postMessage(type,values) {
 
     switch(type) {
@@ -638,7 +656,7 @@ function postMessage(type,values) {
                 }, 
                 
                 error: function(xhr, text, err) {
-                    smileAlert('#globalstatus', 'Unable to send SESSION_VALUES to server', 'trace');
+                    smileAlert('Unable to send SESSION_VALUES to server', 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -655,7 +673,7 @@ function postMessage(type,values) {
                 async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('#globalstatus', 'Unable to send START_MAKE phase', 'trace');
+                    smileAlert('Unable to send START_MAKE phase', 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -673,10 +691,10 @@ function postMessage(type,values) {
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('#globalstatus', 'Unable to send START_SOLVE phase', 'trace');
+                    smileAlert('Unable to send START_SOLVE phase', 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('#globalstatus', 'Start solving questions (START_SOLVE)', 'green',3500);
+                    smileAlert('Start solving questions (START_SOLVE)', 'green', '', 3500);
                 }
             });
             break;
@@ -692,10 +710,10 @@ function postMessage(type,values) {
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('#globalstatus', 'Unable to send START_SHOW phase', 'trace');
+                    smileAlert('Unable to send START_SHOW phase', 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('#globalstatus', 'See result (START_SHOW)', 'green',3500);
+                    smileAlert('See result (START_SHOW)', 'green','', 3500);
                 }
             });
             break;
@@ -724,7 +742,7 @@ function postMessage(type,values) {
                 },
                 
                 error: function(xhr, text, err) {
-                    smileAlert('#globalstatus', 'Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace', '#globalstatus');
                 }, 
                 success: function(data) {}
             });
@@ -748,7 +766,7 @@ function smile_all() {
         async: false,
         data: {}, 
         error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to call /smile/all', 'trace',8000);
+            smileAlert('Unable to call /smile/all', 'trace', '#globalstatus', 8000);
         }, 
         success: function(data) { all = data; }
     });
@@ -767,7 +785,7 @@ function smile_reset() {
         async: false,
         
         error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, 'trace');
+            smileAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, 'trace', '#globalstatus');
         }, 
         success: function(data) {}
     });
@@ -786,7 +804,7 @@ function smile_iqsets() {
         data: {}, 
         
         error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
+            smileAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace', '#globalstatus');
         }, 
         success: function(data) { 
             iqsets = data; 
@@ -807,7 +825,7 @@ function smile_iqset(id) {
         async: false,
         data: {},  
         error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Unable to call /smile/iqset/{key}', 'trace',8000);
+            smileAlert('Unable to call /smile/iqset/{key}', 'trace', '#globalstatus', 8000);
         }, 
         success: function(data) { iqset = data; }
     });
