@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.6.5';
+var VERSION = '0.6.6';
 
 var SMILEROUTES = {
     "all": "/smile/all",
@@ -447,20 +447,13 @@ $(document).ready(function() {
     ko.applyBindings(GlobalViewModel);
 
     GlobalViewModel.redirectView();
-
-    // Selection for list of questions
-    $('table#questions tr').click(function() {
-        if($(this).hasClass('checked'))
-            $(this).removeClass('checked');
-        else
-            $(this).addClass('checked');
-    });
 });
 
-/* ---------
-    UTILITY
-   --------- */
+/* ------------------
 
+         UTILITY
+
+   ------------------ */
 
 GlobalViewModel.seeContent = function() {
 
@@ -512,6 +505,16 @@ function smileAlert(text, lifetime, alerttype, divId) {
 function switchSection(newSection) {
     $('section.visible').removeClass('visible').addClass('hidden');
     $('section[smile='+newSection+']').addClass('visible').removeClass('hidden');
+
+    if(newSection === 'general-board') {
+        
+        $('table#questions tr').click(function() {
+            if($(this).hasClass('checked'))
+                $(this).removeClass('checked');
+            else
+                $(this).addClass('checked');
+        });
+    }
 }
 
 // Should I really have this skeleton? or directly having the add________ in the loop synchronizing everytime ?
