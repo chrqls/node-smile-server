@@ -28,26 +28,30 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.6.6';
+var VERSION = '0.6.7';
 
 var SMILEROUTES = {
-    "all": "/smile/all",
-    "reset": "/smile/reset",
-    "iqsets": "/smile/iqsets",
-    "iqset": "/smile/iqset/",
-    "question": "/smile/question",
-    "session": "/smile/createsession",
-    "startmake": "/smile/startmakequestion",
-    "startsolve": "/smile/startsolvequestion",
-    "seeresults": "/smile/sendshowresults",
-    "deletequestion": "/smile/questionview/"
+    'all': '/smile/all',
+    'reset': '/smile/reset',
+    'iqsets': '/smile/iqsets',
+    'iqset': '/smile/iqset',
+    'question': '/smile/question',
+    'session': '/smile/createsession',
+    'startmake': '/smile/startmakequestion',
+    'startsolve': '/smile/startsolvequestion',
+    'seeresults': '/smile/sendshowresults',
+    'deletequestion': '/smile/questionview/'
 };
 
 var deamon_updating_board;
 
-/* --------
-    MODELS
-   -------- */
+
+/* ------------------
+
+         MODELS
+
+   ------------------ */
+
 var Student = function(name,ip) {
 
     this.name = name;
@@ -88,6 +92,7 @@ var GlobalViewModel = {
     session_name: ko.observable(''),
     group_name: ko.observable(''),
     status: ko.observable(''),
+    new_iqset_name: ko.observable(''),
 
     // Use prepared questions
     iqsets: ko.observableArray([]),
@@ -97,18 +102,18 @@ var GlobalViewModel = {
 
     // Start making questions
     position: ko.observable(''),
-    //id_questions: ko.observable(''),
     students: ko.observableArray([]),
     questions: ko.observableArray([]),
-
 
     // Detail of a question
     question_detail: ko.observableArray([])
 };
 
-/* --------------
-    KO EXTENDERS
-   -------------- */
+/* ------------------
+
+      KO EXTENDERS
+
+   ------------------ */
 
 // This adds the required extender for validation
 ko.extenders.required = function(target, overrideMessage) {
@@ -132,9 +137,11 @@ ko.extenders.required = function(target, overrideMessage) {
     return target;
 };
 
-/* ---------
-    ACTIONS
-   --------- */
+/* ------------------
+
+         ACTIONS
+
+   ------------------ */
 
 GlobalViewModel.redirectView = function() {
 
@@ -297,33 +304,14 @@ function previewIQSet(idIQSet) {
 
 GlobalViewModel.startMakingQuestionsWithIQSet = function() {
 
-    $.ajax({ 
-        cache: false, 
-        type: "GET", 
-        dataType: "text", 
-        url: SMILEROUTES["iqset"]+GlobalViewModel.iqsets()[GlobalViewModel.position()].id, 
-        async: false,
-        data: {}, 
-        
-        error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/iqset/{key}.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 15000, 'trace', '#globalstatus');
-        }, 
-        
-        success: function(data) {
+    var iqset = JSON.parse(smile_iqset(GlobalViewModel.iqsets()[GlobalViewModel.position()].id));
+    var iqdata = iqset.iqdata;
 
-            var iqset = JSON.parse(data);
-            var iqdata = iqset.iqdata;
+    for (i = 0; i < iqdata.length; i++) {
 
-            for (i = 0; i < iqdata.length; i++) {
-
-                // We add the question on client side
-                //addQuestion(iqdata[i]);
-
-                // Same job on server side
-                postMessage('question',iqdata[i]);
-            }
-        }
-    });
+        // We send each question to the server
+        postMessage('question',iqdata[i]);
+    }
     
     postMessage('startmake');
 
@@ -431,7 +419,7 @@ GlobalViewModel.removeQuestionFromSession = function() {
                         smileAlert('Unable to remove question from session', 15000, 'trace','#globalstatus');
                     }, 
                     success: function(data) {
-                        smileAlert('Question deleted', 5000, 'green'); 
+                        smileAlert('Question deleted', 10000, 'green'); 
                         switchSection('general-board');
                     }
                 });
@@ -439,6 +427,49 @@ GlobalViewModel.removeQuestionFromSession = function() {
             }
         }
     }
+}
+
+// Used to display or hide the "iqset name" field
+function switchVisibilityIqsetField() {
+
+    if($('#new_iqset_field').hasClass('hidden')) {
+
+        $('#new_iqset_field').removeClass('hidden');
+
+    } else {
+        $('#new_iqset_field').addClass('hidden');
+        GlobalViewModel.new_iqset_name('');
+    }
+}
+
+GlobalViewModel.saveNewIQSet = function() {
+
+    var iqset = {};
+    iqset['iqdata'] = [];
+    iqset['title'] = GlobalViewModel.new_iqset_name();
+
+    $('table#questions tr.checked').each(function(index) {
+
+        for(i=0; i<GlobalViewModel.questions().length; i++) {
+
+            if($(this).find('input[type=hidden]').attr('name') === GlobalViewModel.questions()[i].session_id) {
+                
+                iqset.iqdata.push({
+                    "PICURL":GlobalViewModel.questions()[i].urlImage,
+                      "NAME":GlobalViewModel.questions()[i].author,
+                         "Q":GlobalViewModel.questions()[i].question,
+                         "A":GlobalViewModel.questions()[i].answer,
+                        "IP":GlobalViewModel.questions()[i].ip,
+                        "O4":GlobalViewModel.questions()[i].options[3],
+                        "O3":GlobalViewModel.questions()[i].options[2],
+                        "O2":GlobalViewModel.questions()[i].options[1],
+                        "O1":GlobalViewModel.questions()[i].options[0],
+                      "TYPE":GlobalViewModel.questions()[i].type
+                });
+            }
+        }
+    });
+    postMessage('iqset',JSON.stringify(iqset));
 }
 
 $(document).ready(function() {
@@ -454,7 +485,7 @@ $(document).ready(function() {
          UTILITY
 
    ------------------ */
-
+/*
 GlobalViewModel.seeContent = function() {
 
     var content = '';
@@ -463,8 +494,8 @@ GlobalViewModel.seeContent = function() {
         content += $(this).find('input[type=hidden]').attr('name')+'|';
     });
 
-    smileAlert('checked:'+content,7000);
-}
+    smileAlert('checked:'+content,10000);
+}*/
 
 function smileAlert(text, lifetime, alerttype, divId) {
     
@@ -605,7 +636,7 @@ function updateGVM() {
             case 'HAIL':
             if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
                 addStudent(dataAll[i]);
-                smileAlert(dataAll[i].NAME+' appears!',5000);
+                smileAlert('<b>'+dataAll[i].NAME+'</b> appears!',10000);
                 
             }
             break;
@@ -614,7 +645,7 @@ function updateGVM() {
             case 'QUESTION_PIC':
             if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
                 addQuestion(dataAll[i]);
-                smileAlert('New question!',5000);
+                smileAlert('New question!',10000);
             }
             break;
         }
@@ -657,7 +688,7 @@ function postMessage(type,values) {
                 }, 
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send SESSION_VALUES to server', 8000, 'trace');
+                    smileAlert('Unable to send SESSION_VALUES to server', 10000, 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -674,7 +705,7 @@ function postMessage(type,values) {
                 async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send START_MAKE phase', 8000, 'trace');
+                    smileAlert('Unable to send START_MAKE phase', 10000, 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -692,10 +723,10 @@ function postMessage(type,values) {
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send START_SOLVE phase', 8000, 'trace');
+                    smileAlert('Unable to send START_SOLVE phase', 10000, 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('START_SOLVE sent!', 5000, 'green');
+                    smileAlert('START_SOLVE sent!', 10000, 'green');
                 }
             });
             break;
@@ -704,17 +735,17 @@ function postMessage(type,values) {
 
             $.ajax({ 
                 cache: false, 
-                type: "GET", 
-                contentType: "application/json",
+                type: 'GET', 
+                contentType: 'application/json',
                 url: SMILEROUTES['seeresults'],
                 data: {}, 
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send START_SHOW phase', 8000, 'trace');
+                    smileAlert('Unable to send START_SHOW phase', 10000, 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('START_SHOW sent!', 5000, 'green');
+                    smileAlert('START_SHOW sent!', 10000, 'green');
                 }
             });
             break;
@@ -723,29 +754,52 @@ function postMessage(type,values) {
 
             $.ajax({ 
                 cache: false, 
-                type: "POST", 
-                dataType: "text", 
+                type: 'POST', 
+                dataType: 'text', 
                 url: SMILEROUTES['question'],
                 //async: false,
 
                 data: {
-                    "TYPE":values.TYPE,
-                    "IP":values.IP,
-                    "NAME":values.NAME,
-                    "O1":values.O1,
-                    "O2":values.O2,
-                    "O3":values.O3,
-                    "O4":values.O4,
-                    "Q":values.Q,
-                    "SessionID":Date.now(),
-                    "A":values.A,
-                    "PICURL":values.PICURL
+                    'TYPE':values.TYPE,
+                    'IP':values.IP,
+                    'NAME':values.NAME,
+                    'O1':values.O1,
+                    'O2':values.O2,
+                    'O3':values.O3,
+                    'O4':values.O4,
+                    'Q':values.Q,
+                    'SessionID':Date.now(),
+                    'A':values.A,
+                    'PICURL':values.PICURL
                 },
                 
                 error: function(xhr, text, err) {
                     smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 15000, 'trace', '#globalstatus');
                 }, 
                 success: function(data) {}
+            });
+            break;
+
+        case 'iqset':
+
+            //var newIqset = 
+            console.log(values);
+
+            $.ajax({ 
+                cache: false, 
+                type: 'POST', 
+                contentType: 'application/json',
+                url: SMILEROUTES['iqset'],
+                //async: false,
+                data: values,
+                
+                error: function(xhr, text, err) {
+                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 15000, 'trace', '#globalstatus');
+                }, 
+                success: function(data) {
+                    smileAlert('New iqset <i>"'+data.title+'"</i> saved!',10000,'green');
+                    switchVisibilityIqsetField();
+                }
             });
             break;
     }
@@ -761,13 +815,13 @@ function smile_all() {
 
     $.ajax({ 
         cache: false, 
-        type: "GET", 
-        dataType: "text", 
-        url: SMILEROUTES["all"], 
+        type: 'GET', 
+        dataType: 'text', 
+        url: SMILEROUTES['all'], 
         async: false,
         data: {}, 
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/all', 8000, 'trace');
+            smileAlert('Unable to call /smile/all', 10000, 'trace');
         }, 
         success: function(data) { all = data; }
     });
@@ -778,8 +832,8 @@ function smile_reset() {
 
     $.ajax({ 
         cache: false, 
-        type: "GET", 
-        dataType: "text", 
+        type: 'GET', 
+        dataType: 'text', 
         //contentType: "application/json", 
         url: SMILEROUTES['reset'],
         data: {}, 
@@ -798,9 +852,9 @@ function smile_iqsets() {
 
     $.ajax({ 
         cache: false, 
-        type: "GET", 
-        dataType: "text", 
-        url: SMILEROUTES["iqsets"],
+        type: 'GET', 
+        dataType: 'text', 
+        url: SMILEROUTES['iqsets'],
         async: false,
         data: {}, 
         
@@ -820,16 +874,15 @@ function smile_iqset(id) {
 
     $.ajax({ 
         cache: false, 
-        type: "GET", 
-        dataType: "text", 
-        url: SMILEROUTES["iqset"]+id, 
+        type: 'GET', 
+        dataType: 'text', 
+        url: SMILEROUTES['iqset']+'/'+id, 
         async: false,
         data: {},  
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/iqset/{key}', 8000, 'trace');
+            smileAlert('Unable to call /smile/iqset/{key}', 10000, 'trace');
         }, 
         success: function(data) { iqset = data; }
     });
     return iqset;
 }
-

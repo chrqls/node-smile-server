@@ -91,7 +91,7 @@
 <body>
 
 	<!-- Absolute alert container-->
-	<div id="absolute_alerts" class="" style="position:fixed;z-index: 10">
+	<div id="absolute_alerts" class="" style="position:fixed;z-index: 10;border:1px dotted black">
 	</div>
 		
 	<div id="logo_smile_teacher" class="row">
@@ -215,7 +215,25 @@
 											</tr>    
 										</table>
 
-										<a href="#" data-bind='click: seeContent' class="tiny button">Save</a>
+										<!--a href="#" data-bind='click: seeContent' class="tiny secondary button">See what you checked</a-->
+										
+										<div class="row">
+											<div class="large-7 columns">
+												<div class="row collapse" smile="save-new-iqset">
+													<div class="small-2 columns" onclick="switchVisibilityIqsetField()">
+														<span class="radius prefix">Save</span>
+													</div>
+													<div id="new_iqset_field" class="small-4 columns hidden">
+														<input type="text" data-bind='value: new_iqset_name, valueUpdate: "afterkeydown"' placeholder="Give a name" />
+													</div>
+													<div data-bind="if: new_iqset_name" class="small-6 columns">
+														<a href="#" class="button prefix" data-bind='click: saveNewIQSet'>
+															Create "<span style="font-weight:normal" data-bind="text: new_iqset_name"></span>"
+														</a>
+													</div>
+												</div>
+											</div>
+										</div>
 									</div>
 								</section>
 
