@@ -30,6 +30,9 @@
 
 var VERSION = '0.6.7';
 
+// Interval of time used to update the GlobalViewModel
+var INTERVAL_ = 5000;
+
 var SMILEROUTES = {
     'all': '/smile/all',
     'reset': '/smile/reset',
@@ -166,7 +169,7 @@ GlobalViewModel.redirectView = function() {
             case 'START_MAKE':
                 section = 'general-board';
                 clearInterval(deamon_updating_board);
-                deamon_updating_board = setInterval(updateGVM, 5000);
+                deamon_updating_board = setInterval(updateGVM, INTERVAL_TIME_TO_UPDATE_BOARD);
                 break;
 
             case 'START_SOLVE':
@@ -430,14 +433,16 @@ GlobalViewModel.removeQuestionFromSession = function() {
 }
 
 // Used to display or hide the "iqset name" field
-function switchVisibilityIqsetField() {
+function switchVisibilitySaveButton() {
 
-    if($('#new_iqset_field').hasClass('hidden')) {
+    if($('#saveButton_with_form').hasClass('hidden')) {
 
-        $('#new_iqset_field').removeClass('hidden');
+        $('#saveButton_with_form').removeClass('hidden');
+        $('#saveButton_without_form').addClass('hidden');
 
     } else {
-        $('#new_iqset_field').addClass('hidden');
+        $('#saveButton_with_form').addClass('hidden');
+        $('#saveButton_without_form').removeClass('hidden');
         GlobalViewModel.new_iqset_name('');
     }
 }
@@ -537,6 +542,7 @@ function switchSection(newSection) {
     $('section.visible').removeClass('visible').addClass('hidden');
     $('section[smile='+newSection+']').addClass('visible').removeClass('hidden');
 
+/*
     if(newSection === 'general-board') {
         
         $('table#questions tr').click(function() {
@@ -546,6 +552,7 @@ function switchSection(newSection) {
                 $(this).addClass('checked');
         });
     }
+    */
 }
 
 // Should I really have this skeleton? or directly having the add________ in the loop synchronizing everytime ?
@@ -645,11 +652,20 @@ function updateGVM() {
             case 'QUESTION_PIC':
             if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
                 addQuestion(dataAll[i]);
-                smileAlert('New question!',10000);
+                smileAlert('New question from <b>'+dataAll[i].NAME+'</b>!',10000);
             }
             break;
         }
     }
+
+    // Everytime updateGVM() is called, we have to restart the listener (by doing off/on) to wake up the multiple selection
+    // 
+    $(document).off('click', 'table#questions tr').on('click', 'table#questions tr', function() {
+            if($(this).hasClass('checked'))
+                $(this).removeClass('checked');
+            else
+                $(this).addClass('checked');
+        });
 }
 
 function typeExist(type) {

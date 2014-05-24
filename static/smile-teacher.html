@@ -55,6 +55,22 @@
 			background-color: #c9eff6;
 		} 
 
+		/*
+			Zurb does not have a class for labels alone (without a field collapsed).
+			See: http://foundation.zurb.com/docs/v/4.3.2/components/forms.html
+		*/
+		.zurb_labelAlone {
+			border: 1px solid #D9D9D9;
+			background: none repeat scroll 0 0 #F2F2F2;
+			color: #333333;
+			border-radius: 3px 0 0 3px;
+			text-align: center;
+			font-size: 0.875em;
+			display: block;
+			height: 2.3125em;
+			line-height: 2.3125em;
+		}
+
 		.style_redRight {
 			color: #D22;
 			font-size: 12px;
@@ -217,13 +233,22 @@
 
 										<!--a href="#" data-bind='click: seeContent' class="tiny secondary button">See what you checked</a-->
 										
-										<div class="row">
-											<div class="large-7 columns">
-												<div class="row collapse" smile="save-new-iqset">
-													<div class="small-2 columns" onclick="switchVisibilityIqsetField()">
+										<div class="row" data-bind="if: questions().length>0">
+											
+											<div class="large-7 columns" smile="save-new-iqset">
+
+												<div id="saveButton_without_form" class="row">
+													<div class="small-3 columns" onclick="switchVisibilitySaveButton()">
+														<span class="zurb_labelAlone">Save</span>
+													</div>
+												</div>
+
+												<div id="saveButton_with_form" class="row collapse hidden">
+
+													<div class="small-2 columns" onclick="switchVisibilitySaveButton()">
 														<span class="radius prefix">Save</span>
 													</div>
-													<div id="new_iqset_field" class="small-4 columns hidden">
+													<div class="small-4 columns">
 														<input type="text" data-bind='value: new_iqset_name, valueUpdate: "afterkeydown"' placeholder="Give a name" />
 													</div>
 													<div data-bind="if: new_iqset_name" class="small-6 columns">
@@ -231,6 +256,7 @@
 															Create "<span style="font-weight:normal" data-bind="text: new_iqset_name"></span>"
 														</a>
 													</div>
+
 												</div>
 											</div>
 										</div>
