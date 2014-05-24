@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.6.7';
+var VERSION = '0.7.1';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
@@ -130,7 +130,7 @@ ko.extenders.required = function(target, overrideMessage) {
     //define a function to do validation
     function validate(newValue) {
         target.hasError(newValue ? false : true);
-        target.validationMessage(newValue ? "" : overrideMessage || "This field is required");
+        target.validationMessage(newValue ? '' : overrideMessage || 'This field is required');
     }
 
     //initial validation
@@ -197,9 +197,9 @@ GlobalViewModel.redirectView = function() {
 GlobalViewModel.createSession = function() {
     
     if(!typeExist('SESSION_VALUES')) {
-        if (!this.teacher_name() || this.teacher_name() === "") { this.teacher_name('Unknown'); }
-        if (!this.session_name() || this.session_name() === "") { this.session_name('Unspecified'); }
-        if (!this.group_name() || this.group_name() === "")     { this.group_name('General');  }
+        if (!this.teacher_name() || this.teacher_name() === '') { this.teacher_name('Unknown'); }
+        if (!this.session_name() || this.session_name() === '') { this.session_name('Unspecified'); }
+        if (!this.group_name() || this.group_name() === '')     { this.group_name('General');  }
 
         // Send session values to server
         postMessage('session');
@@ -415,9 +415,9 @@ GlobalViewModel.removeQuestionFromSession = function() {
 
                 $.ajax({ 
                     cache: false, 
-                    type: "DELETE", 
+                    type: 'DELETE', 
                     //dataType: "text",
-                    contentType: "application/json", 
+                    contentType: 'application/json', 
                     url: urlDeletingQuestion,
                     data: {}, 
                     
@@ -452,32 +452,36 @@ function switchVisibilitySaveButton() {
 
 GlobalViewModel.saveNewIQSet = function() {
 
-    var iqset = {};
-    iqset['iqdata'] = [];
-    iqset['title'] = GlobalViewModel.new_iqset_name();
+    if($('table#questions tr.checked').length > 0) {
+        var iqset = {};
+        iqset['iqdata'] = []; 
+        iqset.title = GlobalViewModel.new_iqset_name();
 
-    $('table#questions tr.checked').each(function(index) {
+        $('table#questions tr.checked').each(function(index) {
 
-        for(i=0; i<GlobalViewModel.questions().length; i++) {
+            for(i=0; i<GlobalViewModel.questions().length; i++) {
 
-            if($(this).find('input[type=hidden]').attr('name') === GlobalViewModel.questions()[i].session_id) {
-                
-                iqset.iqdata.push({
-                    "PICURL":GlobalViewModel.questions()[i].urlImage,
-                      "NAME":GlobalViewModel.questions()[i].author,
-                         "Q":GlobalViewModel.questions()[i].question,
-                         "A":GlobalViewModel.questions()[i].answer,
-                        "IP":GlobalViewModel.questions()[i].ip,
-                        "O4":GlobalViewModel.questions()[i].options[3],
-                        "O3":GlobalViewModel.questions()[i].options[2],
-                        "O2":GlobalViewModel.questions()[i].options[1],
-                        "O1":GlobalViewModel.questions()[i].options[0],
-                      "TYPE":GlobalViewModel.questions()[i].type
-                });
+                if($(this).find('input[type=hidden]').attr('name') === GlobalViewModel.questions()[i].session_id) {
+                    
+                    iqset.iqdata.push({
+                        "PICURL":GlobalViewModel.questions()[i].urlImage,
+                          "NAME":GlobalViewModel.questions()[i].author,
+                             "Q":GlobalViewModel.questions()[i].question,
+                             "A":GlobalViewModel.questions()[i].answer,
+                            "IP":GlobalViewModel.questions()[i].ip,
+                            "O4":GlobalViewModel.questions()[i].options[3],
+                            "O3":GlobalViewModel.questions()[i].options[2],
+                            "O2":GlobalViewModel.questions()[i].options[1],
+                            "O1":GlobalViewModel.questions()[i].options[0],
+                          "TYPE":GlobalViewModel.questions()[i].type
+                    });
+                }
             }
-        }
-    });
-    postMessage('iqset',JSON.stringify(iqset));
+        });
+        postMessage('iqset',JSON.stringify(iqset));
+    } else {
+        smileAlert('Please select <b>at least</b> one question', DELAY_SHORT,'red');
+    }
 }
 
 $(document).ready(function() {
@@ -526,9 +530,11 @@ function smileAlert(text, lifetime, alerttype, divId) {
         divId = '#absolute_alerts';
     }
 
-    var formatstr = '<div id="%s" style="margin:3px 0" class="alert-box %s"> \
-        <span style="font-weight:normal">%s</span> \
-    </div>';
+    var formatstr = '<div id="%s"> \
+                        <div style="margin:3px 0;opacity:0.8;display: inline-block" class="alert-box %s" style="opacity:0.4"> \
+                            <span style="font-weight:normal">%s</span><br> \
+                        </div><br> \
+                    </div>';
 
     if (divId) {
         $(divId).append(sprintf(formatstr, alertID, alerttype, text));
@@ -803,7 +809,7 @@ function postMessage(type,values) {
                 }, 
                 success: function(data) {
                     smileAlert('New iqset <i>"'+data.title+'"</i> saved!',DELAY_NORMAL,'green');
-                    switchVisibilityIqsetField();
+                    switchVisibilitySaveButton();
                 }
             });
             break;
