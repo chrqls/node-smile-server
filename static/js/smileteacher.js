@@ -31,7 +31,10 @@
 var VERSION = '0.6.7';
 
 // Interval of time used to update the GlobalViewModel
-var INTERVAL_ = 5000;
+var DELAY_UPDATE_BOARD = 5000;
+var DELAY_SHORT = 5000;
+var DELAY_NORMAL = 10000;
+var DELAY_LONG = 20000;
 
 var SMILEROUTES = {
     'all': '/smile/all',
@@ -169,7 +172,7 @@ GlobalViewModel.redirectView = function() {
             case 'START_MAKE':
                 section = 'general-board';
                 clearInterval(deamon_updating_board);
-                deamon_updating_board = setInterval(updateGVM, INTERVAL_TIME_TO_UPDATE_BOARD);
+                deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
                 break;
 
             case 'START_SOLVE':
@@ -318,7 +321,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
     
     postMessage('startmake');
 
-    deamon_updating_board = setInterval(updateGVM, 5000);
+    deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
     location.reload();
 }
 
@@ -326,7 +329,7 @@ GlobalViewModel.startSolvingQuestions = function() {
 
     $('.start_solving').addClass('hidden');
     postMessage('startsolve');
-    smileAlert('Trying to start solving...', 5000);
+    smileAlert('Trying to start solving...', DELAY_SHORT);
     this.redirectView();
 }
 
@@ -334,7 +337,7 @@ GlobalViewModel.seeResults = function() {
 
     $('.see_results').addClass('hidden');
     postMessage('seeresults');
-    smileAlert('Trying to see results...', 5000);
+    smileAlert('Trying to see results...', DELAY_SHORT);
     this.redirectView();
 }
 
@@ -419,10 +422,10 @@ GlobalViewModel.removeQuestionFromSession = function() {
                     data: {}, 
                     
                     error: function(xhr, text, err) {
-                        smileAlert('Unable to remove question from session', 15000, 'trace','#globalstatus');
+                        smileAlert('Unable to remove question from session', DELAY_LONG, 'trace','#globalstatus');
                     }, 
                     success: function(data) {
-                        smileAlert('Question deleted', 10000, 'green'); 
+                        smileAlert('Question deleted', DELAY_NORMAL, 'green'); 
                         switchSection('general-board');
                     }
                 });
@@ -541,22 +544,8 @@ function smileAlert(text, lifetime, alerttype, divId) {
 function switchSection(newSection) {
     $('section.visible').removeClass('visible').addClass('hidden');
     $('section[smile='+newSection+']').addClass('visible').removeClass('hidden');
-
-/*
-    if(newSection === 'general-board') {
-        
-        $('table#questions tr').click(function() {
-            if($(this).hasClass('checked'))
-                $(this).removeClass('checked');
-            else
-                $(this).addClass('checked');
-        });
-    }
-    */
 }
 
-// Should I really have this skeleton? or directly having the add________ in the loop synchronizing everytime ?
-// Same question for the future addStudent(student)
 function addQuestion(question) {
 
     var options = [];
@@ -643,7 +632,7 @@ function updateGVM() {
             case 'HAIL':
             if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
                 addStudent(dataAll[i]);
-                smileAlert('<b>'+dataAll[i].NAME+'</b> appears!',10000);
+                smileAlert('<b>'+dataAll[i].NAME+'</b> appears!',DELAY_NORMAL);
                 
             }
             break;
@@ -652,7 +641,7 @@ function updateGVM() {
             case 'QUESTION_PIC':
             if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
                 addQuestion(dataAll[i]);
-                smileAlert('New question from <b>'+dataAll[i].NAME+'</b>!',10000);
+                smileAlert('New question from <b>'+dataAll[i].NAME+'</b>!',DELAY_NORMAL);
             }
             break;
         }
@@ -704,7 +693,7 @@ function postMessage(type,values) {
                 }, 
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send SESSION_VALUES to server', 10000, 'trace');
+                    smileAlert('Unable to send SESSION_VALUES to server', DELAY_NORMAL, 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -721,7 +710,7 @@ function postMessage(type,values) {
                 async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send START_MAKE phase', 10000, 'trace');
+                    smileAlert('Unable to send START_MAKE phase', DELAY_NORMAL, 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -739,10 +728,10 @@ function postMessage(type,values) {
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send START_SOLVE phase', 10000, 'trace');
+                    smileAlert('Unable to send START_SOLVE phase', DELAY_NORMAL, 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('START_SOLVE sent!', 10000, 'green');
+                    smileAlert('START_SOLVE sent!', DELAY_NORMAL, 'green');
                 }
             });
             break;
@@ -758,10 +747,10 @@ function postMessage(type,values) {
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send START_SHOW phase', 10000, 'trace');
+                    smileAlert('Unable to send START_SHOW phase', DELAY_NORMAL, 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('START_SHOW sent!', 10000, 'green');
+                    smileAlert('START_SHOW sent!', DELAY_NORMAL, 'green');
                 }
             });
             break;
@@ -790,7 +779,7 @@ function postMessage(type,values) {
                 },
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 15000, 'trace', '#globalstatus');
+                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_LONG, 'trace', '#globalstatus');
                 }, 
                 success: function(data) {}
             });
@@ -810,10 +799,10 @@ function postMessage(type,values) {
                 data: values,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 15000, 'trace', '#globalstatus');
+                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_LONG, 'trace', '#globalstatus');
                 }, 
                 success: function(data) {
-                    smileAlert('New iqset <i>"'+data.title+'"</i> saved!',10000,'green');
+                    smileAlert('New iqset <i>"'+data.title+'"</i> saved!',DELAY_NORMAL,'green');
                     switchVisibilityIqsetField();
                 }
             });
@@ -837,7 +826,7 @@ function smile_all() {
         async: false,
         data: {}, 
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/all', 10000, 'trace');
+            smileAlert('Unable to call /smile/all', DELAY_NORMAL, 'trace');
         }, 
         success: function(data) { all = data; }
     });
@@ -856,7 +845,7 @@ function smile_reset() {
         async: false,
         
         error: function(xhr, text, err) {
-            smileAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, 10000, 'trace', '#globalstatus');
+            smileAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_LONG, 'trace', '#globalstatus');
         }, 
         success: function(data) {}
     });
@@ -875,7 +864,7 @@ function smile_iqsets() {
         data: {}, 
         
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 15000, 'trace', '#globalstatus');
+            smileAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_LONG, 'trace', '#globalstatus');
         }, 
         success: function(data) { 
             iqsets = data; 
@@ -896,7 +885,7 @@ function smile_iqset(id) {
         async: false,
         data: {},  
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/iqset/{key}', 10000, 'trace');
+            smileAlert('Unable to call /smile/iqset/{key}', DELAY_NORMAL, 'trace');
         }, 
         success: function(data) { iqset = data; }
     });
