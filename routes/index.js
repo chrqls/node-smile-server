@@ -370,9 +370,9 @@ exports.handleStudentResultsGet = function(req, res) {
 
 exports.handleStartSolveQuestionPut = function(req, res) {
     var timeLimit = 10; // The same time limit of old implementation.
-    if (req.body.TIME_LIMIT) {
-        timeLimit = req.body.TIME_LIMIT;
-    }
+    //if (req.body.TIME_LIMIT !== undefined && req.body.TIME_LIMIT) {
+    //    timeLimit = req.body.TIME_LIMIT;
+    //}
     var numberOfQuestions = game.questions.getNumberOfQuestions();
     var rightAnswers = game.questions.getRightAnswers();
     var message = {};
@@ -834,7 +834,7 @@ exports.handleQuestionImageGet = function(req, res) {
     console.log('CRASH AT THIS MOMENT>>'+game.questions.getQuestionPicture(questionNumber));
     var dataBuffer = new Buffer(game.questions.getQuestionPicture(questionNumber), 'base64');
     res.writeHead(200, {
-        'Content-Type' : 'image/jpeg',
+        'Content-Type' : 'image/jpeg'
     });
     res.write(dataBuffer);
     res.end();
