@@ -170,19 +170,21 @@
 
 						<section smile="list-of-iqsets" class="hidden">
 							
-							<table class="center_bloc" data-bind="foreach: iqsets" >
-							    <tr>
-						    		<td>
-					    				<input style="margin:0" type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
-						    			<a style="margin:0" id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
-							    	</td>
-						    		<td style="font-weight:bold"><span data-bind="text: sessionName"></span></td>
-							    	<td style="color:#444"><span data-bind="text: teacherName"></span></td>
-						    		<td style="color:#777"><span data-bind="text: groupName"></span></td>
-							    	<td style="color:#AAA"><span data-bind="text: date"></span></td>
-							    	<td style="color:#CCC"><span data-bind="text: size"></span></td>
-								</tr>    
-							</table>
+							<div style="overflow:scroll;max-height:200px">
+								<table class="center_bloc" data-bind="foreach: iqsets" >
+								    <tr>
+							    		<td>
+						    				<input style="margin:0" type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
+							    			<a style="margin:0" id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
+								    	</td>
+							    		<td style="font-weight:bold"><span data-bind="text: sessionName"></span></td>
+								    	<td style="color:#444"><span data-bind="text: teacherName"></span></td>
+							    		<td style="color:#777"><span data-bind="text: groupName"></span></td>
+								    	<td style="color:#AAA"><span data-bind="text: date"></span></td>
+								    	<td style="color:#CCC"><span data-bind="text: size"></span></td>
+									</tr>    
+								</table>
+							</div>
 							
 							<ul class="button-group radius even-2">
 								<li><a href="#" data-bind='click: redirectView' class="button secondary expand">Back</a></li>
