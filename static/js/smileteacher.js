@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.7.1';
+var VERSION = '0.7.2';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
@@ -51,6 +51,13 @@ var SMILEROUTES = {
 
 var deamon_updating_board;
 
+$(document).ready(function() {
+    
+    // Init Data Model
+    ko.applyBindings(GlobalViewModel);
+
+    GlobalViewModel.redirectView();
+});
 
 /* ------------------
 
@@ -143,11 +150,12 @@ ko.extenders.required = function(target, overrideMessage) {
     return target;
 };
 
-/* ------------------
+/* -----------------------------------
+ 
+                ACTIONS
+    (functions called by the view)
 
-         ACTIONS
-
-   ------------------ */
+   ----------------------------------- */
 
 GlobalViewModel.redirectView = function() {
 
@@ -170,6 +178,9 @@ GlobalViewModel.redirectView = function() {
                 break;
 
             case 'START_MAKE':
+                // If we are at least at START_MAKE phase, we display the 'status' progress bar
+                switchProgressBar('loading');
+
                 section = 'general-board';
                 clearInterval(deamon_updating_board);
                 deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
@@ -213,6 +224,7 @@ GlobalViewModel.resetSession = function() {
     this.session_name('');
     this.group_name('');
     this.status('');
+    switchProgressBar('');
     GlobalViewModel.questions.removeAll();
     GlobalViewModel.students.removeAll();
     clearInterval(deamon_updating_board);
@@ -327,7 +339,6 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
 
 GlobalViewModel.startSolvingQuestions = function() {
 
-    $('.start_solving').addClass('hidden');
     postMessage('startsolve');
     smileAlert('Trying to start solving...', DELAY_SHORT);
     this.redirectView();
@@ -484,19 +495,14 @@ GlobalViewModel.saveNewIQSet = function() {
     }
 }
 
-$(document).ready(function() {
-    
-    // Init Data Model
-    ko.applyBindings(GlobalViewModel);
 
-    GlobalViewModel.redirectView();
-});
 
-/* ------------------
+/* --------------------------------------------------------
 
-         UTILITY
+                           UTILITY
+         (encapsulation of code used by the actions)
 
-   ------------------ */
+   -------------------------------------------------------- */
 /*
 GlobalViewModel.seeContent = function() {
 
@@ -550,6 +556,11 @@ function smileAlert(text, lifetime, alerttype, divId) {
 function switchSection(newSection) {
     $('section.visible').removeClass('visible').addClass('hidden');
     $('section[smile='+newSection+']').addClass('visible').removeClass('hidden');
+}
+
+function switchProgressBar(newProgressBar) {
+    $('.status-progress-bars div.visible').removeClass('visible').addClass('hidden');
+    $('.status-progress-bars div[smile='+newProgressBar+']').addClass('visible').removeClass('hidden');
 }
 
 function addQuestion(question) {
@@ -615,14 +626,18 @@ function updateGVM() {
                 if(GlobalViewModel.students().length > 0) {
                     $('.start_solving').removeClass('hidden');
                 }
-                GlobalViewModel.status('START_MAKE'); 
+                GlobalViewModel.status('START_MAKE');
+                switchProgressBar('start-make');
                 break;
             case 'START_SOLVE': 
                 GlobalViewModel.status('START_SOLVE');
+                switchProgressBar('start-solve');
+                $('.start_solving').addClass('hidden');
                 $('.see_results').removeClass('hidden');
                 break;
             case 'START_SHOW':  
                 GlobalViewModel.status('START_SHOW');
+                switchProgressBar('start-show');
                 $('.see_results').addClass('hidden');
                 $('.retake').removeClass('hidden');
                 break;
@@ -709,8 +724,8 @@ function postMessage(type,values) {
 
             $.ajax({ 
                 cache: false, 
-                type: "POST", 
-                dataType: "text", 
+                type: 'POST', 
+                dataType: 'text', 
                 url: SMILEROUTES['startmake'],
                 data: { "TYPE":"START_MAKE" }, 
                 async: false,
@@ -726,9 +741,9 @@ function postMessage(type,values) {
 
             $.ajax({ 
                 cache: false, 
-                type: "GET", 
-                contentType: "application/json",
-                dataType: "text",
+                type: 'GET', 
+                contentType: 'application/json',
+                dataType: 'text',
                 url: SMILEROUTES['startsolve'],
                 data: {}, 
                 //async: false,

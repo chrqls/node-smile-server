@@ -24,7 +24,7 @@
 	<!-- CSS -->
 	<link rel="stylesheet" href="css/foundation.css">
 	<link rel="stylesheet" href="css/app.css">
-	<link rel="stylesheet" href="css/checkbox-style.css">
+	<!--link rel="stylesheet" href="css/checkbox-style.css"-->
 	<link rel="stylesheet" href="css/rating.css" />
 	<link rel="stylesheet" href="css/fineuploader-3.5.0.css" />
 
@@ -36,9 +36,13 @@
 	    <![endif]-->
 
 	<style>
-		.hidden {
-			display:none;
-		}
+		/* 
+			General css
+		*/
+		.hidden 	{ display:none; }
+		.center_bloc{ margin: 0 auto; }
+		.button 	{ margin-bottom: 0; }
+
 		section[smile=list-of-iqsets] td,
 		section[smile=general-board] td {
 			border: black solid 0;
@@ -78,28 +82,50 @@
 			text-decoration: underline;
 		}
 		#logo_smile_teacher {
-			margin: 20px auto;
-			text-align: center;
+			margin: 5px 0;
+			/*text-align: center;*/
 		}
 		#logo_smile_teacher img {
 			width: 150px;
 		}
 
-		#session_values {
-			float: right;
-			background-color: #EAEAEA;
+		
+		/*#session_values div 		{ margin-bottom: 5px; }*/
+		#session_values span.label 	{ background-color: #666; border: 2px solid #333;}
+		#session_values 			{ 
+			text-align: center;
+			margin: 5px 0 15px;
 		}
+
 		.copyright {
 			color: #666;
 			text-align: center;
 		    font-size: 0.66667rem;
 		    margin: 6px 0 0;
 		}
-		.center_bloc {
-			margin: 0 auto;
+		
+
+		/* 
+			Status progress bars 
+		*/
+		.status_progress_bar span {
+			text-align:right;
+			padding-top: 3px; 
+			padding-right:10px;
+			font-size: 11px;
+			color:white;
+			font-weight:bold;
+			text-transform:capitalize;
 		}
-		.button {
-			margin-bottom: 0;
+		.status-progress-bars div[smile=start-make] span 	{ width: 34%; background-color:#7AC;}
+		.status-progress-bars div[smile=start-solve] span 	{ width: 67%; background-color:#7BB;}
+		.status-progress-bars div[smile=start-show] span 	{ width: 100% }
+		.status-progress-bars div[smile=loading] span 		{ 
+			text-align: center;
+			font-style: italic;
+			background-color: white;
+			color: #999;
+			font-weight:normal;
 		}
 	</style>
 </head>
@@ -107,20 +133,31 @@
 <body>
 
 	<!-- Absolute alert container-->
-	<div id="absolute_alerts" class="" style="position:fixed;z-index: 10;border:0 dotted #CCC">
-	</div>
-		
-	<div id="logo_smile_teacher" class="row">
-		<img data-bind='click: redirectView' src="images/smile_grey_teacher.png" />
-		v<span data-bind="text: version"></span>
+	<div id="absolute_alerts" class="" style="position:fixed;z-index: 10;border:0 dotted #CCC;float:right">
 	</div>
 
 	<div class="row">
-
-		<div style="visibility:hidden" class="large-2 columns">.</div>
-
-		<div id="board" class="large-8 columns">
+		<div class="small-2 columns">
+			<div class="row" id="logo_smile_teacher">
+				<div class="small-12 columns">
+					<img data-bind='click: redirectView' src="images/smile_grey_teacher.png" />
+					
+				</div>
+			</div>
+			<div class="row" style="text-align: right;font-size:12px">
+				v<span data-bind="text: version"></span>
+			</div>
+		</div>
+		<div class="small-9 end columns" style="margin-top:10px">
 			
+			<div class="row" id="session_values" data-bind="if: teacher_name"> 
+				<span class="round label">
+					<span style="color:#fcf4ce" data-bind="text: teacher_name"></span> - 
+					<span style="color:#fde6eb" data-bind="text: session_name"></span> - 
+					<span style="color:#e6f6fd" data-bind="text: group_name"></span>
+				</span>
+			</div>
+
 			<!-- Trace smile alert -->
 			<div class="row">
 				<div class="large-8 small-8 columns">
@@ -128,12 +165,20 @@
 				</div>
 			</div>
 
-			<div class="row">
-				<div id="session_values">
-					(<span data-bind="text: teacher_name"></span>,
-					<span data-bind="text: session_name"></span>,
-					<span data-bind="text: group_name"></span>,
-					<span data-bind="text: status"></span>)
+			<div class="status-progress-bars row">
+				<div class="small-12 columns">
+					<div smile="loading" class="radius progress large-12 status_progress_bar hidden">
+						<span class="meter">Loading...</span>
+					</div>
+					<div smile="start-make" class="radius progress large-12 status_progress_bar hidden">
+						<span class="meter">START_MAKE</span>
+					</div>
+					<div smile="start-solve" class="radius progress large-12 status_progress_bar hidden">
+						<span class="meter">START_SOLVE</span>
+					</div>
+					<div smile="start-show" class="radius success progress large-12 status_progress_bar hidden">
+						<span class="meter">START_SHOW</span>
+					</div>
 				</div>
 			</div>
 
@@ -346,32 +391,47 @@
 				</div>
 			</div>
 		</div>
-		<!-- to center the main bloc -->
-		<div class="large-2 columns"></div>
 	</div>
 
-	<div class="row">
+	
+
+	<!--div class="row">
+
 		<div style="visibility:hidden" class="large-2 columns">.</div>
-		<div class="large-8 columns">
-			<div style="float:left">
+
+		<div id="board" class="large-8 columns">
+
+			
+
+			
+		</div>
+		<!-- to center the main bloc ->
+		<div class="large-2 columns"></div>
+	</div-->
+
+	<div class="row">
+		<div style="visibility:hidden" class="small-1 columns">.</div>
+		<div class="small-10 end columns">
+			<div style="text-align:center">
 				<img style="width:100px" src="images/smile.jpg" /><br>
-				<img style="width:100px" src="images/marvell_horiz_logo.jpg" />
-			</div>
-			<div style="float:right">
+				<img style="width:100px" src="images/marvell_horiz_logo.jpg" /><br>
 				<img style="width:100px" src="images/jamsj_slim.png" />
+			</div>
+			<!--div style="float:right">
+				
 			</div>
 			<p style="font-size:10px">
 				SMILE turns a traditional classroom into a highly interactive
 				learning environment by engaging students in critical reasoning and
 				problem solving while enabling them to generate, share, and
 				evaluate multimedia-rich inquiries.
-			</p>
+			</p-->
 		</div>
-		<div class="large-2 columns"></div>
+
 	</div>
 
 	<div class="row">
-		<div class="small-6 small-centered columns">
+		<div class="small-6 small-centered columns" style="text-align:center">
 			<ul class="smile-links">
 				<li><a href="http://www.smileconsortium.org"><img style="width:30px" src="../images/smile_grey_48x23.png" /></a></li>
 				<li><a href="mailto:reply+i-23475388-c2457b2df337933075fa1a78843d843cefe305ca-64202@reply.github.com">Support</a></li>
