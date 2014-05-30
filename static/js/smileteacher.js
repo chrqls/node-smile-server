@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.7.2';
+var VERSION = '0.7.3';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
@@ -245,6 +245,7 @@ GlobalViewModel.startMakingQuestions = function() {
 
 GlobalViewModel.usePreparedQuestions = function() {
 
+    // If a session is already running, we redirect directly to the current session
     if(typeExist('START_MAKE')) {
         this.redirectView();
     } else {
@@ -273,6 +274,22 @@ GlobalViewModel.usePreparedQuestions = function() {
                 iqset.iqdata.length
             ));  
         }
+
+        //$(document).off('click', 'table#questions tr').on('click', 'table#questions tr', function() {
+        $('section[smile=list-of-iqsets] table tr').click(function() {
+
+            console.log('i am clicked !!');
+
+            if(!$(this).hasClass('selected')) {
+                $('section[smile=list-of-iqsets] table tr.selected').each(function(index) {
+
+                        console.log('attempt to remove class !!!!');
+
+                    $(this).removeClass('selected');
+                });
+                $(this).addClass('selected');
+            }
+        });
     }
 }
 
@@ -669,13 +686,13 @@ function updateGVM() {
     }
 
     // Everytime updateGVM() is called, we have to restart the listener (by doing off/on) to wake up the multiple selection
-    // 
+    // Why? If you call a 'click' listener already listening, the listener will be disabled
     $(document).off('click', 'table#questions tr').on('click', 'table#questions tr', function() {
-            if($(this).hasClass('checked'))
-                $(this).removeClass('checked');
-            else
-                $(this).addClass('checked');
-        });
+        if($(this).hasClass('checked'))
+            $(this).removeClass('checked');
+        else
+            $(this).addClass('checked');
+    });
 }
 
 function typeExist(type) {

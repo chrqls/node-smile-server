@@ -52,12 +52,12 @@
 			min-height: 200px;
 		}
 
-		table#questions {
+		table#questions,
+		section[smile=list-of-iqsets] table {
 			border-collapse:collapse;
 		}
-		section[smile=general-board] table#questions tr.checked {
-			background-color: #c9eff6;
-		} 
+		section[smile=general-board] table#questions tr.checked { background-color: #c9eff6; }
+		section[smile=list-of-iqsets] table tr.selected { background-color: #FCF4CE; } 
 
 		/*
 			Zurb does not have a class for labels alone (without a field collapsed).
@@ -268,7 +268,9 @@
 								    				<input type="hidden" data-bind="attr: {name: session_id}" />
 									    			<a style="margin: 2px 0" id="more" onclick="detailQuestion(this.name)" data-bind="attr: {name: session_id}" class="tiny round button more">+</a>
 										    	</td>
-									    		<td style="color:#888;font-size:14px;font-style:italic"><span data-bind="text: question"></span></td>
+									    		<td style="color:#888;font-size:14px;font-style:italic">
+									    			<span data-bind="text: question"></span>
+									    		</td>
 										    	<td style="color:#444;font-size:12px"><span data-bind="text: author"></span></td>
 									    		<td style="color:#444;font-size:12px"><span data-bind="text: ip"></span></td>
 										    	<td>
