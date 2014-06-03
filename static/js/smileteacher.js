@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.7.3';
+var VERSION = '0.7.4';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
@@ -114,7 +114,6 @@ var GlobalViewModel = {
     iqset_to_preview: ko.observableArray([]),
 
     // Start making questions
-    position: ko.observable(''),
     students: ko.observableArray([]),
     questions: ko.observableArray([]),
 
@@ -275,16 +274,10 @@ GlobalViewModel.usePreparedQuestions = function() {
             ));  
         }
 
-        //$(document).off('click', 'table#questions tr').on('click', 'table#questions tr', function() {
+        // Preparing listener for single selection (radio mode)
         $('section[smile=list-of-iqsets] table tr').click(function() {
-
-            console.log('i am clicked !!');
-
             if(!$(this).hasClass('selected')) {
                 $('section[smile=list-of-iqsets] table tr.selected').each(function(index) {
-
-                        console.log('attempt to remove class !!!!');
-
                     $(this).removeClass('selected');
                 });
                 $(this).addClass('selected');
@@ -339,19 +332,30 @@ function previewIQSet(idIQSet) {
 
 GlobalViewModel.startMakingQuestionsWithIQSet = function() {
 
-    var iqset = JSON.parse(smile_iqset(GlobalViewModel.iqsets()[GlobalViewModel.position()].id));
-    var iqdata = iqset.iqdata;
+    if($('section[smile=list-of-iqsets] table tr.selected')) {
+        
+        var positionOfIQSet = document.querySelector('[smile=list-of-iqsets]')
+                                      .querySelector('[class=selected]')
+                                      .getAttribute('position_iqset');
+        
+        /* We get the position to get the id of the iqset
+        var iqset = JSON.parse(smile_iqset(GlobalViewModel.iqsets()[GlobalViewModel.position()].id));*/
+        var iqset = JSON.parse(smile_iqset(GlobalViewModel.iqsets()[positionOfIQSet].id));
+        var iqdata = iqset.iqdata;
 
-    for (i = 0; i < iqdata.length; i++) {
+        for (i = 0; i < iqdata.length; i++) {
 
-        // We send each question to the server
-        postMessage('question',iqdata[i]);
+            // We send each question to the server
+            postMessage('question',iqdata[i]);
+        }
+        
+        postMessage('startmake');
+
+        deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
+        location.reload();
+    } else {
+        smileAlert('Please <b>select</b> an iqset', DELAY_SHORT,'red');
     }
-    
-    postMessage('startmake');
-
-    deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
-    location.reload();
 }
 
 GlobalViewModel.startSolvingQuestions = function() {
@@ -685,7 +689,7 @@ function updateGVM() {
         }
     }
 
-    // Everytime updateGVM() is called, we have to restart the listener (by doing off/on) to wake up the multiple selection
+    // Everytime updateGVM() is called, we have to restart the listener (by doing off/on) to wake up the multiple selection (checkbox mode)
     // Why? If you call a 'click' listener already listening, the listener will be disabled
     $(document).off('click', 'table#questions tr').on('click', 'table#questions tr', function() {
         if($(this).hasClass('checked'))

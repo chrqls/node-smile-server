@@ -57,7 +57,11 @@
 			border-collapse:collapse;
 		}
 		section[smile=general-board] table#questions tr.checked { background-color: #c9eff6; }
-		section[smile=list-of-iqsets] table tr.selected { background-color: #FCF4CE; } 
+		section[smile=list-of-iqsets] table tr.selected { 
+			background-color: #FCF4CE; 
+			border-top: 1px solid #EBE3BD; 
+			border-bottom: 1px solid #EBE3BD;
+		} 
 
 		/*
 			Zurb does not have a class for labels alone (without a field collapsed).
@@ -213,13 +217,14 @@
 							
 						</section>
 
-						<section smile="list-of-iqsets" class="hidden">
-							
+						<section smile="list-of-iqsets" class="list-of-iqsets hidden">
+
 							<div style="overflow:scroll;max-height:200px">
 								<table class="center_bloc" data-bind="foreach: iqsets" >
-								    <tr>
+								    <tr data-bind="attr: {position_iqset: position}">
 							    		<td>
-						    				<input style="margin:0" type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" />
+							    			<!-- Old way to select an iqset: the radio input -->
+						    				<!--input style="margin:0" type="radio" name="optionsGroup" data-bind="attr: {value: position}, checked: $root.position" /-->
 							    			<a style="margin:0" id="more" onclick="previewIQSet(this.name)" data-bind="attr: {name: id}" class="tiny round button more">+</a>
 								    	</td>
 							    		<td style="font-weight:bold"><span data-bind="text: sessionName"></span></td>
