@@ -32,9 +32,10 @@ var VERSION = '0.7.4';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
+var DELAY_ERROR = 60000;
 var DELAY_SHORT = 5000;
-var DELAY_NORMAL = 10000;
-var DELAY_LONG = 20000;
+var DELAY_NORMAL = 10000;/*
+var DELAY_LONG = 20000;*/
 
 var SMILEROUTES = {
     'all': '/smile/all',
@@ -454,10 +455,10 @@ GlobalViewModel.removeQuestionFromSession = function() {
                     data: {}, 
                     
                     error: function(xhr, text, err) {
-                        smileAlert('Unable to remove question from session', DELAY_LONG, 'trace','#globalstatus');
+                        smileAlert('Unable to remove question from session', DELAY_ERROR, 'trace');
                     }, 
                     success: function(data) {
-                        smileAlert('Question deleted', DELAY_NORMAL, 'green'); 
+                        smileAlert('Question deleted', DELAY_NORMAL, 'green');
                         switchSection('general-board');
                     }
                 });
@@ -536,40 +537,35 @@ GlobalViewModel.seeContent = function() {
     smileAlert('checked:'+content,10000);
 }*/
 
-function smileAlert(text, lifetime, alerttype, divId) {
+function smileAlert(text, lifetime, alerttype, hasCross) {
     
+    var container = '#absolute_alerts';
     var alertID = 'id_'+Math.floor(Math.random()*99999);
+    var cross = hasCross? '<a style="color:white" class="close" href="">×</a>' : '';
 
-    // Colors
-    var defaultalert = 'secondary';
-    var redalert = 'alert';
-    var bluealert = '';
-    var greenalert = 'success';
+    // Types of box
+    var box_grey = 'secondary';
+    var box_red = 'alert';
+    var box_blue = '';
+    var box_green = 'success';
     
-    if (!alerttype)                 { alerttype = defaultalert; } 
-    else if (alerttype === 'trace') { alerttype = redalert; 
-                                      text += ' : ' + printStackTrace(); } 
-    else if (alerttype === 'red')   { alerttype = redalert; } 
-    else if (alerttype === 'blue')  { alerttype = bluealert; } 
-    else if (alerttype === 'green') { alerttype = greenalert; } 
+    if (!alerttype)                 { alerttype = box_grey; } 
+    else if (alerttype === 'trace') { alerttype = box_red; text += ' : ' + printStackTrace(); } 
+    else if (alerttype === 'red')   { alerttype = box_red; } 
+    else if (alerttype === 'blue')  { alerttype = box_blue; } 
+    else if (alerttype === 'green') { alerttype = box_green; } 
 
-    if(!divId || divId === '') {
-        divId = '#absolute_alerts';
-    }
+    var html_to_inject = '<div id="%s"> \
+                            <div style="margin:3px 0;opacity:0.8;display: inline-block" class="alert-box %s" data-alert=""> \
+                              <span style="font-weight:normal">%s</span>%s \
+                            </div> \
+                          </div>';
 
-    var formatstr = '<div id="%s"> \
-                        <div style="margin:3px 0;opacity:0.8;display: inline-block" class="alert-box %s" style="opacity:0.4"> \
-                            <span style="font-weight:normal">%s</span><br> \
-                        </div><br> \
-                    </div>';
-
-    if (divId) {
-        $(divId).append(sprintf(formatstr, alertID, alerttype, text));
-    } 
+    $(container).append(sprintf(html_to_inject, alertID, alerttype, text, cross));
 
     if (lifetime) {
         setInterval(function() {
-            $(divId).find('#'+alertID).fadeOut().remove();
+            $(container).find('#'+alertID).fadeOut().remove();
         }, lifetime)
     }
 }
@@ -821,7 +817,7 @@ function postMessage(type,values) {
                 },
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_LONG, 'trace', '#globalstatus');
+                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -829,7 +825,6 @@ function postMessage(type,values) {
 
         case 'iqset':
 
-            //var newIqset = 
             console.log(values);
 
             $.ajax({ 
@@ -841,7 +836,7 @@ function postMessage(type,values) {
                 data: values,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_LONG, 'trace', '#globalstatus');
+                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
                 }, 
                 success: function(data) {
                     smileAlert('New iqset <i>"'+data.title+'"</i> saved!',DELAY_NORMAL,'green');
@@ -868,7 +863,7 @@ function smile_all() {
         async: false,
         data: {}, 
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/all', DELAY_NORMAL, 'trace');
+            smileAlert('Unable to call /smile/all', DELAY_ERROR, 'trace',true);
         }, 
         success: function(data) { all = data; }
     });
@@ -887,7 +882,7 @@ function smile_reset() {
         async: false,
         
         error: function(xhr, text, err) {
-            smileAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_LONG, 'trace', '#globalstatus');
+            smileAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace');
         }, 
         success: function(data) {}
     });
@@ -906,7 +901,7 @@ function smile_iqsets() {
         data: {}, 
         
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_LONG, 'trace', '#globalstatus');
+            smileAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
         }, 
         success: function(data) { 
             iqsets = data; 
