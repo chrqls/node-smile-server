@@ -28,13 +28,14 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.7.1';
+var VERSION = '0.7.4';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
+var DELAY_ERROR = 60000;
 var DELAY_SHORT = 5000;
-var DELAY_NORMAL = 10000;
-var DELAY_LONG = 20000;
+var DELAY_NORMAL = 10000;/*
+var DELAY_LONG = 20000;*/
 
 var SMILEROUTES = {
     'all': '/smile/all',
@@ -51,6 +52,13 @@ var SMILEROUTES = {
 
 var deamon_updating_board;
 
+$(document).ready(function() {
+    
+    // Init Data Model
+    ko.applyBindings(GlobalViewModel);
+
+    GlobalViewModel.redirectView();
+});
 
 /* ------------------
 
@@ -107,7 +115,6 @@ var GlobalViewModel = {
     iqset_to_preview: ko.observableArray([]),
 
     // Start making questions
-    position: ko.observable(''),
     students: ko.observableArray([]),
     questions: ko.observableArray([]),
 
@@ -143,11 +150,12 @@ ko.extenders.required = function(target, overrideMessage) {
     return target;
 };
 
-/* ------------------
+/* -----------------------------------
+ 
+                ACTIONS
+    (functions called by the view)
 
-         ACTIONS
-
-   ------------------ */
+   ----------------------------------- */
 
 GlobalViewModel.redirectView = function() {
 
@@ -170,6 +178,9 @@ GlobalViewModel.redirectView = function() {
                 break;
 
             case 'START_MAKE':
+                // If we are at least at START_MAKE phase, we display the 'status' progress bar
+                switchProgressBar('loading');
+
                 section = 'general-board';
                 clearInterval(deamon_updating_board);
                 deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
@@ -213,6 +224,7 @@ GlobalViewModel.resetSession = function() {
     this.session_name('');
     this.group_name('');
     this.status('');
+    switchProgressBar('');
     GlobalViewModel.questions.removeAll();
     GlobalViewModel.students.removeAll();
     clearInterval(deamon_updating_board);
@@ -233,6 +245,7 @@ GlobalViewModel.startMakingQuestions = function() {
 
 GlobalViewModel.usePreparedQuestions = function() {
 
+    // If a session is already running, we redirect directly to the current session
     if(typeExist('START_MAKE')) {
         this.redirectView();
     } else {
@@ -261,6 +274,16 @@ GlobalViewModel.usePreparedQuestions = function() {
                 iqset.iqdata.length
             ));  
         }
+
+        // Preparing listener for single selection (radio mode)
+        $('section[smile=list-of-iqsets] table tr').click(function() {
+            if(!$(this).hasClass('selected')) {
+                $('section[smile=list-of-iqsets] table tr.selected').each(function(index) {
+                    $(this).removeClass('selected');
+                });
+                $(this).addClass('selected');
+            }
+        });
     }
 }
 
@@ -310,24 +333,34 @@ function previewIQSet(idIQSet) {
 
 GlobalViewModel.startMakingQuestionsWithIQSet = function() {
 
-    var iqset = JSON.parse(smile_iqset(GlobalViewModel.iqsets()[GlobalViewModel.position()].id));
-    var iqdata = iqset.iqdata;
+    if($('section[smile=list-of-iqsets] table tr.selected')) {
+        
+        var positionOfIQSet = document.querySelector('[smile=list-of-iqsets]')
+                                      .querySelector('[class=selected]')
+                                      .getAttribute('position_iqset');
+        
+        /* We get the position to get the id of the iqset
+        var iqset = JSON.parse(smile_iqset(GlobalViewModel.iqsets()[GlobalViewModel.position()].id));*/
+        var iqset = JSON.parse(smile_iqset(GlobalViewModel.iqsets()[positionOfIQSet].id));
+        var iqdata = iqset.iqdata;
 
-    for (i = 0; i < iqdata.length; i++) {
+        for (i = 0; i < iqdata.length; i++) {
 
-        // We send each question to the server
-        postMessage('question',iqdata[i]);
+            // We send each question to the server
+            postMessage('question',iqdata[i]);
+        }
+        
+        postMessage('startmake');
+
+        deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
+        location.reload();
+    } else {
+        smileAlert('Please <b>select</b> an iqset', DELAY_SHORT,'red');
     }
-    
-    postMessage('startmake');
-
-    deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
-    location.reload();
 }
 
 GlobalViewModel.startSolvingQuestions = function() {
 
-    $('.start_solving').addClass('hidden');
     postMessage('startsolve');
     smileAlert('Trying to start solving...', DELAY_SHORT);
     this.redirectView();
@@ -422,10 +455,10 @@ GlobalViewModel.removeQuestionFromSession = function() {
                     data: {}, 
                     
                     error: function(xhr, text, err) {
-                        smileAlert('Unable to remove question from session', DELAY_LONG, 'trace','#globalstatus');
+                        smileAlert('Unable to remove question from session', DELAY_ERROR, 'trace');
                     }, 
                     success: function(data) {
-                        smileAlert('Question deleted', DELAY_NORMAL, 'green'); 
+                        smileAlert('Question deleted', DELAY_NORMAL, 'green');
                         switchSection('general-board');
                     }
                 });
@@ -484,19 +517,14 @@ GlobalViewModel.saveNewIQSet = function() {
     }
 }
 
-$(document).ready(function() {
-    
-    // Init Data Model
-    ko.applyBindings(GlobalViewModel);
 
-    GlobalViewModel.redirectView();
-});
 
-/* ------------------
+/* --------------------------------------------------------
 
-         UTILITY
+                           UTILITY
+         (encapsulation of code used by the actions)
 
-   ------------------ */
+   -------------------------------------------------------- */
 /*
 GlobalViewModel.seeContent = function() {
 
@@ -509,40 +537,35 @@ GlobalViewModel.seeContent = function() {
     smileAlert('checked:'+content,10000);
 }*/
 
-function smileAlert(text, lifetime, alerttype, divId) {
+function smileAlert(text, lifetime, alerttype, hasCross) {
     
+    var container = '#absolute_alerts';
     var alertID = 'id_'+Math.floor(Math.random()*99999);
+    var cross = hasCross? '<a style="color:white" class="close" href="">×</a>' : '';
 
-    // Colors
-    var defaultalert = 'secondary';
-    var redalert = 'alert';
-    var bluealert = '';
-    var greenalert = 'success';
+    // Types of box
+    var box_grey = 'secondary';
+    var box_red = 'alert';
+    var box_blue = '';
+    var box_green = 'success';
     
-    if (!alerttype)                 { alerttype = defaultalert; } 
-    else if (alerttype === 'trace') { alerttype = redalert; 
-                                      text += ' : ' + printStackTrace(); } 
-    else if (alerttype === 'red')   { alerttype = redalert; } 
-    else if (alerttype === 'blue')  { alerttype = bluealert; } 
-    else if (alerttype === 'green') { alerttype = greenalert; } 
+    if (!alerttype)                 { alerttype = box_grey; } 
+    else if (alerttype === 'trace') { alerttype = box_red; text += ' : ' + printStackTrace(); } 
+    else if (alerttype === 'red')   { alerttype = box_red; } 
+    else if (alerttype === 'blue')  { alerttype = box_blue; } 
+    else if (alerttype === 'green') { alerttype = box_green; } 
 
-    if(!divId || divId === '') {
-        divId = '#absolute_alerts';
-    }
+    var html_to_inject = '<div id="%s"> \
+                            <div style="margin:3px 0;opacity:0.8;display: inline-block" class="alert-box %s" data-alert=""> \
+                              <span style="font-weight:normal">%s</span>%s \
+                            </div> \
+                          </div>';
 
-    var formatstr = '<div id="%s"> \
-                        <div style="margin:3px 0;opacity:0.8;display: inline-block" class="alert-box %s" style="opacity:0.4"> \
-                            <span style="font-weight:normal">%s</span><br> \
-                        </div><br> \
-                    </div>';
-
-    if (divId) {
-        $(divId).append(sprintf(formatstr, alertID, alerttype, text));
-    } 
+    $(container).append(sprintf(html_to_inject, alertID, alerttype, text, cross));
 
     if (lifetime) {
         setInterval(function() {
-            $(divId).find('#'+alertID).fadeOut().remove();
+            $(container).find('#'+alertID).fadeOut().remove();
         }, lifetime)
     }
 }
@@ -550,6 +573,11 @@ function smileAlert(text, lifetime, alerttype, divId) {
 function switchSection(newSection) {
     $('section.visible').removeClass('visible').addClass('hidden');
     $('section[smile='+newSection+']').addClass('visible').removeClass('hidden');
+}
+
+function switchProgressBar(newProgressBar) {
+    $('.status-progress-bars div.visible').removeClass('visible').addClass('hidden');
+    $('.status-progress-bars div[smile='+newProgressBar+']').addClass('visible').removeClass('hidden');
 }
 
 function addQuestion(question) {
@@ -615,14 +643,18 @@ function updateGVM() {
                 if(GlobalViewModel.students().length > 0) {
                     $('.start_solving').removeClass('hidden');
                 }
-                GlobalViewModel.status('START_MAKE'); 
+                GlobalViewModel.status('START_MAKE');
+                switchProgressBar('start-make');
                 break;
             case 'START_SOLVE': 
                 GlobalViewModel.status('START_SOLVE');
+                switchProgressBar('start-solve');
+                $('.start_solving').addClass('hidden');
                 $('.see_results').removeClass('hidden');
                 break;
             case 'START_SHOW':  
                 GlobalViewModel.status('START_SHOW');
+                switchProgressBar('start-show');
                 $('.see_results').addClass('hidden');
                 $('.retake').removeClass('hidden');
                 break;
@@ -653,14 +685,14 @@ function updateGVM() {
         }
     }
 
-    // Everytime updateGVM() is called, we have to restart the listener (by doing off/on) to wake up the multiple selection
-    // 
+    // Everytime updateGVM() is called, we have to restart the listener (by doing off/on) to wake up the multiple selection (checkbox mode)
+    // Why? If you call a 'click' listener already listening, the listener will be disabled
     $(document).off('click', 'table#questions tr').on('click', 'table#questions tr', function() {
-            if($(this).hasClass('checked'))
-                $(this).removeClass('checked');
-            else
-                $(this).addClass('checked');
-        });
+        if($(this).hasClass('checked'))
+            $(this).removeClass('checked');
+        else
+            $(this).addClass('checked');
+    });
 }
 
 function typeExist(type) {
@@ -709,8 +741,8 @@ function postMessage(type,values) {
 
             $.ajax({ 
                 cache: false, 
-                type: "POST", 
-                dataType: "text", 
+                type: 'POST', 
+                dataType: 'text', 
                 url: SMILEROUTES['startmake'],
                 data: { "TYPE":"START_MAKE" }, 
                 async: false,
@@ -726,9 +758,9 @@ function postMessage(type,values) {
 
             $.ajax({ 
                 cache: false, 
-                type: "GET", 
-                contentType: "application/json",
-                dataType: "text",
+                type: 'GET', 
+                contentType: 'application/json',
+                dataType: 'text',
                 url: SMILEROUTES['startsolve'],
                 data: {}, 
                 //async: false,
@@ -785,7 +817,7 @@ function postMessage(type,values) {
                 },
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_LONG, 'trace', '#globalstatus');
+                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -793,7 +825,6 @@ function postMessage(type,values) {
 
         case 'iqset':
 
-            //var newIqset = 
             console.log(values);
 
             $.ajax({ 
@@ -805,7 +836,7 @@ function postMessage(type,values) {
                 data: values,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_LONG, 'trace', '#globalstatus');
+                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
                 }, 
                 success: function(data) {
                     smileAlert('New iqset <i>"'+data.title+'"</i> saved!',DELAY_NORMAL,'green');
@@ -832,7 +863,7 @@ function smile_all() {
         async: false,
         data: {}, 
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/all', DELAY_NORMAL, 'trace');
+            smileAlert('Unable to call /smile/all', DELAY_ERROR, 'trace',true);
         }, 
         success: function(data) { all = data; }
     });
@@ -851,7 +882,7 @@ function smile_reset() {
         async: false,
         
         error: function(xhr, text, err) {
-            smileAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_LONG, 'trace', '#globalstatus');
+            smileAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace');
         }, 
         success: function(data) {}
     });
@@ -870,7 +901,7 @@ function smile_iqsets() {
         data: {}, 
         
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_LONG, 'trace', '#globalstatus');
+            smileAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
         }, 
         success: function(data) { 
             iqsets = data; 
