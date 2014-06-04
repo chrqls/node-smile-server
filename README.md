@@ -27,3 +27,8 @@ Tests
 
  * Run functional tests
   $ ./run_functional_tests 
+
+Attributions
+============
+
+* Flickr: https://www.flickr.com/photos/testrunbomber842/10053155455
