@@ -1,6 +1,6 @@
 ---
-title: "Shortcodes"
-date: "2013-07-01"
+title: "Epoch SMILE Server Guide"
+date: "2014-06-04"
 aliases: ["/doc/shortcodes/"]
 groups: ["guides"]
 groups_weight: 210

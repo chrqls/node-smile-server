@@ -1,6 +1,6 @@
 ---
-title: "Permalinks"
-date: "2013-11-18"
+title: "Epoch SMILE Teacher Web Guide"
+date: "2014-06-04"
 aliases:
   - "/doc/permalinks/"
 groups: ["guides"]

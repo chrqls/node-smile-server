@@ -1,8 +1,8 @@
 ---
-title: "Table of Contents"
-date: "2013-07-09"
+title: "Epoch SMILE Student Android App guide"
+date: "2014-06-04"
 groups: ["guides"]
-groups_weight: 70
+groups_weight: 240
 ---
 
 Hugo will automatically parse the markdown for your content and create

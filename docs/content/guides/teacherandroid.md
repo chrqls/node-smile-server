@@ -1,6 +1,6 @@
 ---
-title: "Aliases"
-date: "2013-07-09"
+title: "Epoch SMILE Teacher Android App Guide"
+date: "2014-06-04"
 aliases:
     - /doc/redirects/
     - /doc/alias/

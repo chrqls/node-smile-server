@@ -1,6 +1,6 @@
 ---
-title: "URLs"
-date: "2014-01-03"
+title: "Epoch SMILE Student Web Guide"
+date: "2014-06-04"
 aliases:
   - "/doc/urls/"
 groups: ["guides"]
