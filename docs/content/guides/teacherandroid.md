@@ -80,4 +80,12 @@ By clicking the *Restart* menu, the teacher can log out all students and reset t
 
 ### Retaking a Session
 
-A Teacher can *Retake* a session by clicking *Retake" in the menu.  This will cause all students to stay in the session, not logged out.  Instead, the Teacher has the opportunity to select a new session from the Prepared Questions.  Once selected, each student will be put into this new sesion with the selected questions.  This is ideal for situations where a Teacher may have multiple sets of questions use in the session.  It's also ideal for when a Teacher wants to reset wihtout kicking all students out of teh session.
+A Teacher can *Retake* a session by clicking *Retake* in the menu.  This will cause all students to stay in the session, not logged out.  Instead, the Teacher has the opportunity to select a new session from the Prepared Questions.  Once selected, each student will be put into this new sesion with the selected questions.  This is ideal for situations where a Teacher may have multiple sets of questions use in the session.  It's also ideal for when a Teacher wants to reset wihtout kicking all students out of teh session.
+
+The subtle difference between *Retake* and *Restart* is that *Retake* will keep the students logged in, while *Restart* sends students back to login.  The Teacher should, upon *Retake*, select *Start Answer Questions* in the app.
+
+## Recovering a Session
+
+It's possible the Teacher tablet will lose power or crash during a session.  In these cases, it is still possible to get back into the session.  The teacher simply needs to log back in by restarting the App, select *Start Making Questions*, and then click on *Recover Session".
+
+![Login Screen](/static/img/smileteacher-recover.png)
