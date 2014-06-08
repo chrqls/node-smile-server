@@ -1,74 +1,68 @@
 ---
-title: "Epoch SMILE Teacher Android App Guide"
+title: "Epoch IQManager Guide"
 date: "2014-06-04"
 aliases:
-    - /doc/teacherandroid/
-    - /doc/teacher/
+    - /doc/iqmanager/
+    - /doc/teacheriqmanager/
+    - /doc/smileiqmanager/
 groups: ["guides"]
-groups_weight: 20
+groups_weight: 25
 ---
 
-The SMILE Teacher Android App is designed to allow the Teacher to organize the Epoch SMILE learning session.
+The Epoch IQManager is designed to allow the Teacher to organize Inquiry Sets for an Epoch SMILE learning session.
 
 ## Logging In
 
-Every session begins with the Teacher and Students logging in.  The default Server IP address (*10.1.0.1*) will be prefilled for the Teacher.  If the default address doesn't suit you, enter one appropriate to your installation.
+The IQManager can be reached using the browser at the default Server IP address (*http://10.1.0.1/smile-iqmanager.html*).  If the default address doesn't suit you, enter one appropriate to your installation.
 
-![Login Screen](/static/img/smileteacher-login.png)
+## Creating an IQSet
 
-Your login screen may look slightly different, depending on branding used in your installation, or depending on screen size.
+The steps to create an IQSet are described below.  We recommend using a spreadsheet program like Microsoft Excel to export a CSV file.  Use the IQSet_Template.xls to create IQSets.
 
-## Session Set Up
+1. TODO
+1. TODO
+1. TODO
 
-The next important step is to set up the Session.  The default information screen has values prefilled.
+This will be the most difficult step to complete.
 
-![Session 1](/static/img/smileteacher-session1.png)
+## Uploading an IQSet
 
-The Teacher can fill in the fields with information relevant to the new session: *Teacher Name*, *Session Title*, *Group Name*.  This information is used later in the session, when the session is saved for later review in the IQManager.
+To upload IQSets, follow the previous instructions for "Creating an IQSet".  To upload a set, you simply click on the button "Upload IQSet".
 
-![Session 2](/static/img/smileteacher-session2.png)
+![IQManager Menu](/static/img/iqmanager-menu.png)
 
-## Choose Question Setup
+After clicking the button, you will see a dialog popup.  Select the .csv IQSet file you want to upload.
 
-After providing session information, the Teacher will need to choose the Question Setup, either 
+![IQManager IQset Upload](/static/img/iqmanager-upload.png)
 
-1. *Start Making Questions* - This allows students to start making their own questions, thus starting the session
-1. *Use Prepared Questions* - This allows students to start a session using previously prepared questions
+Upon success, the upload will complete and pop up a summary window of the uploaded IQSet.  This means the IQSet is now uploaded and ready to use.
 
-![Choose Question](/static/img/smileteacher-chooseq.png)
+![IQManager IQset Upload](/static/img/iqmanager-upload2.png)
 
-If Teacher chooses to *Use Prepared Questions*, a dialog will open and it will be possible to choose the prepared questions.  The question sets are also known as *IQSets* (Inquiry Sets).  If no prepared questions are available, none will be displayed.  The Teacher should select an IQSet to use in the Session.  Note, the details of each IQSet are present, with information coming from the Session setup details of past sessions.
+## Viewing IQSets
 
-![Use Prepared Questions](/static/img/smileteacher-preparedq.png)
+To view the IQSets loaded in the systme, click on the IQSets tab.  
 
-## Session Phase I - Start Making Questions
+![IQManager IQset Upload](/static/img/iqmanager-iqsets.png)
 
-After providing session information, the Teacher will need to choose the Question Setup, either 
+By clicking on one of the IQSets, you will get a detailed view of the IQSet.  You also have the option to delet an IQSet.
 
-![Login Screen](/static/img/smileteacher-chooseq.png)
+![IQManager IQset Upload](/static/img/iqmanager-iqsetdetail.png)
 
-## Session Phase II - Start Answering Questions
+## Viewing IQSessions
 
-After providing session information, the Teacher will need to choose the Question Setup, either 
+An IQSession is just a term for the in-class inquiry session.  Any time you run a session to completion (by hitting Show Results), the session will be saved automatically using session details provided on the setup.  You can review this information as a way to understand the progress of your class, or to check the records for particular students.
 
-![Login Screen](/static/img/smileteacher-chooseq.png)
+![IQManager IQSessions](/static/img/iqmanager-iqsessions.png)
 
-## Session Phase III - Show Results
+By clicking onpng any IQSession listed, you will be able to review the IQSession details.  This is useful information about the session, including who taught the class, which students participated in the session, and scores. 
 
-After providing session information, the Teacher will need to choose the Question Setup, either 
+![IQManager IQSession Details](/static/img/iqmanager-iqsessiondetail.png)
 
-![Login Screen](/static/img/smileteacher-chooseq.png)
+## Issues
 
-## Restarting A Session
+Not Yet Implemented
 
-After providing session information, the Teacher will need to choose the Question Setup, either 
-
-![Login Screen](/static/img/smileteacher-chooseq.png)
-
-## Retaking A Session
-
-After providing session information, the Teacher will need to choose the Question Setup, either 
-
-![Login Screen](/static/img/smileteacher-chooseq.png)
-
-ok
+* Search
+* Edit IQSet
+* Link IQSet into IQSession 
