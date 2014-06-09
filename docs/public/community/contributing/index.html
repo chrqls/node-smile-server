@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+  <head>
+  <title>Contributing to Epoch SMILE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+        <link href="http://localhost:1313/static/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="http://localhost:1313/static/css/styles.css" rel="stylesheet"/>
+    <link href="http://localhost:1313/static/css/hugofont.css" rel="stylesheet"/>
+    <link href='http://fonts.googleapis.com/css?family=Arbutus+Slab&family=Cabin:600&family=Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="http://localhost:1313/"><i class="icon-home" alt="Home"></i></a>
+  </div>
+
+  
+  <div class="collapse navbar-collapse navbar-ex1-collapse">
+    <ul class="nav navbar-nav">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            
+            <li hugo-nav="/overview/introduction"><a href="http://localhost:1313/overview/introduction"> Introduction </a> </li>
+            
+            <li hugo-nav="/overview/quickstart"><a href="http://localhost:1313/overview/quickstart"> Quickstart </a> </li>
+            
+            <li hugo-nav="/overview/installing"><a href="http://localhost:1313/overview/installing"> Installing Hugo </a> </li>
+            
+            <li hugo-nav="/overview/usage"><a href="http://localhost:1313/overview/usage"> Using Hugo </a> </li>
+            
+            <li hugo-nav="/overview/configuration"><a href="http://localhost:1313/overview/configuration"> Configuration </a> </li>
+            
+            <li hugo-nav="/overview/source-directory"><a href="http://localhost:1313/overview/source-directory"> Source Directory Organization </a> </li>
+            
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Guides <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            
+            <li hugo-nav="/guides/teacherandroid"><a href="http://localhost:1313/guides/teacherandroid"> Epoch SMILE Teacher Android App Guide </a> </li>
+            
+            <li hugo-nav="/guides/iqmanager"><a href="http://localhost:1313/guides/iqmanager"> Epoch IQManager Guide </a> </li>
+            
+            <li hugo-nav="/guides/teacherweb"><a href="http://localhost:1313/guides/teacherweb"> Epoch SMILE Teacher Web Guide </a> </li>
+            
+            <li hugo-nav="/guides/studentweb"><a href="http://localhost:1313/guides/studentweb"> Epoch SMILE Student Web Guide </a> </li>
+            
+            <li hugo-nav="/guides/server"><a href="http://localhost:1313/guides/server"> Epoch SMILE Server Guide </a> </li>
+            
+            <li hugo-nav="/guides/studentandroid"><a href="http://localhost:1313/guides/studentandroid"> Epoch SMILE Student Android App guide </a> </li>
+            
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Community <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li hugo-nav="showcase"><a href="http://localhost:1313/showcase"> Showcase </a> </li>
+            
+            <li hugo-nav="/community/mailing-list"><a href="http://localhost:1313/community/mailing-list"> Mailing List </a> </li>
+            
+            <li hugo-nav="/community/contributing"><a href="http://localhost:1313/community/contributing"> Contributing to Epoch SMILE </a> </li>
+            
+            <li hugo-nav="/community/contributors"><a href="http://localhost:1313/community/contributors"> Contributors </a> </li>
+            
+        </ul>
+      </li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Meta <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            
+            <li hugo-nav="/meta/release-notes"><a href="http://localhost:1313/meta/release-notes"> Release Notes </a> </li>
+            
+            <li hugo-nav="/meta/roadmap"><a href="http://localhost:1313/meta/roadmap"> Roadmap </a> </li>
+            
+            <li hugo-nav="/meta/license"><a href="http://localhost:1313/meta/license"> License </a> </li>
+            
+        </ul>
+      </li>
+      <li><a href="https://github.com/RazortoothRTC/node-smile-server/releases"><i class="icon-arrow-down "> </i></a></li>
+      <li><a href="https://github.com/RazortoothRTC/node-smile-server"><i class="icon-octocat icon-2x"> </i></a></li>
+    </ul>
+  </div>
+</nav>
+
+
+    <div class="container" id="main">
+      <div class="row">
+        <div class="col-md-12">
+
+          
+            <div id="toc" class="well col-md-4 col-sm-6">
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#toc_0">Contribution Overview</a></li>
+</ul></li>
+<li><a href="#toc_1">Building from source</a>
+<ul>
+<li><a href="#toc_2">Clone locally (for contributors):</a></li>
+<li><a href="#toc_3">Running Epoch SMILE</a></li>
+<li><a href="#toc_4">Building Epoch SMILE</a></li>
+</ul></li>
+</ul>
+</nav>
+            </div>
+          
+          <h1>Contributing to Epoch SMILE</h1>
+          
+
+<p>We welcome all contributions. Feel free to pick something from the roadmap
+or contact <a href="http://twitter.com/dkords">@dkords</a> about what may make sense
+to do next. Go ahead and fork the project and make your changes.  <em>We encourage pull requests to discuss code changes.</em></p>
+
+<p>When you&rsquo;re ready to create a pull request, be sure to:</p>
+
+<ul>
+<li>Have test cases for the new code.  If you have questions about how to do it, please ask in your pull request.</li>
+<li>A Contributor Agreement will be made available shortly, designed as a protection for all parties.  It is needed to ensure that all code is free and clear for contribution and distribution.</li>
+</ul>
+
+<h2 id="toc_0">Contribution Overview</h2>
+
+<ol>
+<li>Fork Epoch SMILE from <a href="https://github.com/RazortoothRTC/node-smile-server">https://github.com/RazortoothRTC/node-smile-server</a></li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
+<li>Commit passing tests to validate changes.</li>
+<li>Squash commits into a single (or logically grouped) commits (<code>git rebase -i</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request
+(Thanks SPF13 for this workflow)</li>
+</ol>
+
+<h1 id="toc_1">Building from source</h1>
+
+<h2 id="toc_2">Clone locally (for contributors):</h2>
+
+<pre><code>git clone https://github.com/RazortoothRTC/node-smile-server
+cd node-smile-server
+</code></pre>
+
+<h2 id="toc_3">Running Epoch SMILE</h2>
+
+<pre><code>cd &lt;YOUR REPO&gt;
+node smileplug.js
+</code></pre>
+
+<h2 id="toc_4">Building Epoch SMILE</h2>
+
+<p>It&rsquo;s Javascript!  It doesn&rsquo;t build.  However, there are some things to do to prepare the environment.</p>
+
+<ul>
+<li>cd <YOUR REPO></li>
+<li>npm install .</li>
+<li>In the future, we will implement packaging, and probably make this into an NPM module.</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <hr>
+      <footer id="footer">
+            <p class="pull-right"><a href="#top">Back to top</a></p>
+            Made by <a href="http://razortooth.biz">Razortooth Communications, LLC/a>.<br>
+            Code licensed under the <a href="http://opensource.org/licenses/BSD-3-Clause">3-Clause BSD License</a>.<br>
+      </footer>
+      </div>
+      <script src="http://localhost:1313/static/js/jquery.js"></script>
+      <script src="http://localhost:1313/static/js/bootstrap.min.js"></script>
+
+      <script>
+        $(document).ready(function() {
+            $("nav#TableOfContents a").click(function() {
+                $("html, body").animate({
+                    scrollTop: $($(this).attr("href")).offset().top-25 + "px"
+                }, {
+                    duration: 450,
+                });
+                return false;
+            });
+        });
+    </script>
+    <script>
+	
+</script>
+
+
+  </body>
+
+</html>
+

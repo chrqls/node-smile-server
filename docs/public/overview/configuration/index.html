@@ -1,0 +1,216 @@
+<!doctype html>
+<html>
+  <head>
+  <title>Configuring Hugo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+        <link href="http://localhost:1313/static/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="http://localhost:1313/static/css/styles.css" rel="stylesheet"/>
+    <link href="http://localhost:1313/static/css/hugofont.css" rel="stylesheet"/>
+    <link href='http://fonts.googleapis.com/css?family=Arbutus+Slab&family=Cabin:600&family=Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="http://localhost:1313/"><i class="icon-home" alt="Home"></i></a>
+  </div>
+
+  
+  <div class="collapse navbar-collapse navbar-ex1-collapse">
+    <ul class="nav navbar-nav">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            
+            <li hugo-nav="/overview/introduction"><a href="http://localhost:1313/overview/introduction"> Introduction </a> </li>
+            
+            <li hugo-nav="/overview/quickstart"><a href="http://localhost:1313/overview/quickstart"> Quickstart </a> </li>
+            
+            <li hugo-nav="/overview/installing"><a href="http://localhost:1313/overview/installing"> Installing Hugo </a> </li>
+            
+            <li hugo-nav="/overview/usage"><a href="http://localhost:1313/overview/usage"> Using Hugo </a> </li>
+            
+            <li hugo-nav="/overview/configuration"><a href="http://localhost:1313/overview/configuration"> Configuration </a> </li>
+            
+            <li hugo-nav="/overview/source-directory"><a href="http://localhost:1313/overview/source-directory"> Source Directory Organization </a> </li>
+            
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Guides <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            
+            <li hugo-nav="/guides/teacherandroid"><a href="http://localhost:1313/guides/teacherandroid"> Epoch SMILE Teacher Android App Guide </a> </li>
+            
+            <li hugo-nav="/guides/iqmanager"><a href="http://localhost:1313/guides/iqmanager"> Epoch IQManager Guide </a> </li>
+            
+            <li hugo-nav="/guides/teacherweb"><a href="http://localhost:1313/guides/teacherweb"> Epoch SMILE Teacher Web Guide </a> </li>
+            
+            <li hugo-nav="/guides/studentweb"><a href="http://localhost:1313/guides/studentweb"> Epoch SMILE Student Web Guide </a> </li>
+            
+            <li hugo-nav="/guides/server"><a href="http://localhost:1313/guides/server"> Epoch SMILE Server Guide </a> </li>
+            
+            <li hugo-nav="/guides/studentandroid"><a href="http://localhost:1313/guides/studentandroid"> Epoch SMILE Student Android App guide </a> </li>
+            
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Community <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li hugo-nav="showcase"><a href="http://localhost:1313/showcase"> Showcase </a> </li>
+            
+            <li hugo-nav="/community/mailing-list"><a href="http://localhost:1313/community/mailing-list"> Mailing List </a> </li>
+            
+            <li hugo-nav="/community/contributing"><a href="http://localhost:1313/community/contributing"> Contributing to Epoch SMILE </a> </li>
+            
+            <li hugo-nav="/community/contributors"><a href="http://localhost:1313/community/contributors"> Contributors </a> </li>
+            
+        </ul>
+      </li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Meta <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            
+            <li hugo-nav="/meta/release-notes"><a href="http://localhost:1313/meta/release-notes"> Release Notes </a> </li>
+            
+            <li hugo-nav="/meta/roadmap"><a href="http://localhost:1313/meta/roadmap"> Roadmap </a> </li>
+            
+            <li hugo-nav="/meta/license"><a href="http://localhost:1313/meta/license"> License </a> </li>
+            
+        </ul>
+      </li>
+      <li><a href="https://github.com/RazortoothRTC/node-smile-server/releases"><i class="icon-arrow-down "> </i></a></li>
+      <li><a href="https://github.com/RazortoothRTC/node-smile-server"><i class="icon-octocat icon-2x"> </i></a></li>
+    </ul>
+  </div>
+</nav>
+
+
+    <div class="container" id="main">
+      <div class="row">
+        <div class="col-md-12">
+
+          
+          <h1>Configuring Hugo</h1>
+          
+
+<p>The directory structure and templates provide the majority of the
+configuration for a site. In fact a config file isn&rsquo;t even needed for many
+websites since the defaults used follow commonly used patterns.</p>
+
+<p>Hugo expects to find the config file in the root of the source directory and
+will look there first for a <code>config.yaml</code> file. If none is present it will
+then look for a <code>config.json</code> file, followed by a <code>config.toml</code> file.</p>
+
+<p><strong>Please note the field names must be all lowercase</strong></p>
+
+<h2 id="toc_0">Examples</h2>
+
+<p>The following is an example of a yaml config file with the default values:
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">&mdash;</span>
+<span style="color: #ae81ff">contentdir</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;content&quot;</span>
+<span style="color: #ae81ff">layoutdir</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;layouts&quot;</span>
+<span style="color: #ae81ff">publishdir</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;public&quot;</span>
+<span style="color: #ae81ff">builddrafts</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">false</span>
+<span style="color: #ae81ff">indexes</span><span style="color: #f8f8f2">:</span>
+   <span style="color: #ae81ff">category</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;categories&quot;</span>
+   <span style="color: #ae81ff">tag</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;tags&quot;</span>
+<span style="color: #ae81ff">baseurl</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;<a href="http://yoursite.example.com/&amp;quot;&lt;/span&gt;">http://yoursite.example.com/&amp;quot;&lt;/span&gt;</a>
+<span style="color: #ae81ff">canonifyurls</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">true</span>
+<span style="color: #f8f8f2">&hellip;</span>
+</pre></div></p>
+
+<p>The following is an example of a json config file with the default values:</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">{</span>
+    <span style="color: #f92672">&quot;contentdir&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;content&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #f92672">&quot;layoutdir&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;layouts&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #f92672">&quot;publishdir&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;public&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #f92672">&quot;builddrafts&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #66d9ef">false</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #f92672">&quot;indexes&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">{</span>
+       <span style="color: #f92672">&quot;category&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;categories&quot;</span><span style="color: #f8f8f2">,</span>
+       <span style="color: #f92672">&quot;tag&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;tags&quot;</span>
+    <span style="color: #f8f8f2">},</span>
+    <span style="color: #f92672">&quot;baseurl&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;http://yoursite.example.com/&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #f92672">&quot;canonifyurls&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #66d9ef">true</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
+
+<p>The following is an example of a toml config file with the default values:</p>
+
+<pre><code>contentdir = &quot;content&quot;
+layoutdir = &quot;layouts&quot;
+publishdir = &quot;public&quot;
+builddrafts = false
+baseurl = &quot;http://yoursite.example.com/&quot;
+canonifyurls = true
+[indexes]
+   category = &quot;categories&quot;
+   tag = &quot;tags&quot;
+</code></pre>
+
+<p>Here is a yaml configuration file which sets a few more options</p>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span style="color: #f8f8f2">---</span>
+<span style="color: #ae81ff">baseurl</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;http://yoursite.example.com/&quot;</span>
+<span style="color: #ae81ff">title</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;Yoyodyne</span><span style="color: #f8f8f2"> </span><span style="color: #e6db74">Widget</span><span style="color: #f8f8f2"> </span><span style="color: #e6db74">Blogging&quot;</span>
+<span style="color: #ae81ff">permalinks</span><span style="color: #f8f8f2">:</span>
+  <span style="color: #ae81ff">post</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">/:year/:month/:title/</span>
+<span style="color: #ae81ff">params</span><span style="color: #f8f8f2">:</span>
+  <span style="color: #ae81ff">Subtitle</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;Spinning</span><span style="color: #f8f8f2"> </span><span style="color: #e6db74">the</span><span style="color: #f8f8f2"> </span><span style="color: #e6db74">cogs</span><span style="color: #f8f8f2"> </span><span style="color: #e6db74">in</span><span style="color: #f8f8f2"> </span><span style="color: #e6db74">the</span><span style="color: #f8f8f2"> </span><span style="color: #e6db74">widgets&quot;</span>
+  <span style="color: #ae81ff">AuthorName</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;John</span><span style="color: #f8f8f2"> </span><span style="color: #e6db74">Doe&quot;</span>
+  <span style="color: #ae81ff">GitHubUser</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;spf13&quot;</span>
+  <span style="color: #ae81ff">ListOfFoo</span><span style="color: #f8f8f2">:</span>
+    <span style="color: #f8f8f2">-</span> <span style="color: #e6db74">&quot;foo1&quot;</span>
+    <span style="color: #f8f8f2">-</span> <span style="color: #e6db74">&quot;foo2&quot;</span>
+  <span style="color: #ae81ff">SidebarRecentLimit</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">5</span>
+<span style="color: #f8f8f2">...</span>
+</pre></div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <hr>
+      <footer id="footer">
+            <p class="pull-right"><a href="#top">Back to top</a></p>
+            Made by <a href="http://razortooth.biz">Razortooth Communications, LLC/a>.<br>
+            Code licensed under the <a href="http://opensource.org/licenses/BSD-3-Clause">3-Clause BSD License</a>.<br>
+      </footer>
+      </div>
+      <script src="http://localhost:1313/static/js/jquery.js"></script>
+      <script src="http://localhost:1313/static/js/bootstrap.min.js"></script>
+
+      <script>
+        $(document).ready(function() {
+            $("nav#TableOfContents a").click(function() {
+                $("html, body").animate({
+                    scrollTop: $($(this).attr("href")).offset().top-25 + "px"
+                }, {
+                    duration: 450,
+                });
+                return false;
+            });
+        });
+    </script>
+    <script>
+	
+</script>
+
+
+  </body>
+
+</html>
+

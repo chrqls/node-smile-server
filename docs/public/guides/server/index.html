@@ -1,0 +1,403 @@
+<!doctype html>
+<html>
+  <head>
+  <title>Epoch SMILE Server Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+        <link href="http://localhost:1313/static/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="http://localhost:1313/static/css/styles.css" rel="stylesheet"/>
+    <link href="http://localhost:1313/static/css/hugofont.css" rel="stylesheet"/>
+    <link href='http://fonts.googleapis.com/css?family=Arbutus+Slab&family=Cabin:600&family=Source+Code+Pro' rel='stylesheet' type='text/css'>
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="http://localhost:1313/"><i class="icon-home" alt="Home"></i></a>
+  </div>
+
+  
+  <div class="collapse navbar-collapse navbar-ex1-collapse">
+    <ul class="nav navbar-nav">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting Started <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            
+            <li hugo-nav="/overview/introduction"><a href="http://localhost:1313/overview/introduction"> Introduction </a> </li>
+            
+            <li hugo-nav="/overview/quickstart"><a href="http://localhost:1313/overview/quickstart"> Quickstart </a> </li>
+            
+            <li hugo-nav="/overview/installing"><a href="http://localhost:1313/overview/installing"> Installing Hugo </a> </li>
+            
+            <li hugo-nav="/overview/usage"><a href="http://localhost:1313/overview/usage"> Using Hugo </a> </li>
+            
+            <li hugo-nav="/overview/configuration"><a href="http://localhost:1313/overview/configuration"> Configuration </a> </li>
+            
+            <li hugo-nav="/overview/source-directory"><a href="http://localhost:1313/overview/source-directory"> Source Directory Organization </a> </li>
+            
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Guides <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            
+            <li hugo-nav="/guides/teacherandroid"><a href="http://localhost:1313/guides/teacherandroid"> Epoch SMILE Teacher Android App Guide </a> </li>
+            
+            <li hugo-nav="/guides/iqmanager"><a href="http://localhost:1313/guides/iqmanager"> Epoch IQManager Guide </a> </li>
+            
+            <li hugo-nav="/guides/teacherweb"><a href="http://localhost:1313/guides/teacherweb"> Epoch SMILE Teacher Web Guide </a> </li>
+            
+            <li hugo-nav="/guides/studentweb"><a href="http://localhost:1313/guides/studentweb"> Epoch SMILE Student Web Guide </a> </li>
+            
+            <li hugo-nav="/guides/server"><a href="http://localhost:1313/guides/server"> Epoch SMILE Server Guide </a> </li>
+            
+            <li hugo-nav="/guides/studentandroid"><a href="http://localhost:1313/guides/studentandroid"> Epoch SMILE Student Android App guide </a> </li>
+            
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Community <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li hugo-nav="showcase"><a href="http://localhost:1313/showcase"> Showcase </a> </li>
+            
+            <li hugo-nav="/community/mailing-list"><a href="http://localhost:1313/community/mailing-list"> Mailing List </a> </li>
+            
+            <li hugo-nav="/community/contributing"><a href="http://localhost:1313/community/contributing"> Contributing to Epoch SMILE </a> </li>
+            
+            <li hugo-nav="/community/contributors"><a href="http://localhost:1313/community/contributors"> Contributors </a> </li>
+            
+        </ul>
+      </li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Meta <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            
+            <li hugo-nav="/meta/release-notes"><a href="http://localhost:1313/meta/release-notes"> Release Notes </a> </li>
+            
+            <li hugo-nav="/meta/roadmap"><a href="http://localhost:1313/meta/roadmap"> Roadmap </a> </li>
+            
+            <li hugo-nav="/meta/license"><a href="http://localhost:1313/meta/license"> License </a> </li>
+            
+        </ul>
+      </li>
+      <li><a href="https://github.com/RazortoothRTC/node-smile-server/releases"><i class="icon-arrow-down "> </i></a></li>
+      <li><a href="https://github.com/RazortoothRTC/node-smile-server"><i class="icon-octocat icon-2x"> </i></a></li>
+    </ul>
+  </div>
+</nav>
+
+
+    <div class="container" id="main">
+      <div class="row">
+        <div class="col-md-12">
+
+          
+            <div id="toc" class="well col-md-4 col-sm-6">
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#toc_0">Using a shortcode</a></li>
+<li><a href="#toc_1">Hugo Shortcodes</a>
+<ul>
+<li><a href="#toc_2">highlight</a>
+<ul>
+<li><a href="#toc_3">Usage</a></li>
+<li><a href="#toc_4">Example</a></li>
+<li><a href="#toc_5">Example Output</a></li>
+</ul></li>
+<li><a href="#toc_6">figure</a>
+<ul>
+<li><a href="#toc_7">Usage</a></li>
+<li><a href="#toc_8">Example</a></li>
+<li><a href="#toc_9">Example output</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#toc_10">Creating your own shortcodes</a></li>
+<li><a href="#toc_11">Single Positional Example: youtube</a></li>
+<li><a href="#toc_12">Single Named Example: image with caption</a></li>
+<li><a href="#toc_13">Paired Example: Highlight</a></li>
+</ul></li>
+</ul>
+</nav>
+            </div>
+          
+          <h1>Epoch SMILE Server Guide</h1>
+          
+
+<p>Because Hugo uses markdown for its simple content format, however there&rsquo;s a lot
+of things that markdown doesn&rsquo;t support well.</p>
+
+<p>We are unwilling to accept being constrained by our simple format. Also
+unacceptable is writing raw html in our markdown every time we want to include
+unsupported content such as a video. To do so is in complete opposition to the
+intent of using a bare bones format for our content and utilizing templates to
+apply styling for display.</p>
+
+<p>To avoid both of these limitations Hugo created shortcodes.</p>
+
+<p>A shortcode is a simple snippet inside a markdown file that Hugo will render
+using a predefined template.</p>
+
+<h2 id="toc_0">Using a shortcode</h2>
+
+<p>In your content files a shortcode can be called by using &lsquo;{{&#37; name parameters
+%}}&rsquo; respectively. Shortcodes are space delimited (parameters with spaces
+can be quoted).</p>
+
+<p>The first word is always the name of the shortcode. Parameters follow the name.
+The format for named parameters models that of html with the format
+name=&ldquo;value&rdquo;. The current implementation only supports this exact format. Extra
+spaces or different quote marks will not parse properly.</p>
+
+<p>Some shortcodes use or require closing shortcodes. Like HTML, the opening and closing
+shortcodes match (name only), the closing being prepended with a slash.</p>
+
+<p>Example of a paired shortcode:
+{{&#37; highlight go %}} A bunch of code here {{&#37; /highlight %}}</p>
+
+<h2 id="toc_1">Hugo Shortcodes</h2>
+
+<p>Hugo ships with a set of predefined shortcodes.</p>
+
+<h3 id="toc_2">highlight</h3>
+
+<p>This shortcode will convert the source code provided into syntax highlighted
+html. Read more on <a href="http://localhost:1313/extras/highlighting">highlighting</a>.</p>
+
+<h4 id="toc_3">Usage</h4>
+
+<p>Highlight takes exactly one required parameter of language and requires a
+closing shortcode.</p>
+
+<h4 id="toc_4">Example</h4>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%">    {{% highlight html %}}
+    <span style="color: #f92672">&lt;section</span> <span style="color: #a6e22e">id=</span><span style="color: #e6db74">&quot;main&quot;</span><span style="color: #f92672">&gt;</span>
+      <span style="color: #f92672">&lt;div&gt;</span>
+       <span style="color: #f92672">&lt;h1</span> <span style="color: #a6e22e">id=</span><span style="color: #e6db74">&quot;title&quot;</span><span style="color: #f92672">&gt;</span>{{ .Title }}<span style="color: #f92672">&lt;/h1&gt;</span>
+        {{ range .Data.Pages }}
+            {{ .Render &quot;summary&quot;}}
+        {{ end }}
+      <span style="color: #f92672">&lt;/div&gt;</span>
+    <span style="color: #f92672">&lt;/section&gt;</span>
+    {{% /highlight %}}
+</pre></div>
+
+<h4 id="toc_5">Example Output</h4>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%">    <span style="color: #f92672">&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #f92672&quot;</span><span style="color: #f92672">&gt;&lt;section</span><span style="color: #960050; background-color: #1e0010">&lt;/</span><span style="color: #a6e22e">span</span><span style="color: #f92672">&gt;</span> <span style="color: #f92672">&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #a6e22e&quot;</span><span style="color: #f92672">&gt;</span>id=<span style="color: #f92672">&lt;/span&gt;&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #e6db74&quot;</span><span style="color: #f92672">&gt;</span>&quot;main&quot;<span style="color: #f92672">&lt;/span&gt;&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #f92672&quot;</span><span style="color: #f92672">&gt;</span>&gt;<span style="color: #f92672">&lt;/span&gt;</span>
+      <span style="color: #f92672">&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #f92672&quot;</span><span style="color: #f92672">&gt;&lt;div&gt;&lt;/span&gt;</span>
+       <span style="color: #f92672">&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #f92672&quot;</span><span style="color: #f92672">&gt;&lt;h1</span><span style="color: #960050; background-color: #1e0010">&lt;/</span><span style="color: #a6e22e">span</span><span style="color: #f92672">&gt;</span> <span style="color: #f92672">&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #a6e22e&quot;</span><span style="color: #f92672">&gt;</span>id=<span style="color: #f92672">&lt;/span&gt;&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #e6db74&quot;</span><span style="color: #f92672">&gt;</span>&quot;title&quot;<span style="color: #f92672">&lt;/span&gt;&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #f92672&quot;</span><span style="color: #f92672">&gt;</span>&gt;<span style="color: #f92672">&lt;/span&gt;</span>{{ .Title }}<span style="color: #f92672">&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #f92672&quot;</span><span style="color: #f92672">&gt;&lt;/h1&gt;&lt;/span&gt;</span>
+        {{ range .Data.Pages }}
+            {{ .Render &quot;summary&quot;}}
+        {{ end }}
+      <span style="color: #f92672">&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #f92672&quot;</span><span style="color: #f92672">&gt;&lt;/div&gt;&lt;/span&gt;</span>
+    <span style="color: #f92672">&lt;span</span> <span style="color: #a6e22e">style=</span><span style="color: #e6db74">&quot;color: #f92672&quot;</span><span style="color: #f92672">&gt;&lt;/section&gt;&lt;/span&gt;</span>
+</pre></div>
+
+<h3 id="toc_6">figure</h3>
+
+<p>Figure is simply an extension of the image capabilities present with Markdown.
+figure provides the ability to add captions, css classes, alt text, links etc.</p>
+
+<h4 id="toc_7">Usage</h4>
+
+<p>figure can use the following parameters</p>
+
+<ul>
+<li>src</li>
+<li>link</li>
+<li>title</li>
+<li>caption</li>
+<li>attr (attribution)</li>
+<li>attrlink</li>
+<li>alt</li>
+</ul>
+
+<h4 id="toc_8">Example</h4>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%">    {{% figure src=&quot;/media/spf13.jpg&quot; title=&quot;Steve Francia&quot; %}}
+</pre></div>
+
+<h4 id="toc_9">Example output</h4>
+
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%">
+</pre></div>
+
+<h2 id="toc_10">Creating your own shortcodes</h2>
+
+<p>To create a shortcode, place a template in the layouts/shortcodes directory. The
+template name will be the name of the shortcode.</p>
+
+<p>In creating a shortcode you can choose if the short code will use positional
+parameters or named parameters (but not both). A good rule of thumb is that if a
+short code has a single required value in the case of the youtube example below
+then positional works very well. For more complex layouts with optional
+parameters named parameters work best.</p>
+
+<p><strong>Inside the template</strong></p>
+
+<p>To access a parameter by position the .Get method can be used.</p>
+
+<pre><code>{{ .Get 0 }}
+</code></pre>
+
+<p>To access a parameter by name the .Get method should be utilized</p>
+
+<pre><code>{{ .Get &quot;class&quot; }}
+</code></pre>
+
+<p>With is great when the output depends on a parameter being set</p>
+
+<pre><code>{{ with .Get &quot;class&quot;}} class=&quot;{{.}}&quot;{{ end }}
+</code></pre>
+
+<p>Get can also be used to check if a parameter has been provided. This is
+most helpful when the condition depends on either one value or another&hellip;
+or both.</p>
+
+<pre><code>{{ or .Get &quot;title&quot; | .Get &quot;alt&quot; | if }} alt=&quot;{{ with .Get &quot;alt&quot;}}{{.}}{{else}}{{.Get &quot;title&quot;}}{{end}}&quot;{{ end }}
+</code></pre>
+
+<p>If a closing shortcode is used, the variable .Inner will be populated with all
+of the content between the opening and closing shortcodes. If a closing
+shortcode is required, you can check the length of .Inner and provide a warning
+to the user.</p>
+
+<h2 id="toc_11">Single Positional Example: youtube</h2>
+
+<pre><code>{{% youtube 09jf3ow9jfw %}}
+</code></pre>
+
+<p>Would load the template /layouts/shortcodes/youtube.html</p>
+
+<pre><code>&lt;div class=&quot;embed video-player&quot;&gt;
+&lt;iframe class=&quot;youtube-player&quot; type=&quot;text/html&quot; width=&quot;640&quot; height=&quot;385&quot; src=&quot;http://www.youtube.com/embed/{{ index .Params 0 }}&quot; allowfullscreen frameborder=&quot;0&quot;&gt;
+&lt;/iframe&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>This would be rendered as</p>
+
+<pre><code>&lt;div class=&quot;embed video-player&quot;&gt;
+&lt;iframe class=&quot;youtube-player&quot; type=&quot;text/html&quot;
+    width=&quot;640&quot; height=&quot;385&quot; 
+    src=&quot;http://www.youtube.com/embed/09jf3ow9jfw&quot;
+    allowfullscreen frameborder=&quot;0&quot;&gt;
+&lt;/iframe&gt;
+&lt;/div&gt;
+</code></pre>
+
+<h2 id="toc_12">Single Named Example: image with caption</h2>
+
+<p><em>Example has an extra space so Hugo doesn&rsquo;t actually render it</em></p>
+
+<pre><code>{{ % img src=&quot;/media/spf13.jpg&quot; title=&quot;Steve Francia&quot; %}}
+</code></pre>
+
+<p>Would load the template /layouts/shortcodes/img.html
+    &lt;!&ndash; image &ndash;&gt;
+    <figure {{ with .Get "class" }}class="{{.}}"{{ end }}>
+        {{ with .Get &ldquo;link&rdquo;}}<a href="{{.}}">{{ end }}
+            <img src="{{ .Get "src" }}" {{ if or (.Get "alt") (.Get "caption") }}alt="{{ with .Get "alt"}}{{.}}{{else}}{{ .Get "caption" }}{{ end }}"{{ end }} />
+        {{ if .Get &ldquo;link&rdquo;}}</a>{{ end }}
+        {{ if or (or (.Get &ldquo;title&rdquo;) (.Get &ldquo;caption&rdquo;)) (.Get &ldquo;attr&rdquo;)}}
+        <figcaption>{{ if isset .Params &ldquo;title&rdquo; }}
+            <h4>{{ .Get &ldquo;title&rdquo; }}</h4>{{ end }}
+            {{ if or (.Get &ldquo;caption&rdquo;) (.Get &ldquo;attr&rdquo;)}}<p>
+            {{ .Get &ldquo;caption&rdquo; }}
+            {{ with .Get &ldquo;attrlink&rdquo;}}<a href="{{.}}"> {{ end }}
+                {{ .Get &ldquo;attr&rdquo; }}
+            {{ if .Get &ldquo;attrlink&rdquo;}}</a> {{ end }}
+            </p> {{ end }}
+        </figcaption>
+        {{ end }}
+    </figure>
+    &lt;!&ndash; image &ndash;&gt;</p>
+
+<p>Would be rendered as:</p>
+
+<pre><code>&lt;figure &gt;
+    &lt;img src=&quot;/media/spf13.jpg&quot;  /&gt;
+    &lt;figcaption&gt;
+        &lt;h4&gt;Steve Francia&lt;/h4&gt;
+    &lt;/figcaption&gt;
+&lt;/figure&gt;
+</code></pre>
+
+<h2 id="toc_13">Paired Example: Highlight</h2>
+
+<p><em>Hugo already ships with the highlight shortcode</em></p>
+
+<p><em>Example has an extra space so Hugo doesn&rsquo;t actually render it</em>.</p>
+
+<pre><code>{{% highlight html %}}
+&lt;html&gt;
+    &lt;body&gt; This HTML &lt;/body&gt;
+&lt;/html&gt;
+{{% /highlight %}}
+</code></pre>
+
+<p>The template for this utilizes the following code (already include in hugo)
+    {{ .Get 0 | highlight .Inner  }}</p>
+
+<p>And will be rendered as:</p>
+
+<pre><code>&lt;div class=&quot;highlight&quot; style=&quot;background: #272822&quot;&gt;&lt;pre style=&quot;line-height: 125%&quot;&gt;&lt;span style=&quot;color: #f92672&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+    &lt;span style=&quot;color: #f92672&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt; This HTML &lt;span style=&quot;color: #f92672&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span style=&quot;color: #f92672&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+</code></pre>
+
+<p>Please notice that this template makes use of a hugo specific template function
+called highlight which uses pygments to add the highlighting code.</p>
+
+<p>More shortcode examples can be found at <a href="https://github.com/spf13/spf13.com/tree/master/layouts/shortcodes">spf13.com</a></p>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <hr>
+      <footer id="footer">
+            <p class="pull-right"><a href="#top">Back to top</a></p>
+            Made by <a href="http://razortooth.biz">Razortooth Communications, LLC/a>.<br>
+            Code licensed under the <a href="http://opensource.org/licenses/BSD-3-Clause">3-Clause BSD License</a>.<br>
+      </footer>
+      </div>
+      <script src="http://localhost:1313/static/js/jquery.js"></script>
+      <script src="http://localhost:1313/static/js/bootstrap.min.js"></script>
+
+      <script>
+        $(document).ready(function() {
+            $("nav#TableOfContents a").click(function() {
+                $("html, body").animate({
+                    scrollTop: $($(this).attr("href")).offset().top-25 + "px"
+                }, {
+                    duration: 450,
+                });
+                return false;
+            });
+        });
+    </script>
+    <script>
+	
+</script>
+
+
+  </body>
+
+</html>
+
