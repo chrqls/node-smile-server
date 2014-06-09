@@ -225,7 +225,7 @@ i.callout-icon:hover {
 }
 
 #action {
-    background: url(/static/img/gray.png);
+    background: url(../img/gray.png);
     padding: 50px 0px 30px;
     position: fixed;
     bottom: 130px;
