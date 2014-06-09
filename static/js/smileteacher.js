@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.7.4';
+var VERSION = '0.8.1';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
@@ -47,10 +47,11 @@ var SMILEROUTES = {
     'startmake': '/smile/startmakequestion',
     'startsolve': '/smile/startsolvequestion',
     'seeresults': '/smile/sendshowresults',
-    'deletequestion': '/smile/questionview/'
+    'deletequestion': '/smile/questionview/',
+    'talk': '/smile/talk/teacher/post'
 };
 
-var deamon_updating_board;
+var DEAMON_UPDATING_BOARD;
 
 $(document).ready(function() {
     
@@ -107,6 +108,7 @@ var GlobalViewModel = {
     group_name: ko.observable(''),
     status: ko.observable(''),
     new_iqset_name: ko.observable(''),
+    message_for_student: ko.observable(''),
 
     // Use prepared questions
     iqsets: ko.observableArray([]),
@@ -182,8 +184,8 @@ GlobalViewModel.redirectView = function() {
                 switchProgressBar('loading');
 
                 section = 'general-board';
-                clearInterval(deamon_updating_board);
-                deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
+                clearInterval(DEAMON_UPDATING_BOARD);
+                DEAMON_UPDATING_BOARD = setInterval(updateGVM, DELAY_UPDATE_BOARD);
                 break;
 
             case 'START_SOLVE':
@@ -227,7 +229,7 @@ GlobalViewModel.resetSession = function() {
     switchProgressBar('');
     GlobalViewModel.questions.removeAll();
     GlobalViewModel.students.removeAll();
-    clearInterval(deamon_updating_board);
+    clearInterval(DEAMON_UPDATING_BOARD);
     
     // Reset the session on server
     smile_reset();
@@ -352,17 +354,17 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
         
         postMessage('startmake');
 
-        deamon_updating_board = setInterval(updateGVM, DELAY_UPDATE_BOARD);
+        DEAMON_UPDATING_BOARD = setInterval(updateGVM, DELAY_UPDATE_BOARD);
         location.reload();
     } else {
-        smileAlert('Please <b>select</b> an iqset', DELAY_SHORT,'red');
+        absoluteAlert('Please <b>select</b> an iqset', DELAY_SHORT,'red');
     }
 }
 
 GlobalViewModel.startSolvingQuestions = function() {
 
     postMessage('startsolve');
-    smileAlert('Trying to start solving...', DELAY_SHORT);
+    absoluteAlert('Trying to start solving...', DELAY_SHORT);
     this.redirectView();
 }
 
@@ -370,7 +372,7 @@ GlobalViewModel.seeResults = function() {
 
     $('.see_results').addClass('hidden');
     postMessage('seeresults');
-    smileAlert('Trying to see results...', DELAY_SHORT);
+    absoluteAlert('Trying to see results...', DELAY_SHORT);
     this.redirectView();
 }
 
@@ -455,10 +457,10 @@ GlobalViewModel.removeQuestionFromSession = function() {
                     data: {}, 
                     
                     error: function(xhr, text, err) {
-                        smileAlert('Unable to remove question from session', DELAY_ERROR, 'trace');
+                        absoluteAlert('Unable to remove question from session', DELAY_ERROR, 'trace');
                     }, 
                     success: function(data) {
-                        smileAlert('Question deleted', DELAY_NORMAL, 'green');
+                        absoluteAlert('Question deleted', DELAY_NORMAL, 'green');
                         switchSection('general-board');
                     }
                 });
@@ -468,21 +470,50 @@ GlobalViewModel.removeQuestionFromSession = function() {
     }
 }
 
-// Used to display or hide the "iqset name" field
-function switchVisibilitySaveButton() {
+/*
+    TALK TO A STUDENT
+*/
+function showTalkForm() {
+    $('#talkButton_with_form').removeClass('hidden');
+    $('#talkButton_without_form').addClass('hidden');
+}
+function hideTalkForm() {
+    $('#talkButton_with_form').addClass('hidden');
+    $('#talkButton_without_form').removeClass('hidden');
+    GlobalViewModel.message_for_student('');
+}
+GlobalViewModel.talkToStudent = function() {
 
-    if($('#saveButton_with_form').hasClass('hidden')) {
+    if($('table#students tr.selected').length > 0) {
 
-        $('#saveButton_with_form').removeClass('hidden');
-        $('#saveButton_without_form').addClass('hidden');
+        $('table#students tr.selected').each(function(index) {
+        
+        var message = {};
 
+        message['TYPE'] = 'TEACHER'; 
+        message.TEXT = GlobalViewModel.message_for_student();
+        message.IP = $(this).find('input[type=hidden]').val();
+
+        postMessage('talk',JSON.stringify(message));
+        });
     } else {
-        $('#saveButton_with_form').addClass('hidden');
-        $('#saveButton_without_form').removeClass('hidden');
-        GlobalViewModel.new_iqset_name('');
+        absoluteAlert('Please select a <b>student</b>', DELAY_SHORT,'red');
     }
 }
 
+
+/*
+    SAVE A NEW IQSET
+*/
+function showSaveForm() {
+    $('#saveButton_with_form').removeClass('hidden');
+    $('#saveButton_without_form').addClass('hidden');
+}
+function hideSaveForm() {
+    $('#saveButton_with_form').addClass('hidden');
+    $('#saveButton_without_form').removeClass('hidden');
+    GlobalViewModel.new_iqset_name('');
+}
 GlobalViewModel.saveNewIQSet = function() {
 
     if($('table#questions tr.checked').length > 0) {
@@ -513,7 +544,7 @@ GlobalViewModel.saveNewIQSet = function() {
         });
         postMessage('iqset',JSON.stringify(iqset));
     } else {
-        smileAlert('Please select <b>at least</b> one question', DELAY_SHORT,'red');
+        absoluteAlert('Please select <b>at least</b> one question', DELAY_SHORT,'red');
     }
 }
 
@@ -534,14 +565,14 @@ GlobalViewModel.seeContent = function() {
         content += $(this).find('input[type=hidden]').attr('name')+'|';
     });
 
-    smileAlert('checked:'+content,10000);
+    absoluteAlert('checked:'+content,10000);
 }*/
 
-function smileAlert(text, lifetime, alerttype, hasCross) {
+function absoluteAlert(text, lifetime, alerttype, hasCross) {
     
     var container = '#absolute_alerts';
     var alertID = 'id_'+Math.floor(Math.random()*99999);
-    var cross = hasCross? '<a style="color:white" class="close" href="">×</a>' : '';
+    var cross = hasCross? '<a style="color:white;opacity:0.7" class="close" href="">×</a>' : '';
 
     // Types of box
     var box_grey = 'secondary';
@@ -556,7 +587,7 @@ function smileAlert(text, lifetime, alerttype, hasCross) {
     else if (alerttype === 'green') { alerttype = box_green; } 
 
     var html_to_inject = '<div id="%s"> \
-                            <div style="margin:3px 0;opacity:0.8;display: inline-block" class="alert-box %s" data-alert=""> \
+                            <div style="margin:3px 0;opacity:0.8;display: inline-block;padding-right:30px" class="alert-box %s" data-alert=""> \
                               <span style="font-weight:normal">%s</span>%s \
                             </div> \
                           </div>';
@@ -670,7 +701,7 @@ function updateGVM() {
             case 'HAIL':
             if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
                 addStudent(dataAll[i]);
-                smileAlert('<b>'+dataAll[i].NAME+'</b> appears!',DELAY_NORMAL);
+                absoluteAlert('<b>'+dataAll[i].NAME+'</b> appears!',DELAY_NORMAL);
                 
             }
             break;
@@ -679,19 +710,42 @@ function updateGVM() {
             case 'QUESTION_PIC':
             if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
                 addQuestion(dataAll[i]);
-                smileAlert('New question from <b>'+dataAll[i].NAME+'</b>!',DELAY_NORMAL);
+                absoluteAlert('New question from <b>'+dataAll[i].NAME+'</b>!',DELAY_NORMAL);
             }
             break;
         }
     }
 
-    // Everytime updateGVM() is called, we have to restart the listener (by doing off/on) to wake up the multiple selection (checkbox mode)
-    // Why? If you call a 'click' listener already listening, the listener will be disabled
+    /*
+        Each time updateGVM() is called, we have to wake up those listeners (by doing off/on).
+        Why? If you call a 'click' listener already listening, the listener will be disabled
+    */
+    // Single selection for students
+    $(document).off('click', 'table#students tr').on('click', 'table#students tr', function() {
+        if(!$(this).hasClass('selected')) {
+            $('table#students tr.selected').each(function(index) {
+                $(this).removeClass('selected');
+            });
+            $(this).addClass('selected');
+            $('div[smile=talk-to-student]').parent().removeClass('hidden');
+        } else {
+            $(this).removeClass('selected');
+            hideTalkForm();
+            $('div[smile=talk-to-student]').parent().addClass('hidden');
+        }
+    });
+    // Multiple selection for questions
     $(document).off('click', 'table#questions tr').on('click', 'table#questions tr', function() {
-        if($(this).hasClass('checked'))
+        if($(this).hasClass('checked')) {
             $(this).removeClass('checked');
-        else
+            if($('table#questions tr.checked').length === 0) {
+                $('div[smile=save-new-iqset]').parent().addClass('hidden');
+                hideSaveForm();
+            }
+        } else {
             $(this).addClass('checked');
+            $('div[smile=save-new-iqset]').parent().removeClass('hidden');
+        }
     });
 }
 
@@ -731,7 +785,7 @@ function postMessage(type,values) {
                 }, 
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send SESSION_VALUES to server', DELAY_NORMAL, 'trace');
+                    absoluteAlert('Unable to send SESSION_VALUES to server', DELAY_NORMAL, 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -748,7 +802,7 @@ function postMessage(type,values) {
                 async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send START_MAKE phase', DELAY_NORMAL, 'trace');
+                    absoluteAlert('Unable to send START_MAKE phase', DELAY_NORMAL, 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -766,10 +820,10 @@ function postMessage(type,values) {
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send START_SOLVE phase', DELAY_NORMAL, 'trace');
+                    absoluteAlert('Unable to send START_SOLVE phase', DELAY_NORMAL, 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('START_SOLVE sent!', DELAY_NORMAL, 'green');
+                    absoluteAlert('START_SOLVE sent!', DELAY_NORMAL, 'green');
                 }
             });
             break;
@@ -785,10 +839,10 @@ function postMessage(type,values) {
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to send START_SHOW phase', DELAY_NORMAL, 'trace');
+                    absoluteAlert('Unable to send START_SHOW phase', DELAY_NORMAL, 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('START_SHOW sent!', DELAY_NORMAL, 'green');
+                    absoluteAlert('START_SHOW sent!', DELAY_NORMAL, 'green');
                 }
             });
             break;
@@ -817,7 +871,7 @@ function postMessage(type,values) {
                 },
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
+                    absoluteAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
                 }, 
                 success: function(data) {}
             });
@@ -836,11 +890,38 @@ function postMessage(type,values) {
                 data: values,
                 
                 error: function(xhr, text, err) {
-                    smileAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
+                    absoluteAlert('Unable to post session values.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
                 }, 
                 success: function(data) {
-                    smileAlert('New iqset <i>"'+data.title+'"</i> saved!',DELAY_NORMAL,'green');
+                    absoluteAlert('New iqset <i>"'+data.title+'"</i> saved!',DELAY_NORMAL,'green');
                     switchVisibilitySaveButton();
+                }
+            });
+            break;
+
+        case 'talk':
+
+            $.ajax({ 
+                cache: false, 
+                type: 'POST', 
+                contentType: 'application/json',
+                url: SMILEROUTES['talk'],
+                //async: false,
+                data: values,
+                
+                error: function(xhr, text, err) {
+                    absoluteAlert('Unable to send your message  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
+                }, 
+                success: function(data) {
+
+                    absoluteAlert('Message <b>sent</b>!',DELAY_NORMAL,'green');
+                    
+                    // Hiding 'Talk' button
+                    $('table#students tr.selected').each(function(index) {
+                        $(this).removeClass('selected');
+                    });
+                    hideTalkForm();
+                    $('div[smile=talk-to-student]').parent().addClass('hidden');
                 }
             });
             break;
@@ -863,7 +944,7 @@ function smile_all() {
         async: false,
         data: {}, 
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/all', DELAY_ERROR, 'trace',true);
+            absoluteAlert('Unable to call /smile/all', DELAY_ERROR, 'trace',true);
         }, 
         success: function(data) { all = data; }
     });
@@ -882,7 +963,7 @@ function smile_reset() {
         async: false,
         
         error: function(xhr, text, err) {
-            smileAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace');
+            absoluteAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace');
         }, 
         success: function(data) {}
     });
@@ -901,7 +982,7 @@ function smile_iqsets() {
         data: {}, 
         
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
+            absoluteAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
         }, 
         success: function(data) { 
             iqsets = data; 
@@ -922,7 +1003,7 @@ function smile_iqset(id) {
         async: false,
         data: {},  
         error: function(xhr, text, err) {
-            smileAlert('Unable to call /smile/iqset/{key}', DELAY_NORMAL, 'trace');
+            absoluteAlert('Unable to call /smile/iqset/{key}', DELAY_NORMAL, 'trace');
         }, 
         success: function(data) { iqset = data; }
     });

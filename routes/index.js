@@ -22,6 +22,8 @@ var MESSAGE_WAIT_CONNECT = {
 
 var game = new Game();
 
+var PRIVATE_MESSAGES = [];
+
 exports.handleQuestionGet = function(req, res) {
     var questions = game.questions.getQuestions(req.id);
     if (questions instanceof Error) {
@@ -111,6 +113,30 @@ exports.handleDeleteIQSet = function(req, res) {
     });
 };
 
+exports.postPrivateMessageForStudent = function(req, res) {
+
+    PRIVATE_MESSAGES.push(req.body);
+    console.log("\nPrivate message added to the stack");
+    console.log("%j\n", req.body);
+
+    return res.sendText(HTTP_STATUS_OK, OK);
+}
+
+exports.getPrivateMessageForStudent = function(req, res) {
+
+    var messageToForward = null;
+
+    for(var i=0; i<PRIVATE_MESSAGES.length; i++) {
+
+        if(PRIVATE_MESSAGES[i].IP === req.body.IP) {
+            messageToForward = PRIVATE_MESSAGES[i];
+            console.log('messageToForward');
+            console.log("%j\n", messageToForward);
+            PRIVATE_MESSAGES.splice(PRIVATE_MESSAGES[i], 1);
+        }
+    }
+    return res.sendJSON(HTTP_STATUS_OK, messageToForward);
+}
 
 /**
     Save a new iqset from teacher app
@@ -123,7 +149,7 @@ exports.handlePostNewIQSet = function(req, res) {
     var headers = req.headers;
     var iqset;
 
-    if (headers['content-type'] === 'application/json; charset=UTF-8') {	
+    if (headers['content-type'] === 'application/json; charset=UTF-8') {    
         console.log('Handle post of iqset from json');
         //
         // Handle the upload from JSON
@@ -595,7 +621,7 @@ exports.handlePushMessage = function(req, res) {
 };
 
 /**
-	Creating a session with teacher name, session title, and group name
+    Creating a session with teacher name, session title, and group name
 **/
 exports.createSessionFromTeacherApp = function(req, res) {
 
@@ -712,35 +738,35 @@ exports.handleQuestionHtmlGet = function(req, res) {
     res.writeHead(200, {
         'Content-Type' : 'text/html; charset=utf-8',
     });
-	
-	// Preparing values for solving questions screen
-	var json_solving_questions = {
-		questionNum: (questionNumber + 1),
-		author: studentName,
-		question: question.Q,
-		questionType: question.TYPE,
-		picturePath: '/smile/current/'+questionNumber+".jpg", 
-		option1: question.O1,
-		option2: question.O2,
-		option3: question.O3,
-		option4: question.O4
-	};
+    
+    // Preparing values for solving questions screen
+    var json_solving_questions = {
+        questionNum: (questionNumber + 1),
+        author: studentName,
+        question: question.Q,
+        questionType: question.TYPE,
+        picturePath: '/smile/current/'+questionNumber+".jpg", 
+        option1: question.O1,
+        option2: question.O2,
+        option3: question.O3,
+        option4: question.O4
+    };
 
-	var solving_questions = JSON.stringify(json_solving_questions);
+    var solving_questions = JSON.stringify(json_solving_questions);
 
-	var headers = {
-		'Content-Type': 'application/json',
-		'Content-Length': solving_questions.length
-	};
+    var headers = {
+        'Content-Type': 'application/json',
+        'Content-Length': solving_questions.length
+    };
 
-	var options = {
-		host: 'localhost',
-		port: 80,
-		path: '/smile/current/'+questionNumber+'.html',
-		method: 'POST',
-		headers: headers
-	};
-	
+    var options = {
+        host: 'localhost',
+        port: 80,
+        path: '/smile/current/'+questionNumber+'.html',
+        method: 'POST',
+        headers: headers
+    };
+    
 // Setup the request.  The options parameter is the object defined above.
 var http = require('http');
 req = http.request(options, function(res) {
@@ -850,40 +876,40 @@ exports.handleQuestionResultHtmlGet = function(req, res) {
     res.writeHead(200, {
         'Content-Type' : 'text/html; charset=utf-8',
     });
-	
-	
-	// Preparing values for detailresult.xml	
-	var detail_result = {
-		questionNum: (questionNumber + 1),
-		author: studentName,
-		question: question.Q,
-		questionType: question.TYPE,
-		picturePath: '/smile/current/'+questionNumber+".jpg", 
-		answer: question.A,
-		option1: question.O1,
-		option2: question.O2,
-		option3: question.O3,
-		option4: question.O4,
-		numCorrectPeople: game.questionCorrectCountMap[questionNumber],
-		numberOfStudents: game.students.getNumberOfStudents(),
-		averageRating: game.getQuestionAverageRating(questionNumber) 
-	};
+    
+    
+    // Preparing values for detailresult.xml    
+    var detail_result = {
+        questionNum: (questionNumber + 1),
+        author: studentName,
+        question: question.Q,
+        questionType: question.TYPE,
+        picturePath: '/smile/current/'+questionNumber+".jpg", 
+        answer: question.A,
+        option1: question.O1,
+        option2: question.O2,
+        option3: question.O3,
+        option4: question.O4,
+        numCorrectPeople: game.questionCorrectCountMap[questionNumber],
+        numberOfStudents: game.students.getNumberOfStudents(),
+        averageRating: game.getQuestionAverageRating(questionNumber) 
+    };
 
-	var detail_resultString = JSON.stringify(detail_result);
+    var detail_resultString = JSON.stringify(detail_result);
 
-	var headers = {
-		'Content-Type': 'application/json',
-		'Content-Length': detail_resultString.length
-	};
+    var headers = {
+        'Content-Type': 'application/json',
+        'Content-Length': detail_resultString.length
+    };
 
-	var options = {
-		host: 'localhost',
-		port: 80,
-		path: '/smile/current/'+questionNumber+'_result.html',
-		method: 'POST',
-		headers: headers
-	};
-	
+    var options = {
+        host: 'localhost',
+        port: 80,
+        path: '/smile/current/'+questionNumber+'_result.html',
+        method: 'POST',
+        headers: headers
+    };
+    
 // Setup the request.  The options parameter is the object defined above.
 var http = require('http');
 req = http.request(options, function(res) {
@@ -906,7 +932,7 @@ req.on('error', function(e) {
 
 // XXX What is this for??
 console.log('JSON request ==> '+detail_resultString);
-	res.write(detail_resultString);
+    res.write(detail_resultString);
     res.end();
 };
 

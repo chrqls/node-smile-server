@@ -183,6 +183,16 @@ js.get('/smile/iqset/:id', routes.handleGetIQSet, true);
 **/
 
 /**
+    Add a private message to the stack for a specific student.
+    It has NOTHING TO DO with 'messages' added to /smile/all
+**/
+js.post('/smile/talk/teacher/post', routes.postPrivateMessageForStudent);
+js.post('/smile/talk/student/get', routes.getPrivateMessageForStudent);
+/* To send messages to the teacher, uncomment the 2 lines and implement it in index.js:
+js.post('/smile/talk/teacher/get', routes.listenIfPrivateMessageForTeacher);
+js.post('/smile/talk/student/post', routes.addPrivateMessageForTeacher);*/
+
+/**
     Save a new iqset from teacher app
 **/
 js.put('/smile/iqset', routes.handlePostNewIQSet);

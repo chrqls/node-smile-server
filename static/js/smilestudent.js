@@ -28,15 +28,23 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-//
-// GLOBALS
-//
+var VERSION = '1.1.0';
+
+var DELAY_UPDATE_BOARD = 1500;
+var DELAY_PRIVATE_MESSAGE = 5000;
+var DELAY_ERROR = 60000;
+var DELAY_SHORT = 5000;
+var DELAY_NORMAL = 10000;/*
+var DELAY_LONG = 20000;*/
+
+var DEAMON_UPDATING_BOARD = null;
+var DEAMON_LISTENING_PRIVATE_MESSAGE = null;
+
 var STARTTIME;
 var ALPHASEQ = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 var DIGITSEQ = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 var CLIENTIP = '127.0.0.1';
-var EVENTLOOPCYCLE = 1500; // LOOP WAIT TIME in MILLISECONDS
-var EVENTLOOPINTERVAL = null;
+
 var SMILEROUTES = {
     "pushmsg": "/JunctionServerExecution/pushmsg.php",
     "smsg": "/JunctionServerExecution/current/MSG/smsg.txt",
@@ -46,18 +54,17 @@ var SMILEROUTES = {
     "submitanswers": "/smile/pushmsg.php",
     "echoclientip": "/smile/echoclientip",
     "defaultpicurl": "/images/1x1-pixel.png",
-    "getresults": "/smile/student/%s/result"
+    "getresults": "/smile/student/%s/result",
+    "getprivatemessage": "/smile/talk/student/get"
 };
 
-var VERSION = '1.0.5';
-
-//
-// 1 - login screen
-// 2 - logged in, waiting
-// 3 - making questions
-// 4 - answering questions
-// 5 - results
-//
+/*
+    1 - login screen
+    2 - logged in, waiting
+    3 - making questions
+    4 - answering questions
+    5 - results
+*/
 var STATEMACHINE = {
     "1": { "label": "Login", "id": "#login-pane1"
     }, "2": { "label": "Get Ready", "id": "#start-pane1"
@@ -130,7 +137,6 @@ var SMILEInquiry2 = function(question, answer1, answer2, answer3, answer4, right
  * - LoginModel
  * - MsgModel
  * - StateModel
- *
  */
 var GlobalViewModel = {
     username: ko.observable(nameGen(8)).extend({ required: "Please enter a username" }),
@@ -184,12 +190,12 @@ GlobalViewModel.picdatauri = ko.computed(function() {
 GlobalViewModel.doLogin = function() {
     var self = this;
     if (!self.username() || self.username() === "") {
-        smileAlert('#globalstatus', 'Please Enter a username', 'red', 5000);
+        absoluteAlert('Please Enter a <b>username</b>', DELAY_SHORT,'red');
         return false;
     }
     if (!self.hasSubmitted()) {
         console.log('doLogin');
-        //smileAlert('#globalstatus', 'Logging as ' + self.username(), 'green', 5000);
+        absoluteAlert('Logging as ' + self.username(), DELAY_SHORT,'green');
         doSmileLogin(self.clientip(), self.username(), self.realname());
     }
     self.hasSubmitted(true);
@@ -241,13 +247,13 @@ GlobalViewModel.doSubmitQ = function() {
     //console.log(">>>> >>> >> > doSubmitQ");
     if (self.validateInquirySubmission()) {
 
-	$('#submit-inquiry-area').hide();
+    $('#submit-inquiry-area').hide();
         var jsondata = generateJSONInquiry(self.clientip(), self.username(), self.question(), self.a1(), self.a2(), self.a3(), self.a4(), self.rightanswer(), self.picurl(), self.pic());
         doPostInquiry(jsondata, function() {
             self.doInquiryReset();
             $('#iq-pic').empty();
-	});
-	$('#submit-inquiry-area').show();
+    });
+    $('#submit-inquiry-area').show();
     } else {
         console.log("Cannot validateInquiry");
         $('div#inquiry-form-area').block({
@@ -265,7 +271,7 @@ GlobalViewModel.doSubmitQandDone = function() {
     console.log("doSubmitQandDone");
     if (self.validateInquirySubmission()) {
 
-	$('#submit-inquiry-area').hide();
+    $('#submit-inquiry-area').hide();
         var jsondata = generateJSONInquiry(self.clientip(), self.username(), self.question(), self.a1(), self.a2(), self.a3(), self.a4(), self.rightanswer(), self.picurl(), self.pic());
         doPostInquiry(jsondata, function() {
             console.log("waiting for next phase");
@@ -357,7 +363,7 @@ GlobalViewModel.doAnswerNextQ = function() {
             //
             // Should we do something else?
             //
-            smileAlert('#globalstatus', 'Submitted Answers for ' + GlobalViewModel.username(), 'blue', 5000);
+            absoluteAlert('Submitted Answers for ' + GlobalViewModel.username(), DELAY_SHORT,'blue');
         });
     }
     /* if (self.validateInquiry()) {
@@ -398,10 +404,9 @@ $(document).ready(function() {
 
         if ($(this).hasClass('disabled')) {
             var txt = $activetab.text().split('.'); // XXX This is non-defensive
-            smileAlert('#globalstatus', 'Please wait for phase <em>' + txt[1].trim() + '</em> to complete.', '', 5000);
+            absoluteAlert('Please wait for phase <em>' + txt[1].trim() + '</em> to complete.', DELAY_SHORT);
             return false; // Do something else in here if required
         } else {
-            // smileAlert('#globalstatus', 'Bubble ' + $(this).text(), 'green');
 
             //
             // Toggle the activate tab into disabled state
@@ -414,7 +419,6 @@ $(document).ready(function() {
             //
             $(this).removeClass('disabled');
             $(this).parent().parent().addClass('active');
-            console.log('clicked ' + $(this).attr('href'));
             window.location.href = $(this).attr('href');
         }
     });
@@ -435,21 +439,22 @@ $(document).ready(function() {
 // App functions
 //
 // alerttype
-//	- by default, none is required if you don't intend to use lifetime
-//	- trace : use the stacktrace in the error message
+//  - by default, none is required if you don't intend to use lifetime
+//  - trace : use the stacktrace in the error message
 //  - red : display a red color alert
-//	- blue : display a blue color alert
-//	- green : display a green color alert
+//  - blue : display a blue color alert
+//  - green : display a green color alert
 //
+/*
 function smileAlert(targetid, text, alerttype, lifetime) {
     var defaultalert = 'secondary';
     var redalert = 'alert';
     var bluealert = '';
     var greenalert = 'success';
     var formatstr = '<div class="alert-box %s"> \
-		%s \
-	  	<a href="" class="close">&times;</a> \
-		</div>';
+        %s \
+        <a href="" class="close">&times;</a> \
+        </div>';
     if (!alerttype) {
         alerttype = defaultalert;
     } else if (alerttype === 'trace') {
@@ -471,6 +476,40 @@ function smileAlert(targetid, text, alerttype, lifetime) {
     if (lifetime) {
         setInterval(function() {
             $(targetid).find('.alert-box').fadeOut().remove();
+        }, lifetime)
+    }
+}*/
+
+
+function absoluteAlert(text, lifetime, alerttype, hasCross) {
+    
+    var container = '#absolute_alerts';
+    var alertID = 'id_'+Math.floor(Math.random()*99999);
+    var cross = hasCross? '<a style="color:white;opacity:0.7" class="close" href="">×</a>' : '';
+
+    // Types of box
+    var box_grey = 'secondary';
+    var box_red = 'alert';
+    var box_blue = '';
+    var box_green = 'success';
+    
+    if (!alerttype)                 { alerttype = box_grey; } 
+    else if (alerttype === 'trace') { alerttype = box_red; text += ' : ' + printStackTrace(); } 
+    else if (alerttype === 'red')   { alerttype = box_red; } 
+    else if (alerttype === 'blue')  { alerttype = box_blue; } 
+    else if (alerttype === 'green') { alerttype = box_green; } 
+
+    var html_to_inject = '<div id="%s"> \
+                            <div style="margin:3px 0;opacity:0.8;display: inline-block;padding-right:30px" class="alert-box %s" data-alert=""> \
+                              <span style="font-weight:normal">%s</span>%s \
+                            </div> \
+                          </div>';
+
+    $(container).append(sprintf(html_to_inject, alertID, alerttype, text, cross));
+
+    if (lifetime) {
+        setInterval(function() {
+            $(container).find('#'+alertID).fadeOut().remove();
         }, lifetime)
     }
 }
@@ -504,10 +543,16 @@ function randomIPGen() {
 
 function setClientIP() {
     var clientip;
-    $.ajax({ cache: false, type: "GET" // XXX should be POST
-        , dataType: "json", url: SMILEROUTES["echoclientip"], data: {}, error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Cannot obtain client IP address.  Please verify your connection or server status.', 'trace');
-        }, success: function(data) {
+    $.ajax({ 
+        cache: false, 
+        type: "GET", // XXX should be POST
+        dataType: "json", 
+        url: SMILEROUTES["echoclientip"], 
+        data: {}, 
+        error: function(xhr, text, err) {
+            absoluteAlert('Cannot obtain client IP address.  Please verify your connection or server status.', DELAY_ERROR,'trace');
+        }, 
+        success: function(data) {
             clientip = data.ip; // XXX We should be defensive in case garbage comes back
             if (clientip !== '127.0.0.1') {
                 CLIENTIP = clientip;
@@ -520,7 +565,7 @@ function setClientIP() {
                 // XXX Note, this is not safe against duplicates.  This is as random as the pseudo-random number
                 // generation ... so will be 1 in 255 chance of returning a dup
                 CLIENTIP = randomIPGen();
-                smileAlert('#globalstatus', 'Using fake IP address ' + CLIENTIP, 'blue', 5000);
+                absoluteAlert('Using fake IP address <b>'+CLIENTIP+'</b>', DELAY_SHORT,'blue');
             }
             GlobalViewModel.clientip(CLIENTIP);
         }
@@ -529,17 +574,24 @@ function setClientIP() {
 
 function doSmileLogin(clientip, username, realname) {
     var clientip;
-    $.ajax({ cache: false, type: "POST", dataType: "text", url: SMILEROUTES["pushmsg"], data: generateEncodedHail(clientip, username), error: function(xhr, text, err) {
-        smileAlert('#globalstatus', 'Unable to login.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
-        GlobalViewModel.hasSubmitted(false); // Reset this so clicks will work
-    }, success: function(data) {
-        smileAlert('#globalstatus', 'Successfully logged in', 'green', 10000);
-        // Move to state 2 now
-        statechange(1, 2);
-        GlobalViewModel.loginstatusmsg("Logged In");
-        // GlobalViewModel.sessionstatus();
-        startSmileEventLoop();
-    }
+    $.ajax({ 
+        cache: false, 
+        type: "POST", 
+        dataType: "text", 
+        url: SMILEROUTES["pushmsg"], 
+        data: generateEncodedHail(clientip, username), 
+        error: function(xhr, text, err) {
+            absoluteAlert('Unable to login.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_SHORT,'trace');
+            GlobalViewModel.hasSubmitted(false); // Reset this so clicks will work
+        }, 
+        success: function(data) {
+            absoluteAlert('Successfully logged in', DELAY_NORMAL,'green');
+            // Move to state 2 now
+            statechange(1, 2);
+            GlobalViewModel.loginstatusmsg("Logged In");
+            // GlobalViewModel.sessionstatus();
+            startSmileEventLoop();
+        }
     });
 }
 
@@ -547,28 +599,39 @@ function doGetResults() {
     //
     // TODO
     //
-    $.ajax({ cache: false, type: "GET" // XXX should be POST
-        , dataType: "json", url: sprintf(SMILEROUTES["getresults"], GlobalViewModel.clientip()), data: {}, error: function(xhr, text, err) {
-            smileAlert('#globalstatus', 'Cannot obtain results.  Please verify your connection or server status.', 'trace');
-        }, success: function(data) {
+    $.ajax({ 
+        cache: false, 
+        type: "GET", // XXX should be POST
+        dataType: "json", 
+        url: sprintf(SMILEROUTES["getresults"], GlobalViewModel.clientip()), 
+        data: {}, 
+        error: function(xhr, text, err) {
+            absoluteAlert('Cannot obtain results.  Please verify your connection or server status.', DELAY_ERROR,'trace');
+        }, 
+        success: function(data) {
             displayResults(data);
         }
     });
 }
 
 function doPostInquiry(inquirydata, cb) {
-    $.ajax({ cache: false, type: "POST", dataType: "text", url: SMILEROUTES["postinquiry"], data: inquirydata, error: function(xhr, text, err) {
-        // TODO: XXX Decide what to do if this post fails
-        smileAlert('#globalstatus', 'Unable to post inquiry.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace', '5000');
-    }, success: function(data) {
-        smileAlert('#globalstatus', 'Sent Inquiry Question', 'green', 5000);
-        if (cb) {
-            cb(data);
+    $.ajax({ 
+        cache: false, 
+        type: "POST", 
+        dataType: "text", 
+        url: SMILEROUTES["postinquiry"], 
+        data: inquirydata, 
+        error: function(xhr, text, err) {
+            // TODO: XXX Decide what to do if this post fails
+            absoluteAlert('Unable to post inquiry.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR,'trace');
+        }, 
+        success: function(data) {
+            absoluteAlert('Sent Inquiry Question', DELAY_NORMAL,'green');
+            if (cb) {
+                cb(data);
+            }
+            // We should track a count of successful submits
         }
-        //
-        // We should track a count of successful submits
-        //
-    }
     });
 }
 
@@ -579,57 +642,68 @@ function doPostInquiry(inquirydata, cb) {
 // {"MYRATING":[1,5,5,5,5,5,5,5,5,5,5,5],"MYANSWER":[1,4,4,4,4,4,4,4,4,4,4,4],
 // "NAME":"default.102","TYPE":"ANSWER","IP":"10.0.0.102"}
 function doPostAnswers(answersarray, ratingsarray, username, clientip, cb) {
-    $.ajax({ cache: false, type: "POST", dataType: "text", url: SMILEROUTES["submitanswers"], data: {"MSG": JSON.stringify({
-        "MYRATING": ratingsarray,
-        "MYANSWER": answersarray,
-        "NAME": username,
-        "TYPE": "ANSWER",
-        "IP": clientip
-    })
-    }, error: function(xhr, text, err) {
-        // TODO: XXX Decide what to do if this post fails
-        smileAlert('#globalstatus', 'Unable to submit answers.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
-    }, success: function(data) {
-        if (data) {
+    $.ajax({ 
+        cache: false, 
+        type: "POST", 
+        dataType: "text", 
+        url: SMILEROUTES["submitanswers"], 
+        data: {
+            "MSG": JSON.stringify({
+            "MYRATING": ratingsarray,
+            "MYANSWER": answersarray,
+            "NAME": username,
+            "TYPE": "ANSWER",
+            "IP": clientip})
+        }, 
+        error: function(xhr, text, err) {
+            // TODO: XXX Decide what to do if this post fails
+            absoluteAlert('Unable to submit answers.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR,'trace');
+        }, 
+        success: function(data) {
+            if (data) { }
+            if (cb) { cb(data); }
         }
-        if (cb) {
-            cb(data);
-        }
-    }
     });
 }
 
 function doGetInquiry(qnum, cb) {
-    $.ajax({ cache: false, type: "GET", dataType: "json", url: sprintf(SMILEROUTES["getinquiry"], qnum), data: {}, error: function(xhr, text, err) {
-        // TODO: XXX Decide what to do if this post fails
-        smileAlert('#globalstatus', 'Unable to get inquiry.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', 'trace');
-    }, success: function(data) {
-        if (data) {
-            GlobalViewModel.question(data.Q);
-            GlobalViewModel.rightanswer(data.A);
-            GlobalViewModel.a1(data.O1);
-            GlobalViewModel.a2(data.O2);
-            GlobalViewModel.a3(data.O3);
-            GlobalViewModel.a4(data.O4);
-            GlobalViewModel.qidx(qnum);
-            GlobalViewModel.othermsg((GlobalViewModel.qidx() + 1) + "/" + GlobalViewModel.numq());
-            if (GlobalViewModel.answersarray()[GlobalViewModel.qidx()]) {
-                GlobalViewModel.answer("a" + GlobalViewModel.answersarray()[GlobalViewModel.qidx()]);
-            } else {
-                GlobalViewModel.answer("");
-            }
+    $.ajax({ 
+        cache: false, 
+        type: "GET", 
+        dataType: "json", 
+        url: sprintf(SMILEROUTES["getinquiry"], qnum), 
+        data: {}, 
+        error: function(xhr, text, err) {
+            // TODO: XXX Decide what to do if this post fails
+            absoluteAlert('Unable to get inquiry.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR,'trace');
+        }, 
+        success: function(data) {
+            if (data) {
+                GlobalViewModel.question(data.Q);
+                GlobalViewModel.rightanswer(data.A);
+                GlobalViewModel.a1(data.O1);
+                GlobalViewModel.a2(data.O2);
+                GlobalViewModel.a3(data.O3);
+                GlobalViewModel.a4(data.O4);
+                GlobalViewModel.qidx(qnum);
+                GlobalViewModel.othermsg((GlobalViewModel.qidx() + 1) + "/" + GlobalViewModel.numq());
+                if (GlobalViewModel.answersarray()[GlobalViewModel.qidx()]) {
+                    GlobalViewModel.answer("a" + GlobalViewModel.answersarray()[GlobalViewModel.qidx()]);
+                } else {
+                    GlobalViewModel.answer("");
+                }
 
-            if (data.TYPE === "QUESTION_PIC") {
-                GlobalViewModel.picurl(data.PICURL);
-            } else {
-                GlobalViewModel.picurl(SMILEROUTES["defaultpicurl"]);
-            }
+                if (data.TYPE === "QUESTION_PIC") {
+                    GlobalViewModel.picurl(data.PICURL);
+                } else {
+                    GlobalViewModel.picurl(SMILEROUTES["defaultpicurl"]);
+                }
 
-            if (cb) {
-                cb();
+                if (cb) {
+                    cb();
+                }
             }
         }
-    }
     });
 }
 /**
@@ -637,69 +711,76 @@ function doGetInquiry(qnum, cb) {
  * doSMSG - This handles server side polling.  TODO - get rid of server side polling and use socket.io
  *
  * On success : review incoming messages to see what state we are in
- * On error : smileAlert
+ * On error : absoluteAlert
  */
 function doSMSG() {
-    $.ajax({ cache: false, type: "GET", dataType: "json", url: SMILEROUTES["smsg"], data: {}, error: function(xhr, text, err) {
-        smileAlert('#globalstatus', 'Status Msg Error.  Reason: ' + xhr.status + ':' + xhr.responseText + '.', 'trace');
-    }, success: function(data) {
-        if (data) {
-            msg = data["TYPE"];
+    $.ajax({ 
+        cache: false, 
+        type: "GET", 
+        dataType: "json", 
+        url: SMILEROUTES["smsg"], 
+        data: {}, 
+        error: function(xhr, text, err) {
+            absoluteAlert('Status Msg Error.  Reason: ' + xhr.status + ':' + xhr.responseText + '.', DELAY_SHORT,'trace',true);
+        }, 
+        success: function(data) {
+            if (data) {
+                msg = data["TYPE"];
 
-            // console.log(data); // XXX Remove debug
-            if (msg === "START_MAKE") {
+                // console.log(data); // XXX Remove debug
+                if (msg === "START_MAKE") {
 
-                if (SMILESTATE == 5) {
-                    statechange(5, 3);
+                    if (SMILESTATE == 5) {
+                        statechange(5, 3);
+                    }
+                    else if (SMILESTATE !== 3) {
+                        statechange(2, 3);
+                    }
                 }
-                else if (SMILESTATE !== 3) {
-                    statechange(2, 3);
+                if (msg === "WAIT_CONNECT") {
+
+                    // TODO: RTC #23 >> Should we call from here a method to update the status on student app?
+                    statechange(SMILESTATE, 2);
                 }
-            }
-            if (msg === "WAIT_CONNECT") {
 
-                // TODO: RTC #23 >> Should we call from here a method to update the status on student app?
-                statechange(SMILESTATE, 2);
-            }
-
-            if (msg === "START_SOLVE") {
-                statechange(SMILESTATE, 4, data, function() {
-                    clearAnswerState();
-                    doGetInquiry(0);
-                });
-            }
-            if (msg === "START_SHOW") {
-                statechange(SMILESTATE, 5, data, function() {
-                    GlobalViewModel.sessionstatemsg("Done! Please review your Score.");
-                    doGetResults(data);
-                });
-            }
-
-            if (msg === "WARN") {
-            }
-
-            if (msg === "RESET") {
-                // Only do reset if we aren't just sitting at the login screen
-                if (SMILESTATE !== 1) {
-                    statechange(SMILESTATE, 1, { msg: 'RESET' }, function() {
-                        console.log("RESET, log out");
-                        GlobalViewModel.sessionstatemsg("Session Reset by Teacher.  Logging Out"); // XXX I don't this this is shown
-                        smileAlert('#globalstatus', 'Session Reset by Teacher.  Logging Out', 'blue', 5000);
+                if (msg === "START_SOLVE") {
+                    statechange(SMILESTATE, 4, data, function() {
+                        clearAnswerState();
+                        doGetInquiry(0);
                     });
                 }
-            }
+                if (msg === "START_SHOW") {
+                    statechange(SMILESTATE, 5, data, function() {
+                        GlobalViewModel.sessionstatemsg("Done! Please review your Score.");
+                        doGetResults(data);
+                    });
+                }
 
-            if ((msg === "") || (msg === null) || (msg === undefined)) {
-                // XXX Why in the world was I doing this?  I don't think we want to bump back to state 1
-                // Leave this around for a bit until I remember what of this
-                // statechange(SMILESTATE, 1);
+                if (msg === "WARN") {
+                }
+
+                if (msg === "RESET") {
+                    // Only do reset if we aren't just sitting at the login screen
+                    if (SMILESTATE !== 1) {
+                        statechange(SMILESTATE, 1, { msg: 'RESET' }, function() {
+                            console.log("RESET, log out");
+                            GlobalViewModel.sessionstatemsg("Session Reset by Teacher.  Logging Out"); // XXX I don't this this is shown
+                            absoluteAlert('Session Reset by Teacher.  Logging Out', DELAY_NORMAL,'blue');
+                        });
+                    }
+                }
+
+                if ((msg === "") || (msg === null) || (msg === undefined)) {
+                    // XXX Why in the world was I doing this?  I don't think we want to bump back to state 1
+                    // Leave this around for a bit until I remember what of this
+                    // statechange(SMILESTATE, 1);
+                }
+                // Ignore anything else that we receive
+                // We should have a RESET_GAME
+            } else {
+                console.log('no data');
             }
-            // Ignore anything else that we receive
-            // We should have a RESET_GAME
-        } else {
-            console.log('no data');
         }
-    }
     });
 }
 
@@ -715,15 +796,15 @@ function statechange(from, to, data, cb) {
             return;
         } // This is effectively a reset, logout the user
         if (to != 2) {
-            smileAlert('#globalstatus', 'Cannot move to phase ' + to + ' yet.', 'red', 5000);
+            absoluteAlert('Cannot move to phase ' + to + ' yet.', DELAY_SHORT,'red');
         } else { // Move to 2. Get Ready Phase
             SMILESTATE = 2;
             console.log('SMILESTATE = 2');
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["2"].id + '"]');
             if ($next) {
-                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["2"].label + ' phase.', 2500);
+                absoluteAlert('Jump to: ' + STATEMACHINE["2"].label + ' phase.', DELAY_SHORT);
                 console.log('go to href = ' + $next.attr('href'));
-                $('#logoutarea').show();
+                $('#logout_button').show();
                 // Note, we won't disable the login screen, user can click back to it
                 $next.removeClass('disabled');
                 var a = $next[0]; // get the dom obj
@@ -745,7 +826,7 @@ function statechange(from, to, data, cb) {
             $('div#inquiry-form-area').unblock();
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["3"].id + '"]');
             if ($next) {
-                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["3"].label + ' phase.', 2500);
+                absoluteAlert('Jump to: ' + STATEMACHINE["3"].label + ' phase.', DELAY_SHORT);
                 console.log('go to href = ' + $next.attr('href'));
                 $next.removeClass('disabled');
                 var a = $next[0]; // get the dom obj
@@ -761,7 +842,7 @@ function statechange(from, to, data, cb) {
             $('div#answer-form-area').unblock();
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["4"].id + '"]');
             if ($next) {
-                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["4"].label + ' phase.', 2500);
+                absoluteAlert('Jump to: ' + STATEMACHINE["4"].label + ' phase.', DELAY_SHORT);
                 console.log('go to href = ' + $next.attr('href'));
                 $next.removeClass('disabled');
                 var a = $next[0]; // get the dom obj
@@ -783,7 +864,7 @@ function statechange(from, to, data, cb) {
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["5"].id + '"]');
             if ($next) {
                 // XXX This is a copy paste of the same block of code 'from state == 2', refactor
-                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["5"].label + ' phase.', 2500);
+                absoluteAlert('Jump to: ' + STATEMACHINE["5"].label + ' phase.', DELAY_SHORT);
                 console.log('go to href = ' + $next.attr('href'));
                 $next.removeClass('disabled');
                 var a = $next[0]; // get the dom obj
@@ -811,7 +892,7 @@ function statechange(from, to, data, cb) {
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["4"].id + '"]');
             if ($next) {
                 // XXX This is a copy paste of the same block of code 'from state == 2', refactor
-                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["4"].label + ' phase.', 2500);
+                absoluteAlert('Jump to: ' + STATEMACHINE["4"].label + ' phase.', DELAY_SHORT);
                 console.log('go to href = ' + $next.attr('href'));
                 $next.removeClass('disabled');
                 var a = $next[0]; // get the dom obj
@@ -833,7 +914,7 @@ function statechange(from, to, data, cb) {
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["5"].id + '"]');
             if ($next) {
                 // XXX This is a copy paste of the same block of code 'from state == 2', refactor
-                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["5"].label + ' phase.', 2500);
+                absoluteAlert('Jump to: ' + STATEMACHINE["5"].label + ' phase.', DELAY_SHORT);
                 console.log('go to href = ' + $next.attr('href'));
                 $next.removeClass('disabled');
                 var a = $next[0]; // get the dom obj
@@ -861,7 +942,7 @@ function statechange(from, to, data, cb) {
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["5"].id + '"]');
             if ($next) {
                 // XXX This is a copy paste of the same block of code 'from state == 2', refactor
-                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["5"].label + ' phase.', 2500);
+                absoluteAlert('Jump to: ' + STATEMACHINE["5"].label + ' phase.', DELAY_SHORT);
                 console.log('go to href = ' + $next.attr('href'));
                 $next.removeClass('disabled');
                 var a = $next[0]; // get the dom obj
@@ -894,7 +975,7 @@ function statechange(from, to, data, cb) {
             $('div#inquiry-form-area').unblock();
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["3"].id + '"]');
             if ($next) {
-                smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["3"].label + ' phase.', 2500);
+                absoluteAlert('Jump to: ' + STATEMACHINE["3"].label + ' phase.', DELAY_SHORT);
                 console.log('go to href = ' + $next.attr('href'));
                 $next.removeClass('disabled');
                 var a = $next[0]; // get the dom obj
@@ -1003,10 +1084,10 @@ function restoreLoginState() {
     $('div#answer-form-area').unblock();
 
     var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["1"].id + '"]');
-    $('#logoutarea').hide();
+    $('#logout_button').hide();
     if ($next) {
         stopSmileEventLoop();
-        smileAlert('#globalstatus', 'Jump to: ' + STATEMACHINE["1"].label + ' phase.', 2500);
+        absoluteAlert('Jump to: ' + STATEMACHINE["1"].label + ' phase.', DELAY_SHORT);
         console.log('go to href = ' + $next.attr('href'));
         $next.removeClass('disabled');
         var a = $next[0]; // get the dom obj
@@ -1056,16 +1137,42 @@ function generateEncodedHail(clientip, username) {
 }
 
 function startSmileEventLoop() {
-    EVENTLOOPINTERVAL = setInterval(function() {
+    DEAMON_UPDATING_BOARD = setInterval(function() {
         doSMSG();
-        console.log(Date.now() + " - tick");
-    }, EVENTLOOPCYCLE);
+    }, DELAY_UPDATE_BOARD);
+
+    // ADD LISTENER TALK HERE
+    DEAMON_LISTENING_PRIVATE_MESSAGE = setInterval(getPrivateMessage, DELAY_PRIVATE_MESSAGE);
+}
+
+function getPrivateMessage() {
+
+    //absoluteAlert(GlobalViewModel.clientip(),DELAY_NORMAL);
+    var ipJson = {};
+    ipJson.IP = GlobalViewModel.clientip();
+
+    $.ajax({ 
+        cache: false, 
+        type: 'POST', 
+        contentType: 'application/json',
+        url: SMILEROUTES['getprivatemessage'],
+        //async: false,
+        data: JSON.stringify(ipJson),
+        
+        error: function(xhr, text, err) {
+            absoluteAlert('Unable to send your message  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
+        }, 
+        success: function(data) {
+            
+            if(data) absoluteAlert('<u>Message from teacher</u>:<br><br><b>'+data.TEXT+'</b>',null,'red',true);
+        }
+    });
 }
 
 function stopSmileEventLoop() {
-    if (EVENTLOOPINTERVAL) {
-        clearInterval(EVENTLOOPINTERVAL);
-        EVENTLOOPINTERVAL = null;
+    if (DEAMON_UPDATING_BOARD) {
+        clearInterval(DEAMON_UPDATING_BOARD);
+        DEAMON_UPDATING_BOARD = null;
     }
 }
 
@@ -1076,5 +1183,5 @@ $(window).unload(function() {
 });
 
 var SESSION_STATE_START_MAKE_TPL = ' \
-	<p>Start Making Questions until the teacher is ready to start Answering Questions</p> \
+    <p>Start Making Questions until the teacher is ready to start Answering Questions</p> \
 ';
