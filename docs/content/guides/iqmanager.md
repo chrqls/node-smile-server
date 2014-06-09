@@ -17,11 +17,14 @@ The IQManager can be reached using the browser at the default Server IP address 
 
 ## Creating an IQSet
 
-The steps to create an IQSet are described below.  We recommend using a spreadsheet program like Microsoft Excel to export a CSV file.  Use the IQSet_Template.xls to create IQSets.
+The steps to create an IQSet are described below.  We recommend using a spreadsheet program like Microsoft Excel to export a CSV file.  Use the [iqset_template.csv](/static/assets/iqset_template.csv) or [iqset_template.xls](/static/assets/iqset_template.xls) to create your own IQSets.
 
-1. TODO
-1. TODO
-1. TODO
+1. Open [iqset_template.xls](/static/assets/iqset_template.xls) using Excel, Libre Office, or Open Office.
+1. Modify the Session details for Teacher Name, Session "Title", and Group Name.
+1. Modify the Question answer sets, with one question per row
+1. "Save As" a .csv file, using Charset = UTF-8, Field Delimiter = comma, and Text Delimiter = double quotes
+1. You should have a valid IQSet ready to load.
+1. Go to main menu to Upload an IQSet
 
 This will be the most difficult step to complete.
 
