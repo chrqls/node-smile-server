@@ -1,490 +1,468 @@
 <!DOCTYPE html>
 
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+
 <!--[if lt IE 7]>
-<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+	<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
 <!--[if IE 7]>
-<html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+	<html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
 <!--[if IE 8]>
-<html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!-->
+	<html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]>	<!-->
 <html lang="en">
 <!--<![endif]-->
+
 <head>
-<meta charset="utf-8" />
-<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+	<meta charset="utf-8" />
+	<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 
-<!-- Set the viewport width to device width for mobile -->
-<meta name="viewport" content="width=device-width" />
+	<!-- Set the viewport width to device width for mobile -->
+	<meta name="viewport" content="width=device-width" />
 
-<title>SMILE Student Web</title>
+	<title>SMILE Student Web</title>
 
-<!-- Included CSS Files -->
-<!-- Combine and Compress These CSS Files -->
-<link rel="stylesheet" href="css/foundation.css">
-<link rel="stylesheet" href="css/app.css">
-<link rel="stylesheet" href="css/checkbox-style.css">
-<link rel="stylesheet" href="css/rating.css" />
-<link rel="stylesheet" href="css/fineuploader-3.5.0.css" />
+	<!-- Included CSS Files -->
+	<!-- Combine and Compress These CSS Files -->
+	<link rel="stylesheet" href="css/foundation.css">
+	<link rel="stylesheet" href="css/app.css">
+	<link rel="stylesheet" href="css/checkbox-style.css">
+	<link rel="stylesheet" href="css/rating.css" />
+	<link rel="stylesheet" href="css/fineuploader-3.5.0.css" />
 
-<script src="js/custom.modernizr.js"></script>
+	<script src="js/custom.modernizr.js"></script>
 
-<!-- IE Fix for HTML5 Tags -->
-<!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+	<!-- IE Fix for HTML5 Tags -->
+	<!--[if lt IE 9]>
+	    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
 
 </head>
 <body>
 
-	<!-- container -->
-	<div class="container">
+	<!-- Absolute alert container-->
+	<div id="absolute_alerts" style="position:fixed;z-index: 10;border:1px dotted #CCC;top:80px;font-size:12px">
+	</div>
 
-		<div class="row">
-			<div class="large-12 small-12 columns">
-				<h2>Welcome to SMILE Student Web</h2>
-				<img src="images/smile.jpg" />
-				<img src="images/marvell_horiz_logo.jpg" />
-
-				<p>SMILE turns a traditional classroom into a highly interactive
-					learning environment by engaging students in critical reasoning and
-					problem solving while enabling them to generate, share, and
-					evaluate multimedia-rich inquiries.</p>
-				<hr />
+	<div class="row">
+		
+		<div class="small-2 columns">
+			<div class="row" style="margin:5px 0">
+				<div class="small-12 columns">
+					<img src="images/smile_grey_student.png" />
+				</div>
+			</div>
+			<div class="row" style="text-align: right;font-size:12px">
+				v<span data-bind="text: version"></span>
 			</div>
 		</div>
-		<div class="row">
-			<div class="large-9 small-9 columns">
-				<h3>
-					SMILE Student
-					<span data-bind="text: version"></span>
-				</h3>
 
-				<div class="row">
-					<div class="large-8 small-8 columns">
-						<div id="globalstatus"></div>
+		<div class="small-9 end columns" style="margin-top:10px">
+
+			<div class="row" style="text-align:center;margin:5px 0 15px" data-bind="if: username"> 
+				<span class="round label" style="background-color:#666;border:2px solid #333">
+					<span style="color:#fcf4ce" data-bind="text: username"></span>
+					(<span style="color:#fde6eb" data-bind="text: realname"></span>) - 
+					<span style="color:#e6f6fd" data-bind="text: clientip"></span>
+				</span>
+				<a id="logout_button" data-bind="click: doLoginReset" class="secondary tiny button" href="#logout-action" style="float:right">Logout</a>
+			</div>
+
+			<div class="row">
+				<div class="small-11 small-centered columns" id="login-info">
+					<div id="login-status">
+						<div id="login-panel" class="panel radius">
+							
+							<div data-bind="text: loginstatusmsg" style="font-weight:bold"></div>
+							<div data-bind="text: sessionstatemsg"></div>
+							<div data-bind="text: othermsg"></div>
+						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="large-12 small-12 columns">
-						<div class="panel">
-							<div class="nav-container">
-								<!-- login-pane1Tab -> start-pane1Tab -> makeq-panelTab -> answerq-panelTab -> results-panelTab -->
-								<nav>
-									<div class="section-container vertical-tabs" data-section="vertical-tabs">
-      									<section class="active">
-       						 				<p class="title" data-section-title><a class="wizard disabled" href="#login-pane1">1. Login</a></p>
-        									<div class="content" data-slug="login-pane1" data-section-content>
-          										<!-- NICE DEBUG TRICK -->
-												<!-- KO:<span data-bind="text: ko.toJSON($data)"></span>
-												<form action="return false;"> -->
-												<label data-bind="css: { error: username.hasError }">Username</label>
-												<span
-													data-bind='visible: username.hasError, text: username.validationMessage'>
-												</span>
-												<input data-bind='value: username, valueUpdate: "afterkeydown"'
-													type="text" placeholder="Username" />
+			</div>
 
-												<label>Real Name</label>
-												<input data-bind='value: realname, valueUpdate: "afterkeydown"'
-													type="text" class="twelve" placeholder="Real Name(Optional)" />
-												<label>Client IPAddress</label>
-												<input data-bind='value: clientip' type="text" class="twelve"
-													disabled="true"
-													placeholder="unknown (Will be provided by server)" />
-												<ul class="button-group even two-up">
-													<li>
-														<a href="#" data-bind='click: doLogin, disable: hasSubmitted'
-															class="button">Submit</a>
-													</li>
-													<li>
-														<a href="#" data-bind='click: doLoginReset' class="button">Reset</a>
-													</li>
-												</ul>
-												</form>
-        									</div>
-      									</section>
-      									<section>
-        									<p class="title" data-section-title><a class="wizard disabled" href="#start-pane1">2. Get Ready</a></p>
-        									<div class="content" data-slug="start-pane1" data-section-content>
-												<p>
-													Please wait for the class to begin. Your teacher will give you
-													instructions on whether to prepare questions or start
-													answering questions.
-													<!-- NICE DEBUG TRICK -->
-													<!-- KO:<span data-bind="text: ko.toJSON($data)"></span>-->
-												</p>
-        									</div>
-      									</section>
-      									<section>
-        									<p class="title" data-section-title><a class="wizard disabled" href="#makeq-pane1">3. Make Questions</a></p>
-        									<div class="content" data-slug="makeq-pane1" data-section-content>
-          										<!-- NICE DEBUG TRICK -->
-												<!-- KO:<span data-bind="text: ko.toJSON($data)"></span> -->
-												<div id="inquiry-form-area">
-												<form action="return false;">
-													<label>Question</label>
-													<textarea data-bind="value: question" rows="5" cols="20"></textarea>
-													<P>
-														<img data-bind="attr: { src: picdatauri}" />
-													</P>
-													<div class="row">
-														<div class="large-8 small-8 columns">
-															<label>Answer 1</label>
-															<input data-bind="value: a1, valueUpdate: 'keyup'"
-																type="text" />
-														</div> 
-														<div class="large-4 small-4 mobile-one columns">
-																<input class="css-checkbox" value="a1" data-bind="checked: rightanswer"
-																	name="answer-options" type="radio" id="a1"><label class="css-label" for="a1">
-																Correct?
-															</label>
-														</div>
+			<div class="row">
+				<div class="large-12 small-12 columns">
+					<div class="panel">
+						<div class="nav-container">
+							<!-- login-pane1Tab -> start-pane1Tab -> makeq-panelTab -> answerq-panelTab -> results-panelTab -->
+							<nav>
+								<div class="section-container vertical-tabs" data-section="vertical-tabs">
+  									<section class="active">
+   						 				<p class="title" data-section-title><a class="wizard disabled" href="#login-pane1">1. Login</a></p>
+    									<div class="content" data-slug="login-pane1" data-section-content>
+      										<!-- NICE DEBUG TRICK -->
+											<!-- KO:<span data-bind="text: ko.toJSON($data)"></span>
+											<form action="return false;"> -->
+											<label data-bind="css: { error: username.hasError }">Username</label>
+											<span
+												data-bind='visible: username.hasError, text: username.validationMessage'>
+											</span>
+											<input data-bind='value: username, valueUpdate: "afterkeydown"'
+												type="text" placeholder="Username" />
+
+											<label>Real Name</label>
+											<input data-bind='value: realname, valueUpdate: "afterkeydown"'
+												type="text" class="twelve" placeholder="Real Name(Optional)" />
+											<label>Client IPAddress</label>
+											<input data-bind='value: clientip' type="text" class="twelve"
+												disabled="true"
+												placeholder="unknown (Will be provided by server)" />
+											<ul class="button-group even two-up">
+												<li>
+													<a href="#" data-bind='click: doLogin, disable: hasSubmitted'
+														class="button">Submit</a>
+												</li>
+												<li>
+													<a href="#" data-bind='click: doLoginReset' class="button">Reset</a>
+												</li>
+											</ul>
+											</form>
+    									</div>
+  									</section>
+  									<section>
+    									<p class="title" data-section-title><a class="wizard disabled" href="#start-pane1">2. Get Ready</a></p>
+    									<div class="content" data-slug="start-pane1" data-section-content>
+											<p>
+												Please wait for the class to begin. Your teacher will give you
+												instructions on whether to prepare questions or start
+												answering questions.
+												<!-- NICE DEBUG TRICK -->
+												<!-- KO:<span data-bind="text: ko.toJSON($data)"></span>-->
+											</p>
+    									</div>
+  									</section>
+  									<section>
+    									<p class="title" data-section-title><a class="wizard disabled" href="#makeq-pane1">3. Make Questions</a></p>
+    									<div class="content" data-slug="makeq-pane1" data-section-content>
+      										<!-- NICE DEBUG TRICK -->
+											<!-- KO:<span data-bind="text: ko.toJSON($data)"></span> -->
+											<div id="inquiry-form-area">
+											<form action="return false;">
+												<label>Question</label>
+												<textarea data-bind="value: question" rows="5" cols="20"></textarea>
+												<P>
+													<img data-bind="attr: { src: picdatauri}" />
+												</P>
+												<div class="row">
+													<div class="large-8 small-8 columns">
+														<label>Answer 1</label>
+														<input data-bind="value: a1, valueUpdate: 'keyup'"
+															type="text" />
+													</div> 
+													<div class="large-4 small-4 mobile-one columns">
+															<input class="css-checkbox" value="a1" data-bind="checked: rightanswer"
+																name="answer-options" type="radio" id="a1"><label class="css-label" for="a1">
+															Correct?
+														</label>
 													</div>
-													<div class="row">
-														<div class="large-8 small-8 columns">
-															<label>Answer 2</label>
-															<input data-bind="value: a2" type="text" />
-														</div>
-														<div class="large-4 small-4 mobile-one columns">
-															
-																<input class="css-checkbox" value="a2" data-bind="checked: rightanswer"
-																	name="answer-options" type="radio" id="a2"><label class="css-label" for="a2">
-																Correct?
-															</label>
-														</div>
-													</div>
-													<div class="row">
-														<div class="large-8 small-8 columns">
-															<label>Answer 3</label>
-															<input data-bind="value: a3" type="text" />
-														</div>
-														<div class="large-4 small-4 mobile-one columns">
-															
-																<input class="css-checkbox" value="a3" data-bind="checked: rightanswer"
-																	name="answer-options" type="radio" id="a3"><label class="css-label" for="a3">
-																Correct?
-															</label>
-														</div>
-													</div>
-													<div class="row">
-														<div class="large-8 small-8 columns">
-															<label>Answer 4</label>
-															<input data-bind="value: a4" type="text" />
-														</div>
-														<div class="large-4 small-4 mobile-one columns">
-															
-																<input class="css-checkbox" value="a4" data-bind="checked: rightanswer"
-																	name="answer-options" type="radio" id="a4"><label class="css-label" for="a4">
-																Correct?
-															</label>
-														</div>
-													</div>
-													<div class="row">
-														<div class="large-8 small-8 columns">
-															<div id="fine-uploader"></div>
-														</div>
-													</div>
-													<div id="submit-inquiry-area">
-														<ul class="button-group even two-up">
-															<li>
-																<a id="submitQbutton" href="#" data-bind='click: doSubmitQ' class="button">Submit</a>
-															</li>
-															<li>
-																<a href="#" data-bind='click: doSubmitQandDone'
-																	class="button">Submit &amp; Done</a>
-															</li>
-														</ul>
-													</div>
-												</form>
 												</div>
-        									</div>
-      									</section>
-      									<section>
-        									<p class="title" data-section-title><a class="wizard disabled" href="#answerq-pane1">4. Answer Questions</a></p>
-        									<div class="content" data-slug="answerq-pane1" data-section-content>
-          										<!-- NICE DEBUG TRICK -->
-												<!-- KO:<span data-bind="text: ko.toJSON($data)"></span> -->
-												<div id="answer-form-area">
-													<H3>
-														Question
-														<span data-bind="text: qidx() + 1"></span>
-													</H3>
-													<p class="subheader">
-														<span data-bind="text: question"></span>
-													</p>
-
-													<P>
-														<img data-bind="attr: { src: picurl }" />
-													</P>
-													<br />
-
-													<form>
-														<div class="row">
-															<div class="large-8 small-8 columns">
-																<label>
-																	A)
-																	<span data-bind="text: a1">1998</span>
-																</label>
-															</div>
-															<div class="large-4 small-4 mobile-one columns">
-																	<!--  <input class="css-checkbox" value="a4" data-bind="checked: rightanswer"
-																	name="answer-options" type="radio" id="a4"><label class="css-label" for="a4">
-																Correct?
-															</label> -->
-																	<input class="css-checkbox" value="a1" data-bind="checked: answer"
-																	name="answer-options" type="radio"  id="a1"><label class="css-label" for="a1">
-																	Correct?
-																</label>
-															</div>
-														</div>
-														<div class="row">
-															<div class="large-8 small-8 columns">
-																<label>
-																	B)
-																	<span data-bind="text: a2">1836</span>
-																</label>
-															</div>
-															<div class="large-4 small-4 mobile-one columns">
-																	<input class="css-checkbox" data-bind="checked: answer" name="answer-options"
-																		type="radio" value="a2" id="a2"><label class="css-label" for="a2">
-																	Correct?
-																</label>
-															</div>
-														</div>
-														<div class="row">
-															<div class="large-8 small-8 columns">
-																<label>
-																	C)
-																	<span data-bind="text: a3">
-																		1812
-																		</span3>
-																</label>
-															</div>
-															<div class="large-4 small-4 mobile-one columns">
-																	<input class="css-checkbox" data-bind="checked: answer" name="answer-options"
-																		type="radio" value="a3" id="a3"><label class="css-label" for="a3">
-																	Correct?
-																</label>
-															</div>
-														</div>
-														<div class="row">
-															<div class="large-8 small-4 columns">
-																<label>
-																	D)
-																	<span data-bind="text: a4">1901</span>
-																</label>
-															</div>
-															<div class="large-4 small-4 mobile-one columns">
-																	<input class="css-checkbox" data-bind="checked: answer" name="answer-options"
-																		type="radio" value="a4" id="a4">
-																	<label class="css-label" for="a4">Correct?</label>
-															</div>
-														</div>
-														<P>
-															<em>Rating:</em>
-														</P>
-
-														<!--
-														<div id="star-rating">
-															<input data-bind="checked: rating" type="radio"
-																name="rating" class="rating" value="1" />
-															<input data-bind="checked: rating" type="radio"
-																name="rating" class="rating" value="2" />
-															<input data-bind="checked: rating" type="radio"
-																name="rating" class="rating" value="3" />
-															<input data-bind="checked: rating" type="radio"
-																name="rating" class="rating" value="4" />
-															<input data-bind="checked: rating" type="radio"
-																name="rating" class="rating" value="5" />
-														</div>
-														-->
-														<div class="thumbsup-rating">
-															<input data-bind="checked: rating" type="radio"
-																name="rating" class="rating" id="thumbs-down" value="1" /><label for="thumbs-down">
-																<img src="images/thumbsdown_48x48.png" />
-																</label>
-															<input data-bind="checked: rating" type="radio"
-																name="rating" class="rating" id="thumbs-up" value="5" /><label for="thumbs-up">
-																<img src="images/thumbsup_48x48.png" />
-															</label>
-														</div>
-														<br />
-														<ul class="button-group even two-up">
-															<li>
-																<a href="#" data-bind='click: doAnswerPrevQ' class="button">Prev</a>
-															</li>
-															<li>
-																<a href="#" data-bind='click: doAnswerNextQ' class="button">Next</a>
-															</li>
-
-														</ul>
-													</form>
+												<div class="row">
+													<div class="large-8 small-8 columns">
+														<label>Answer 2</label>
+														<input data-bind="value: a2" type="text" />
+													</div>
+													<div class="large-4 small-4 mobile-one columns">
+														
+															<input class="css-checkbox" value="a2" data-bind="checked: rightanswer"
+																name="answer-options" type="radio" id="a2"><label class="css-label" for="a2">
+															Correct?
+														</label>
+													</div>
 												</div>
-        									</div>
-      									</section>
-      									<section>
-        									<p class="title" data-section-title><a class="wizard disabled" href="#results-pane1">5. View Results</a></p>
-        									<div class="content" data-slug="results-pane1" data-section-content>
-          										<!-- NICE DEBUG TRICK -->
-												<!-- KO:<span data-bind="text: ko.toJSON($data)"></span> -->
-												<div id="results-area">
-													<H3>Congrats. You got 5/10 correct.</h3>
-													<ul>
-														<li>Q1 - Correct</li>
-														<li>Q2 - Correct</li>
-														<li>Q3 - Correct</li>
-														<li>Q4 - Correct</li>
-														<li>Q5 - Correct</li>
-														<li>Q6 - Incorrect</li>
-														<li>Q7 - Incorrect</li>
-														<li>Q8 - Incorrect</li>
-														<li>Q9 - Incorrect</li>
-														<li>Q10- Incorrect</li>
+												<div class="row">
+													<div class="large-8 small-8 columns">
+														<label>Answer 3</label>
+														<input data-bind="value: a3" type="text" />
+													</div>
+													<div class="large-4 small-4 mobile-one columns">
+														
+															<input class="css-checkbox" value="a3" data-bind="checked: rightanswer"
+																name="answer-options" type="radio" id="a3"><label class="css-label" for="a3">
+															Correct?
+														</label>
+													</div>
+												</div>
+												<div class="row">
+													<div class="large-8 small-8 columns">
+														<label>Answer 4</label>
+														<input data-bind="value: a4" type="text" />
+													</div>
+													<div class="large-4 small-4 mobile-one columns">
+														
+															<input class="css-checkbox" value="a4" data-bind="checked: rightanswer"
+																name="answer-options" type="radio" id="a4"><label class="css-label" for="a4">
+															Correct?
+														</label>
+													</div>
+												</div>
+												<div class="row">
+													<div class="large-8 small-8 columns">
+														<div id="fine-uploader"></div>
+													</div>
+												</div>
+												<div id="submit-inquiry-area">
+													<ul class="button-group even two-up">
+														<li>
+															<a id="submitQbutton" href="#" data-bind='click: doSubmitQ' class="button">Submit</a>
+														</li>
+														<li>
+															<a href="#" data-bind='click: doSubmitQandDone'
+																class="button">Submit &amp; Done</a>
+														</li>
 													</ul>
 												</div>
-        									</div>
-      									</section>
-    								</div>
-								</nav>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="large-3 small-3 columns">
-				<!-- <div data-bind="with: logindata"> -->
-				<div id="login-info">
-					<h4>
-						Instructions for
-						<div data-bind="text: username" id="student-username">Student</div>
-						<div data-bind="text: realname" id="student-realname"></div>
-					</h4>
-					<div id="login-status">
-						<div id="login-panel" class="panel callout radius">
-							<h5>
-								<div data-bind="text: loginstatusmsg"></div>
-							</h5>
-							&nbsp;
-							<p>@
-							<div data-bind="text: clientip" id="student-clientip">127.0.0.1</div>
-							</p>
-							<p>
-							<div data-bind="text: sessionstatemsg"></div>
-							</p>
-							<p>
-							<div data-bind="text: othermsg"></div>
-							</p>
-						</div>
-						<p>
-						<div id="logoutarea">
-							<a data-bind="click: doLoginReset" class="secondary button"
-								href="#logout-action">Logout</a>
-						</div>
-						</p>
-					</div>
-					<p><img src="images/jamsj_slim.png" />
-				</div>
-			</div>
-			<div id="iq-area" style="display: none">
-				<H3>
-					Question
-					<span data-bind="text: qidx() + 1"></span>
-				</H3>
-				<H4 class="subheader">
-					<span data-bind="text: question"></span>
-				</H4>
+											</form>
+											</div>
+    									</div>
+  									</section>
+  									<section>
+    									<p class="title" data-section-title><a class="wizard disabled" href="#answerq-pane1">4. Answer Questions</a></p>
+    									<div class="content" data-slug="answerq-pane1" data-section-content>
+      										<!-- NICE DEBUG TRICK -->
+											<!-- KO:<span data-bind="text: ko.toJSON($data)"></span> -->
+											<div id="answer-form-area">
+												<H3>
+													Question
+													<span data-bind="text: qidx() + 1"></span>
+												</H3>
+												<p class="subheader">
+													<span data-bind="text: question"></span>
+												</p>
 
-				<P>
-					<img data-bind="attr: { src: picurl }" />
-				</P>
-				<br />
+												<P>
+													<img data-bind="attr: { src: picurl }" />
+												</P>
+												<br />
+
+												<form>
+													<div class="row">
+														<div class="large-8 small-8 columns">
+															<label>
+																A)
+																<span data-bind="text: a1">1998</span>
+															</label>
+														</div>
+														<div class="large-4 small-4 mobile-one columns">
+																<!--  <input class="css-checkbox" value="a4" data-bind="checked: rightanswer"
+																name="answer-options" type="radio" id="a4"><label class="css-label" for="a4">
+															Correct?
+														</label> -->
+																<input class="css-checkbox" value="a1" data-bind="checked: answer"
+																name="answer-options" type="radio"  id="a1"><label class="css-label" for="a1">
+																Correct?
+															</label>
+														</div>
+													</div>
+													<div class="row">
+														<div class="large-8 small-8 columns">
+															<label>
+																B)
+																<span data-bind="text: a2">1836</span>
+															</label>
+														</div>
+														<div class="large-4 small-4 mobile-one columns">
+																<input class="css-checkbox" data-bind="checked: answer" name="answer-options"
+																	type="radio" value="a2" id="a2"><label class="css-label" for="a2">
+																Correct?
+															</label>
+														</div>
+													</div>
+													<div class="row">
+														<div class="large-8 small-8 columns">
+															<label>
+																C)
+																<span data-bind="text: a3">
+																	1812
+																	</span3>
+															</label>
+														</div>
+														<div class="large-4 small-4 mobile-one columns">
+																<input class="css-checkbox" data-bind="checked: answer" name="answer-options"
+																	type="radio" value="a3" id="a3"><label class="css-label" for="a3">
+																Correct?
+															</label>
+														</div>
+													</div>
+													<div class="row">
+														<div class="large-8 small-4 columns">
+															<label>
+																D)
+																<span data-bind="text: a4">1901</span>
+															</label>
+														</div>
+														<div class="large-4 small-4 mobile-one columns">
+																<input class="css-checkbox" data-bind="checked: answer" name="answer-options"
+																	type="radio" value="a4" id="a4">
+																<label class="css-label" for="a4">Correct?</label>
+														</div>
+													</div>
+													<P>
+														<em>Rating:</em>
+													</P>
+
+													<!--
+													<div id="star-rating">
+														<input data-bind="checked: rating" type="radio"
+															name="rating" class="rating" value="1" />
+														<input data-bind="checked: rating" type="radio"
+															name="rating" class="rating" value="2" />
+														<input data-bind="checked: rating" type="radio"
+															name="rating" class="rating" value="3" />
+														<input data-bind="checked: rating" type="radio"
+															name="rating" class="rating" value="4" />
+														<input data-bind="checked: rating" type="radio"
+															name="rating" class="rating" value="5" />
+													</div>
+													-->
+													<div class="thumbsup-rating">
+														<input data-bind="checked: rating" type="radio"
+															name="rating" class="rating" id="thumbs-down" value="1" /><label for="thumbs-down">
+															<img src="images/thumbsdown_48x48.png" />
+															</label>
+														<input data-bind="checked: rating" type="radio"
+															name="rating" class="rating" id="thumbs-up" value="5" /><label for="thumbs-up">
+															<img src="images/thumbsup_48x48.png" />
+														</label>
+													</div>
+													<br />
+													<ul class="button-group even two-up">
+														<li>
+															<a href="#" data-bind='click: doAnswerPrevQ' class="button">Prev</a>
+														</li>
+														<li>
+															<a href="#" data-bind='click: doAnswerNextQ' class="button">Next</a>
+														</li>
+
+													</ul>
+												</form>
+											</div>
+    									</div>
+  									</section>
+  									<section>
+    									<p class="title" data-section-title><a class="wizard disabled" href="#results-pane1">5. View Results</a></p>
+    									<div class="content" data-slug="results-pane1" data-section-content>
+      										<!-- NICE DEBUG TRICK -->
+											<!-- KO:<span data-bind="text: ko.toJSON($data)"></span> -->
+											<div id="results-area">
+												<H3>Congrats. You got 5/10 correct.</h3>
+												<ul>
+													<li>Q1 - Correct</li>
+													<li>Q2 - Correct</li>
+													<li>Q3 - Correct</li>
+													<li>Q4 - Correct</li>
+													<li>Q5 - Correct</li>
+													<li>Q6 - Incorrect</li>
+													<li>Q7 - Incorrect</li>
+													<li>Q8 - Incorrect</li>
+													<li>Q9 - Incorrect</li>
+													<li>Q10- Incorrect</li>
+												</ul>
+											</div>
+    									</div>
+  									</section>
+								</div>
+							</nav>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="small-1 columns">
+			
+			
+		</div>
+	</div>
+
+	
+
+	<div class="row">
+		<div style="visibility:hidden" class="small-1 columns">.</div>
+		<div class="small-10 end columns">
+			<div style="text-align:center">
+				<img style="width:100px" src="images/smile.jpg" /><br>
+				<img style="width:100px" src="images/marvell_horiz_logo.jpg" /><br>
+				<img style="width:100px" src="images/jamsj_slim.png" />
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-6 small-centered columns" style="text-align:center">
+			<ul class="smile-links">
+				<li><a href="http://www.smileconsortium.org"><img style="width:30px" src="../images/smile_grey_48x23.png" /></a></li>
+				<li><a href="mailto:reply+i-23475388-c2457b2df337933075fa1a78843d843cefe305ca-64202@reply.github.com">Support</a></li>
+				<li><a onclick="alert('Help Not Implemented.  Help! visit: https://plus.google.com/u/0/communities/117391182825484902493 for more human support'); return false;" href="#">Help</a></li>
+			</ul>
+			<p class="copyright">© 2012‐2014 SMILE Consortium, Inc., a 501c3 Non-Profit</p>
+		</div>
+	</div>
+
+	<!-- THIS IS A DUPLICATE BLOCK, I COMMENT IT FOR A WHILE, BUT IT HAS TO BE REMOVED -->
+	<!--div class="container">
+
+		<div class="row">
+			
+			<!--div id="iq-area" style="display: none">
+				
+				<H3>Question <span data-bind="text: qidx() + 1"></span></H3>
+				<H4 class="subheader"><span data-bind="text: question"></span></H4>
+
+				<P><img data-bind="attr: { src: picurl }" /></P>
+				
+				<br>
 
 				<form>
 					<ul class="block-grid two-up">
-						<!-- Row Q1 -->
+
 						<li>
-							<label>
-								A)
-								<span data-bind="text: a1">1998</span>
-							</label>
+							<label>A)<span data-bind="text: a1">1998</span></label>
 						</li>
 						<li>
 							<label for="a1">
-								<input disabled="true" data-bind="checked: answer"
-									name="answer-options" type="radio" value="a1" id="a1">
+								<input disabled="true" data-bind="checked: answer" name="answer-options" type="radio" value="a1" id="a1">
 								Correct?
 							</label>
 						</li>
-						<!-- Row Q2 -->
+
 						<li>
-							<label>
-								B)
-								<span data-bind="text: a2">1836</span>
-							</label>
+							<label>B)<span data-bind="text: a2">1836</span></label>
 						</li>
 						<li>
 							<label for="a2">
-								<input disabled="true" data-bind="checked: answer"
-									name="answer-options" type="radio" value="a2" id="a2">
+								<input disabled="true" data-bind="checked: answer" name="answer-options" type="radio" value="a2" id="a2">
 								Correct?
 							</label>
 						</li>
-						<!-- Row Q3 -->
+
 						<li>
-							<label>
-								C)
-								<span data-bind="text: a3">
-									1812
-									</span3>
-							</label>
+							<label>C)<span data-bind="text: a3">1812</span></label>
 						</li>
 						<li>
 							<label for="a3">
-								<input disabled="true" data-bind="checked: answer"
-									name="answer-options" type="radio" value="a3" id="a3">
+								<input disabled="true" data-bind="checked: answer" name="answer-options" type="radio" value="a3" id="a3">
 								Correct?
 							</label>
 						</li>
-						<!-- Row Q4 -->
+
 						<li>
-							<label>
-								D)
-								<span data-bind="text: a4">1901</span>
-							</label>
+							<label>D)<span data-bind="text: a4">1901</span></label>
 						</li>
 						<li>
 							<label for="a4">
-								<input disabled="true" data-bind="checked: answer"
-									name="answer-options" type="radio" value="a4" id="a4">
+								<input disabled="true" data-bind="checked: answer" name="answer-options" type="radio" value="a4" id="a4">
 								Correct?
 							</label>
 						</li>
 					</ul>
-					<P>
-						<em>Rating:</em>
-						<span data-bind="text: rating">5</span>
-					</P>
+					<p><em>Rating:</em><span data-bind="text: rating">5</span></p>
 				</form>
 			</div>
 		</div>
-		<!-- div: row -->
-		<div class="row">
-			<div class="small-6 small-centered columns">
-				<a class="smile-logo regular" href="http://www.smileconsortium.org"></a>
-				<ul class="smile-links">
-					<li><a href="mailto:reply+i-23475388-c2457b2df337933075fa1a78843d843cefe305ca-64202@reply.github.com">Support</a></li>
-					<li><a onclick="alert('Help Not Implemented.  Help! visit: https://plus.google.com/u/0/communities/117391182825484902493 for more human support'); return false;" href="#">Help</a></li>
-				</ul>
-				<p class="copyright">© 2012‐2013 SMILE Consortium, Inc., a 501c3 Non-Profit</p>
-			</div>
-		</div>
-		<!-- div: row -->
-	</div>
-	<!-- container -->
-
-
+	</div-->
 	<!-- Included JS Files -->
+
 	<!-- Included JS Files -->
 	<script>
 	  /* document.write('<script src=' +
