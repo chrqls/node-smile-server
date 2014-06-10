@@ -52,16 +52,23 @@
 			min-height: 200px;
 		}
 
+		table#students,
 		table#questions,
 		section[smile=list-of-iqsets] table {
 			border-collapse:collapse;
 		}
 		section[smile=general-board] table#questions tr.checked { background-color: #c9eff6; }
+		section[smile=general-board] table#students tr.selected { 
+			background-color: #e6fded; 
+			border-top: 1px solid #b3e3c2; 
+			border-bottom: 1px solid #b3e3c2;
+		}
 		section[smile=list-of-iqsets] table tr.selected { 
 			background-color: #FCF4CE; 
 			border-top: 1px solid #EBE3BD; 
 			border-bottom: 1px solid #EBE3BD;
-		} 
+		}
+
 
 		/*
 			Zurb does not have a class for labels alone (without a field collapsed).
@@ -145,7 +152,6 @@
 			<div class="row" id="logo_smile_teacher">
 				<div class="small-12 columns">
 					<img data-bind='click: redirectView' src="images/smile_grey_teacher.png" />
-					
 				</div>
 			</div>
 			<div class="row" style="text-align: right;font-size:12px">
@@ -245,11 +251,41 @@
 										Students (<span data-bind="text: students().length"></span>)</a>
 									</p>
 									<div class="content" data-section-content>
-										<div data-bind="foreach: students" >
-										    <div>
-										    	<span style="color:#222" data-bind="text: name"></span>
-										    	<span style="color:#888" data-bind="text: ip"></span>
-											</div>    
+
+										<table id="students" data-bind="foreach: students" >
+										    <tr>
+									    		<td><span data-bind="text: name"></span></td>
+									    		<td>
+									    			<input type="hidden" data-bind="attr: {value: ip}" />
+									    			<span data-bind="text: ip"></span>
+									    		</td>
+											</tr>    
+										</table>
+
+										<div class="hidden row">
+											
+											<div class="large-12 columns" smile="talk-to-student">
+
+												<div id="talkButton_without_form" class="row">
+													<div class="small-2 columns" onclick="showTalkForm()">
+														<span class="zurb_labelAlone">Talk</span>
+													</div>
+												</div>
+
+												<div id="talkButton_with_form" class="row collapse hidden">
+
+													<div class="small-1 columns" onclick="hideTalkForm()">
+														<span class="radius prefix">Cancel</span>
+													</div>
+													<div class="small-9 columns">
+														<input type="text" data-bind='value: message_for_student, valueUpdate: "afterkeydown"' placeholder="Your message" />
+													</div>
+													<div data-bind="if: message_for_student" class="small-2 columns">
+														<a href="#" class="button prefix" data-bind='click: talkToStudent'>Send</a>
+													</div>
+
+												</div>
+											</div>
 										</div>
 									</div>
 								</section>
@@ -280,20 +316,20 @@
 
 										<!--a href="#" data-bind='click: seeContent' class="tiny secondary button">See what you checked</a-->
 										
-										<div class="row" data-bind="if: questions().length>0">
+										<div class="hidden row">
 											
 											<div class="large-7 columns" smile="save-new-iqset">
 
 												<div id="saveButton_without_form" class="row">
-													<div class="small-3 columns" onclick="switchVisibilitySaveButton()">
+													<div class="small-3 columns" onclick="showSaveForm()">
 														<span class="zurb_labelAlone">Save</span>
 													</div>
 												</div>
 
 												<div id="saveButton_with_form" class="row collapse hidden">
 
-													<div class="small-2 columns" onclick="switchVisibilitySaveButton()">
-														<span class="radius prefix">Save</span>
+													<div class="small-2 columns" onclick="hideSaveForm()">
+														<span class="radius prefix">Cancel</span>
 													</div>
 													<div class="small-4 columns">
 														<input type="text" data-bind='value: new_iqset_name, valueUpdate: "afterkeydown"' placeholder="Give a name" />
