@@ -36,39 +36,21 @@
 	    <![endif]-->
 
 	<style>
-		/* 
-			General css
-		*/
+		/* ---------
+			GENERAL
+		   --------- */
 		.hidden 	{ display:none; }
 		.center_bloc{ margin: 0 auto; }
 		.button 	{ margin-bottom: 0; }
 
-		section[smile=list-of-iqsets] td,
-		section[smile=general-board] td {
-			border: black solid 0;
-			padding: 0 10px;
-		}
-		section[smile=general-board] .content {
-			min-height: 200px;
-		}
+		#logo_smile_teacher 	{ margin: 5px 0; }
+		#logo_smile_teacher img { width: 150px; }
 
-		table#students,
-		table#questions,
-		section[smile=list-of-iqsets] table {
-			border-collapse:collapse;
+		#session_values span.label 	{ background-color: #666; border: 2px solid #333;}
+		#session_values 			{ 
+			text-align: center;
+			margin: 5px 0 15px;
 		}
-		section[smile=general-board] table#questions tr.checked { background-color: #c9eff6; }
-		section[smile=general-board] table#students tr.selected { 
-			background-color: #e6fded; 
-			border-top: 1px solid #b3e3c2; 
-			border-bottom: 1px solid #b3e3c2;
-		}
-		section[smile=list-of-iqsets] table tr.selected { 
-			background-color: #FCF4CE; 
-			border-top: 1px solid #EBE3BD; 
-			border-bottom: 1px solid #EBE3BD;
-		}
-
 
 		/*
 			Zurb does not have a class for labels alone (without a field collapsed).
@@ -86,39 +68,72 @@
 			line-height: 2.3125em;
 		}
 
-		.style_redRight {
-			color: #D22;
-			font-size: 12px;
-			float: right;
-			text-decoration: underline;
-		}
-		#logo_smile_teacher {
-			margin: 5px 0;
-			/*text-align: center;*/
-		}
-		#logo_smile_teacher img {
-			width: 150px;
-		}
-
-		
-		/*#session_values div 		{ margin-bottom: 5px; }*/
-		#session_values span.label 	{ background-color: #666; border: 2px solid #333;}
-		#session_values 			{ 
-			text-align: center;
-			margin: 5px 0 15px;
-		}
-
 		.copyright {
 			color: #666;
 			text-align: center;
 		    font-size: 0.66667rem;
 		    margin: 6px 0 0;
 		}
+
+		/* --------
+			TABLES
+		   -------- */
+		section[smile=list-of-iqsets] td,
+		section[smile=general-board] td {
+			border: black solid 0;
+			padding: 0 10px;
+		}
+		table#students,
+		table#questions,
+		section[smile=list-of-iqsets] table {
+			border-collapse:collapse;
+			width:100%;
+		}
+		section[smile=general-board] table#questions tr.checked { 
+			background-color: #c9eff6; }
+		section[smile=general-board] table#students tr.selected { /* red style: #fff2f9/#ffe3f1 */
+			background-color: #f9f8ee;
+			border-top: 1px solid #e6deb5;
+			border-bottom: 1px solid #e6deb5; }
+		section[smile=list-of-iqsets] table tr.selected { 
+			background-color: #FCF4CE; 
+			border-top: 1px solid #EBE3BD; 
+			border-bottom: 1px solid #EBE3BD;
+		}
+
+		section[smile=general-board] table#students .sticker {
+			color: white;
+			font-weight: bold;
+			background-color: #ffa938;
+			border-radius: 3px;
+			padding: 2px 6px;
+		}
+
+		/* -------
+			BOARD
+		   ------- */
+
+		section[smile=general-board] .content {
+			min-height: 200px;
+		}
+
+		.answered {
+			text-shadow:0 0 4px #47f286;
+			color:#29914f;
+			font-weight:bold;
+		}
+
+		.style_redRight {
+			color: #D22;
+			font-size: 12px;
+			float: right;
+			text-decoration: underline;
+		}
 		
 
-		/* 
-			Status progress bars 
-		*/
+		/* ----------------------
+			STATUS PROGRESS BARS
+		   ---------------------- */
 		.status_progress_bar span {
 			text-align:right;
 			padding-top: 3px; 
@@ -144,7 +159,7 @@
 <body>
 
 	<!-- Absolute alert container-->
-	<div id="absolute_alerts" class="" style="position:fixed;z-index: 10;border:1px dotted #CCC;top:80px;font-size:12px">
+	<div id="absolute_alerts" class="" style="position:fixed;z-index: 10;border:0 dotted #BBB;top:80px;font-size:12px">
 	</div>
 
 	<div class="row">
@@ -253,11 +268,17 @@
 									<div class="content" data-section-content>
 
 										<table id="students" data-bind="foreach: students" >
-										    <tr>
-									    		<td><span data-bind="text: name"></span></td>
-									    		<td>
+										    <tr style="height:30px">
+									    		<td smile="name_of_student">
+									    			<input type="hidden" data-bind="attr: {value: name}" />
+									    			<span data-bind="text: name"></span>
+									    		</td>
+									    		<td smile="ip_of_student">
 									    			<input type="hidden" data-bind="attr: {value: ip}" />
 									    			<span data-bind="text: ip"></span>
+									    		</td>
+									    		<td smile="number_of_questions">
+									    			<span class="sticker">0</span>
 									    		</td>
 											</tr>    
 										</table>
@@ -302,19 +323,19 @@
 								    				<input type="hidden" data-bind="attr: {name: session_id}" />
 									    			<a style="margin: 2px 0" id="more" onclick="detailQuestion(this.name)" data-bind="attr: {name: session_id}" class="tiny round button more">+</a>
 										    	</td>
-									    		<td style="color:#888;font-size:14px;font-style:italic">
+									    		<td style="color:#888;font-size:12px;font-style:italic">
 									    			<span data-bind="text: question"></span>
 									    		</td>
-										    	<td style="color:#444;font-size:12px"><span data-bind="text: author"></span></td>
-									    		<td style="color:#444;font-size:12px"><span data-bind="text: ip"></span></td>
-										    	<td>
+										    	<td style="font-size:12px;color:#444"><span data-bind="text: author"></span></td>
+									    		<td style="font-size:12px;color:#444"><span data-bind="text: ip"></span></td>
+										    	<td style="font-size:12px">
 										    		<span data-bind="if: type==='QUESTION_PIC'" style="color:#e7729a">\o/ picture</span>
 										    		<span data-bind="if: type==='QUESTION'" style="color:#CCC;font-style:italic">no picture</span>
 									    		</td>
 											</tr>    
 										</table>
 
-										<!--a href="#" data-bind='click: seeContent' class="tiny secondary button">See what you checked</a-->
+										
 										
 										<div class="hidden row">
 											
