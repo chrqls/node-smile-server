@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.8.1';
+var VERSION = '0.8.3';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
@@ -75,7 +75,6 @@ var Student = function(name,ip) {
 
 var Question = function(sessionID,urlImage,author,question,answer,options,ip,type) {
 
-    //this.position = position;
     this.session_id = sessionID;
     this.urlImage = urlImage;
     this.author = author;
@@ -199,8 +198,12 @@ GlobalViewModel.redirectView = function() {
                 break;
 
             case 'QUESTION':
-            case 'QUESTION_PIC': addQuestion(dataAll[i]); break;
-            case 'HAIL':         addStudent(dataAll[i]);  break;
+            case 'QUESTION_PIC': 
+                addQuestion(dataAll[i]); break;
+            case 'HAIL':         
+                addStudent(dataAll[i]);  break;
+            case 'ANSWER':       
+                questionsAnsweredByStudent(dataAll[i].IP); break;
             default: break;
         }
     }
@@ -368,6 +371,21 @@ GlobalViewModel.startSolvingQuestions = function() {
     this.redirectView();
 }
 
+
+function questionsAnsweredByStudent(IP_student, withAbsoluteAlert) {
+
+    $('table#students tr').each(function(index) {
+
+        var td_name = $(this).find('td[smile=name_of_student]');
+        var td_IP = $(this).find('td[smile=ip_of_student]');
+    
+        if(td_IP.find('input[type=hidden]').val() === IP_student && !td_name.hasClass('answered')) {
+            td_name.addClass('answered');
+            if(withAbsoluteAlert) absoluteAlert('<b>'+td_name.find('input[type=hidden]').val()+'</b> finished answering!',DELAY_NORMAL);
+        }
+    });
+}
+
 GlobalViewModel.seeResults = function() {
 
     $('.see_results').addClass('hidden');
@@ -460,11 +478,23 @@ GlobalViewModel.removeQuestionFromSession = function() {
                         absoluteAlert('Unable to remove question from session', DELAY_ERROR, 'trace');
                     }, 
                     success: function(data) {
-                        absoluteAlert('Question deleted', DELAY_NORMAL, 'green');
+                        absoluteAlert('Question of student deleted!', DELAY_NORMAL, 'green');
                         switchSection('general-board');
+
+                        // Decrementing number of questions of a student (if the question does not come from an iqset)
+                        if(GlobalViewModel.students().length) {
+
+                            $('table#students tr').each(function(index) {
+                            
+                                if($(this).find('td[smile=ip_of_student] input[type=hidden]').val() === data.IP) {
+
+                                    var amount = $(this).find('td[smile=number_of_questions] span');
+                                    amount.text(parseInt(amount.text())-1);
+                                }
+                            });
+                        }
                     }
                 });
-
             }
         }
     }
@@ -492,12 +522,12 @@ GlobalViewModel.talkToStudent = function() {
 
         message['TYPE'] = 'TEACHER'; 
         message.TEXT = GlobalViewModel.message_for_student();
-        message.IP = $(this).find('input[type=hidden]').val();
+        message.IP = $(this).find('td[smile=ip_of_student] input[type=hidden]').val();
 
         postMessage('talk',JSON.stringify(message));
         });
     } else {
-        absoluteAlert('Please select a <b>student</b>', DELAY_SHORT,'red');
+        absoluteAlert('Please <b>select</b> a student', DELAY_SHORT,'red');
     }
 }
 
@@ -556,17 +586,6 @@ GlobalViewModel.saveNewIQSet = function() {
          (encapsulation of code used by the actions)
 
    -------------------------------------------------------- */
-/*
-GlobalViewModel.seeContent = function() {
-
-    var content = '';
-
-    $('table#questions tr.checked').each(function( index ) {
-        content += $(this).find('input[type=hidden]').attr('name')+'|';
-    });
-
-    absoluteAlert('checked:'+content,10000);
-}*/
 
 function absoluteAlert(text, lifetime, alerttype, hasCross) {
     
@@ -627,14 +646,29 @@ function addQuestion(question) {
             question.IP,
             question.TYPE
     ));
+
+    // Incrementing number of questions of a student (if the question does not come from an iqset)
+    if(GlobalViewModel.students().length) {
+
+        $('table#students tr').each(function(index) {
+        
+            if($(this).find('td[smile=ip_of_student] input[type=hidden]').val() === question.IP) {
+
+                var amount = $(this).find('td[smile=number_of_questions] span');
+                amount.text(parseInt(amount.text())+1);
+            }
+        });
+    }
 }
+
 function addStudent(student) {
 
     GlobalViewModel.students.push(
         new Student(
             student.NAME,
             student.IP
-    ));
+        )
+    );
 }
 
 // To recap, each time this function is called, it updates students, questions, and session values
@@ -691,28 +725,29 @@ function updateGVM() {
                 break;
 
             case 'SESSION_VALUES':
-            if(dataAll[i].teacherName !== GlobalViewModel.teacher_name()) {
-                GlobalViewModel.teacher_name(dataAll[i].teacherName);
-                GlobalViewModel.session_name(dataAll[i].sessionName);
-                GlobalViewModel.group_name(dataAll[i].groupName);
-            }
+                if(dataAll[i].teacherName !== GlobalViewModel.teacher_name()) {
+                    GlobalViewModel.teacher_name(dataAll[i].teacherName);
+                    GlobalViewModel.session_name(dataAll[i].sessionName);
+                    GlobalViewModel.group_name(dataAll[i].groupName);
+                }
             break;
 
             case 'HAIL':
-            if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
-                addStudent(dataAll[i]);
-                absoluteAlert('<b>'+dataAll[i].NAME+'</b> appears!',DELAY_NORMAL);
-                
-            }
+                if(!GVM_students.contains('"ip":"'+dataAll[i].IP+'"')) {
+                    addStudent(dataAll[i]);
+                    absoluteAlert('<b>'+dataAll[i].NAME+'</b> appears!',DELAY_NORMAL);
+                }
             break;
 
             case 'QUESTION':
             case 'QUESTION_PIC':
-            if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
-                addQuestion(dataAll[i]);
-                absoluteAlert('New question from <b>'+dataAll[i].NAME+'</b>!',DELAY_NORMAL);
-            }
+                if(!GVM_questions.contains('"session_id":"'+dataAll[i].SessionID+'"')) {
+                    addQuestion(dataAll[i]);
+                    absoluteAlert('New question from <b>'+dataAll[i].NAME+'</b>!',DELAY_NORMAL);
+                }
             break;
+            case 'ANSWER':       
+                questionsAnsweredByStudent(dataAll[i].IP,true); break;
         }
     }
 

@@ -844,7 +844,7 @@ exports.handleQuestionJSONDelete = function(req, res) {
             }
         }
     }
-    res.sendJSON(HTTP_STATUS_OK, {'status': status});
+    res.sendJSON(HTTP_STATUS_OK, {'status': status,'IP':question.IP});
 };
 
 exports.handleQuestionImageGet = function(req, res) {
