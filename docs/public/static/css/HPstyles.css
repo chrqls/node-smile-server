@@ -73,7 +73,7 @@ and (orientation : landscape) {
         height: 70%;
         width: 100%;
         position: relative;
-        background: url(../img/tabletclas-long.png) no-repeat;
+        background: url(../img/tabletclass-long.png) no-repeat;
         background-size: 100% 100%;
         z-index: 99999;
         background-color: black;

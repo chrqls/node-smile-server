@@ -10,7 +10,7 @@ groups_weight: 5
 
 TODO
 
-## What does Hugo do?
+## What does Epoch SMILE do?
 
 TODO
 
