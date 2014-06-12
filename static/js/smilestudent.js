@@ -363,7 +363,7 @@ GlobalViewModel.doAnswerNextQ = function() {
             //
             // Should we do something else?
             //
-            absoluteAlert('Submitted Answers for ' + GlobalViewModel.username(), DELAY_SHORT,'blue');
+            absoluteAlert('Answers submitted!', DELAY_SHORT,'blue');
         });
     }
     /* if (self.validateInquiry()) {
@@ -626,7 +626,7 @@ function doPostInquiry(inquirydata, cb) {
             absoluteAlert('Unable to post inquiry.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR,'trace');
         }, 
         success: function(data) {
-            absoluteAlert('Sent Inquiry Question', DELAY_NORMAL,'green');
+            absoluteAlert('Question sent!', DELAY_NORMAL,'green');
             if (cb) {
                 cb(data);
             }
