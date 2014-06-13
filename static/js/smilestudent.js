@@ -492,15 +492,19 @@ function absoluteAlert(text, lifetime, alerttype, hasCross) {
     var box_red = 'alert';
     var box_blue = '';
     var box_green = 'success';
+    var css = '';
     
     if (!alerttype)                 { alerttype = box_grey; } 
     else if (alerttype === 'trace') { alerttype = box_red; text += ' : ' + printStackTrace(); } 
     else if (alerttype === 'red')   { alerttype = box_red; } 
     else if (alerttype === 'blue')  { alerttype = box_blue; } 
-    else if (alerttype === 'green') { alerttype = box_green; } 
+    else if (alerttype === 'green') { alerttype = box_green; }
+    else if (alerttype === 'pink')  { css = ';border-color:#c80461;background-color:#fc087a'; } 
+
+    
 
     var html_to_inject = '<div id="%s"> \
-                            <div style="margin:3px 0;opacity:0.8;display: inline-block;padding-right:30px" class="alert-box %s" data-alert=""> \
+                            <div style="margin:3px 0;opacity:0.8;display: inline-block;padding-right:30px'+css+'" class="alert-box %s" data-alert=""> \
                               <span style="font-weight:normal">%s</span>%s \
                             </div> \
                           </div>';
@@ -1164,7 +1168,7 @@ function getPrivateMessage() {
         }, 
         success: function(data) {
             
-            if(data) absoluteAlert('<u>Message from teacher</u>:<br><br><b>'+data.TEXT+'</b>',null,'red',true);
+            if(data) absoluteAlert('<u>Message from teacher</u>:<br><br><b>'+data.TEXT+'</b>',null,'pink',true);
         }
     });
 }
