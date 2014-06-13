@@ -1,33 +1,38 @@
 ---
-title: "Epoch SMILE Student Android App guide"
+title: "SMILE Student Android App guide"
 date: "2014-06-04"
 groups: ["guides"]
 groups_weight: 240
 ---
 
-Hugo will automatically parse the markdown for your content and create
-a Table of Contents you can use to guide readers to the sections within
-your content. 
+The SMILE Student Android App is no longer available in Open Source legally.  
 
-## Usage
+## Background
 
-Simply create content like you normally would with the appropriate
-headers. 
+The original SMILE application was designed at Stanford, by Dr. Paul Kim. 
 
-Hugo will take this markdown and create a table of contents stored in the
-[content variable](/layout/variables) .TableOfContents
+For details about the [Stanford Mobile Inquiry-Based Learning Environment](https://gse-it.stanford.edu/research/project/smile), visit their site and learn more.TableOfContents
 
+The source code was given to the [SMILE Consortium, Inc.](http://smileconsortium.org) through improper channels by a Stanford faculty member.  While intentions were good, the [Stanford University of Technology Licensing](http://otl.stanford.edu/) was not involved, unbeknownst to the board members of the [SMILE Consortium, Inc.](http://smileconsortium.org).  As a board member, the project leader of the Open Source raised the issue about Intellectual Property, but was later forced to leave over differences with the [current leadership](http://smileconsortium.org/ourteam) over handling of the issue.
 
-## Template Example
+The Epoch SMILE source was developed in a clean room environment, without access to the source code from Stanford.  The development of the Server, IQManager, SMILE Plug, SMILE Student Web, SMILE Teacher Web, is all very well documented and can be traced from drawing board to inception, without taininting of any Stanford code, funding, or support.  In fact, SMILE Consortium offered no material support of these projects, though the leader of the technology projects tried to get the organization working towards the goal of supporting these projects, it was in vain.  The Open Source work that existed independent of Stanford been forked from the [SMILE Consortium Github](https://github.com/SMILEConsortium), and work continues to be developed in the open by [Razortooth Communications, LLC](https://github.com/RazortoothRTC).
 
-This is example code of a [single.html template](/layout/content).
+Anyone interested in an honest account of the SMILE Open Source effort under the SMILE Consortium should contact @dkords.
 
-    {{ template "chrome/header.html" . }}
-        <div id="toc" class="well col-md-4 col-sm-6">
-        {{ .TableOfContents }}
-        </div>
-        <h1>{{ .Title }}</h1>
-        {{ .Content }}
-    {{ template "chrome/footer.html" . }}
+## Issues With Intellectual Property
 
+The SMILE Junction project, which morphed into just SMILE, was perported to have been developed at Stanford.  The meeting minutes of the SMILE Consortium can be reviewed to show that the [current leadership of SMILE Consortium](http://smileconsortium.org/ourteam) claimed it was actually developed with funding from an outside non-profit, Seeds of Empowerment, plus using volunteer hours, though several of the volunteers happened to be Stanford staff, and were working during business hours.  These kinds of arrangements can be worked out with permission of the Dean or full disclosure.  Unfortunately, the interested parties involved did not disclose these relationships.  To further muddy the situation, all [Stanford-based contributors](https://github.com/SMILEConsortium/smile_c_contributors/tree/master/active) to the project were asked by their manager to sign the Contributor License Agreements as individuals, not as organizational members.  So all work performed by these individuals was to be done as "Volunteers" for SMILE Consortium.  Any work they were to perform during work hours would have been in conflict with existing work contracts through Stanford.  As mentioned previously, when these matters came to light, three of the founding board members departed the organization, as the remaining board members were not willing to take responsibility for the complicated mess with the Intellectual Property.  The current board memebers unwillingness to take the IP through the Technology Department meant that work on SMILE Student Android, SMILE Teacher Java Desktop, and SMILE Global, were all being done both in violation of Stanford's work contracts, and also in violation of copyright (which should be owned by Stanford unless granted), and potentially being used to endorse personal projects using the Stanford name.
 
+## Source Code
+
+Anyone interested in legal use of the SMILE Android Student App or SMILE Java Teacher Desktop Application should contact the [Stanford University of Technology Licensing](http://otl.stanford.edu/).
+
+* [SMILE Student Android App](https://github.com/SMILEConsortium/smile_adhoc_android) - Removed repository in December 2013, recently [added back](https://github.com/SMILEConsortium/smile_adhoc_android/commit/b4f8f0fb3e069935d30601f43fdb963749149122) on April 28th, 2014
+* [SMILE Teacher Java Desktop](https://github.com/SMILEConsortium/smile_teacher_desktop) Removed repository in December 2013, recently [added back](https://github.com/SMILEConsortium/smile_teacher_desktop/commit/5283a4b23744f30d3147b9ffaca090073d93d6c5)
+* [SMILE Global](http://smileglobal.net/) - Removed repository in December 2013.  License, copyright, and right to distribute are all in question.
+
+## Epilogue
+
+It is important that people understand good intentions don't justify actions, right or wrong.  When it comes to Intellectual Property and the Law, there are some clear rules to follow.  When it comes to ethics, they do matter, regardless of whether ethics may stifle ones ability to achieve ambitions or get a competitive edge.
+
+As a proponent of Open Source, the author of this page, @dkords, has worked hard to follow the spirit of Open Source, and the law behind it.  The experience with the SMILE Consortium was a huge disappointment.  Through Razortooth, he continues to promote an ethical approach to creation of Open Source.  See the details of the new approach to project maintenance on the [SMILE Plug G+ Community](https://plus.google.com/u/0/112826671916880508140/posts/NFeeX1TwLDv).
