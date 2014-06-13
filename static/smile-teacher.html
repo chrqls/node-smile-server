@@ -101,12 +101,42 @@
 			border-bottom: 1px solid #EBE3BD;
 		}
 
-		section[smile=general-board] table#students .sticker {
+		section[smile=general-board] table#students .sticker_null {
 			color: white;
 			font-weight: bold;
-			background-color: #ffa938;
+			background-color: #ddd;
+			border: 1px solid #ccc;
 			border-radius: 3px;
-			padding: 2px 6px;
+			padding: 1px 7px;
+			font-size: 16px; }
+		section[smile=general-board] table#students .sticker_positive {
+			color: white;
+			font-weight: bold;
+			background-color: #ffca85;
+			border: 1px solid #ffa938;
+			border-radius: 3px;
+			padding: 1px 7px;
+			font-size: 16px;
+		}
+
+		section[smile=general-board] table#students .score_container {
+			font-size: 20px;	
+			color: white;
+			font-weight:bold;
+			margin-right:15px;
+			width: 20px;
+			text-align: right;
+		}
+		section[smile=general-board] table#students .score {
+			text-shadow:0 0 3px #888;
+		}
+		section[smile=general-board] table#students .gold_score {
+			text-shadow:0 0 3px #ccac00;
+		}
+		section[smile=general-board] table#students .answered {
+			text-shadow:0 0 4px #47f286;
+			color:#29914f;
+			font-weight:bold;
 		}
 
 		/* -------
@@ -115,12 +145,6 @@
 
 		section[smile=general-board] .content {
 			min-height: 200px;
-		}
-
-		.answered {
-			text-shadow:0 0 4px #47f286;
-			color:#29914f;
-			font-weight:bold;
 		}
 
 		.style_redRight {
@@ -269,6 +293,8 @@
 
 										<table id="students" data-bind="foreach: students" >
 										    <tr style="height:30px">
+										    	<td class="score_container">
+									    		</td>
 									    		<td smile="name_of_student">
 									    			<input type="hidden" data-bind="attr: {value: name}" />
 									    			<span data-bind="text: name"></span>
@@ -278,7 +304,7 @@
 									    			<span data-bind="text: ip"></span>
 									    		</td>
 									    		<td smile="number_of_questions">
-									    			<span class="sticker">0</span>
+									    			<span class="sticker_null">0</span>
 									    		</td>
 											</tr>    
 										</table>
