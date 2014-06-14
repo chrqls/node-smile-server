@@ -6,7 +6,7 @@ aliases:
   - "/doc/smilestudentweb/"
 groups: ["guides"]
 groups_weight: 40
-notoc: true
+notoc: false
 ---
 
 The Epoch SMILE Student Web is designed for students who are participating in an Inquiry Based Learning session.  The web app requires a modern HTML5 compliant browser.
