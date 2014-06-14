@@ -2,33 +2,45 @@
 title: "Epoch SMILE Teacher Web Guide"
 date: "2014-06-04"
 aliases:
-  - "/doc/permalinks/"
+  - "/doc/smileteacherweb/"
 groups: ["guides"]
 groups_weight: 30
-notoc: true
+notoc: false
 ---
 
-By default, content is laid out into the target `publishdir` (public)
-namespace matching its layout within the `contentdir` hierarchy.
-The `permalinks` site configuration option allows you to adjust this on a
-per-section basis.
-This will change where the files are written to and will change the page's
-internal "canonical" location, such that template references to
-`.RelPermalink` will honour the adjustments made as a result of the mappings
-in this option.
+TODO
 
-For instance, if one of your sections is called `post` and you want to adjust
-the canonical path to be hierarchical based on the year and month, then you
-might use:
+# Logging In
 
-```yaml
-permalinks:
-  post: /:year/:month/:title/
-```
+TODO
 
-Only the content under `post/` will be so rewritten.
-A file named `content/post/sample-entry` which contains a line
-`date: 2013-11-18T19:20:00-05:00` might end up with the rendered page
-appearing at `public/2013/11/sample-entry/index.html` and be reachable via
-the URL <http://yoursite.example.com/2013/11/sample-entry/>.
+## Phasae I - Start Making Questions
 
+When the class is ready, the Teacher will initiate the "Start Making Questions" Phase.  The student will be asked by the Teacher to create one or more questions with complete answers.
+
+![SMILE Student - Start Making Questions](/static/img/smilestudent-startmake.png)
+
+## Phase II - Start Answering Questions
+
+When all of the students have created an acceptable number of questions, the Teacher will move to the "Start Answering Questions" phase.  The Stuedent will be presented with a set of one or more questions to answer.  The questions are in the form of Multiple Choice, so the format will be familiar to many students.
+
+![SMILE Student - Start Answering Questions](/static/img/smilestudent-startanswer.png)
+
+After completing answers for all questions, the Student will be asked to wait for the teacher to wrap up the session and present results.
+
+![SMILE Student - Start Answering Questions 2](/static/img/smilestudent-startanswer2.png)
+
+
+## Phase III - View Results
+
+When the Teacher is ready to present the results, the results will be displayed in the browser.
+
+![SMILE Student - Results](/static/img/smilestudent-results.png)
+
+## Phase IV - After The Session, Recap
+
+At this point, it is up to the teacher to transition the students from the SMILE session into a recap of the session and help the students to dissect their own work, and evaluate peers.  Examination of question quality is important.
+
+Not Yet Implemented
+
+* Advanced visualization of results
