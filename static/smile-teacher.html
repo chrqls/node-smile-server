@@ -119,7 +119,8 @@
 			font-size: 16px;
 		}
 
-		section[smile=general-board] table#students .score_container {
+		section[smile=general-board] table#students .score_container,
+		section[smile=general-board] table#questions .percentSuccess_container {
 			font-size: 20px;	
 			color: white;
 			font-weight:bold;
@@ -137,6 +138,12 @@
 			text-shadow:0 0 4px #47f286;
 			color:#29914f;
 			font-weight:bold;
+		}
+		section[smile=general-board] table#questions .percent_success {
+			text-shadow:0 0 4px #00a830;
+		}
+		section[smile=general-board] table#questions .percent_fail {
+			text-shadow:0 0 4px #F00;
 		}
 
 		/* -------
@@ -330,7 +337,6 @@
 													<div data-bind="if: message_for_student" class="small-2 columns">
 														<a href="#" class="button prefix" data-bind='click: talkToStudent'>Send</a>
 													</div>
-
 												</div>
 											</div>
 										</div>
@@ -349,6 +355,8 @@
 								    				<input type="hidden" data-bind="attr: {name: session_id}" />
 									    			<a style="margin: 2px 0" id="more" onclick="detailQuestion(this.name)" data-bind="attr: {name: session_id}" class="tiny round button more">+</a>
 										    	</td>
+										    	<td class="percentSuccess_container">
+									    		</td>
 									    		<td style="color:#888;font-size:12px;font-style:italic">
 									    			<span data-bind="text: question"></span>
 									    		</td>
@@ -396,7 +404,7 @@
 							</div>
 
 							<ul class="button-group radius even-2">
-								<li><a href="#" data-bind='click: resetSession' class="secondary button">Quit</a></li>
+								<li><a href="#" data-bind='click: resetSession' class="secondary button">Logout</a></li>
 								<li><a href="#" data-bind='click: startSolvingQuestions' class="start_solving button hidden">Start solving</a></li>
 								<li><a href="#" data-bind='click: seeResults' class="see_results success button hidden">See results</a></li>
 								<li><a href="#" data-bind='click: retake' class="retake secondary button hidden">Restart</a></li>

@@ -28,13 +28,13 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.8.4';
+var VERSION = '0.8.7';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
 var DELAY_ERROR = 60000;
-var DELAY_SHORT = 5000;
-var DELAY_NORMAL = 10000;/*
+var DELAY_SHORT = 9000;
+var DELAY_NORMAL = 18000;/*
 var DELAY_LONG = 20000;*/
 
 var SMILEROUTES = {
@@ -48,7 +48,8 @@ var SMILEROUTES = {
     'startsolve': '/smile/startsolvequestion',
     'seeresults': '/smile/sendshowresults',
     'deletequestion': '/smile/questionview/',
-    'talk': '/smile/talk/teacher/post'
+    'talk': '/smile/talk/teacher/post',
+    'retake': '/smile/retake'
 };
 
 var DEAMON_UPDATING_BOARD;
@@ -102,10 +103,10 @@ var GlobalViewModel = {
     version: ko.observable(VERSION),
 
     // Session values
+    status: ko.observable(''),
+    group_name: ko.observable(''),
     teacher_name: ko.observable(''),
     session_name: ko.observable(''),
-    group_name: ko.observable(''),
-    status: ko.observable(''),
     new_iqset_name: ko.observable(''),
     message_for_student: ko.observable(''),
 
@@ -153,8 +154,10 @@ ko.extenders.required = function(target, overrideMessage) {
 
 /* -----------------------------------
  
+
                 ACTIONS
     (functions called by the view)
+
 
    ----------------------------------- */
 
@@ -396,7 +399,8 @@ GlobalViewModel.seeResults = function() {
 
 GlobalViewModel.retake = function() {
     
-    // postMessage('seeresults');
+    var status = smile_retake();
+    console.log('status='+status);
     this.redirectView();
 }
 
@@ -586,8 +590,12 @@ GlobalViewModel.saveNewIQSet = function() {
 
 /* --------------------------------------------------------
 
+
+
                            UTILITY
          (encapsulation of code used by the actions)
+
+
 
    -------------------------------------------------------- */
 
@@ -794,21 +802,26 @@ function updateGVM() {
 }
 
 function calculateAndShowResults(dataAll) {
-    
-    // Getting /smile/all
-    //var dataAll = JSON.parse(smile_all());
 
-    // Variables to fill
     var students_results = [];
-    var answers;
     var size_Q;
+    var answers;
+    // To display in tables
     var scores = [];
     var best_score = 0;
+    var percents_success;
+    var percents_success_sessionIDs = [];
 
-    // Extracting results
+    // Extracting all values
     for(var i=0; i<dataAll.length; i++) {
 
         switch(dataAll[i].TYPE) {
+
+            case 'QUESTION':
+            case 'QUESTION_PIC':
+
+                percents_success_sessionIDs.push(dataAll[i].SessionID);
+                break;
 
             case 'ANSWER':
                 var studentResults = {};
@@ -821,11 +834,12 @@ function calculateAndShowResults(dataAll) {
             case 'START_SHOW':
                 answers = dataAll[i].RANSWER;
                 size_Q = dataAll[i].NUMQ;
+                percents_success = dataAll[i].RPERCENT;
                 break;
         }
     }
 
-    // Getting percents
+    // Data processing
     for(var i=0; i<students_results.length; i++) {
 
         var points = 0;
@@ -838,12 +852,12 @@ function calculateAndShowResults(dataAll) {
                 points++;
             }
         }
-        score.SCORE = 100*points/size_Q;
+        score.SCORE = Math.round((100*points/size_Q) * 10 ) / 10;
         if(score.SCORE > best_score) best_score = score.SCORE;
         scores.push(score);
     }
 
-    // Injecting scores into students table
+    // Injecting values to display in student and question tables
     $('table#students tr').each(function(index) {
         for(var i=0; i<scores.length; i++) {
             if($(this).find('td[smile=ip_of_student] input[type=hidden]').val() === scores[i].IP) {
@@ -857,6 +871,27 @@ function calculateAndShowResults(dataAll) {
                 html += scores[i].SCORE+'<span style="font-size:14px">%</span></span>'
 
                 $(this).find('.score_container').html(html);
+            }
+        }
+    });
+    $('table#questions tr').each(function(index) {
+        for(var i=0; i<percents_success.length; i++) {
+
+            if($(this).find('input[type=hidden]').attr('name') === percents_success_sessionIDs[i]) {
+                
+
+                console.log('TEST');
+                var html = '<span class="">';
+
+                var html;
+
+                if(parseInt(percents_success[i]) > 50)
+                     html = '<span class="percent_success">';
+                else html = '<span class="percent_fail">';
+
+                html += percents_success[i]+'<span style="font-size:14px">%</span></span>'
+
+                $(this).find('.percentSuccess_container').html(html);
             }
         }
     });
@@ -994,8 +1029,6 @@ function postMessage(type,values) {
 
         case 'iqset':
 
-            console.log(values);
-
             $.ajax({ 
                 cache: false, 
                 type: 'POST', 
@@ -1078,7 +1111,25 @@ function smile_reset() {
         async: false,
         
         error: function(xhr, text, err) {
-            absoluteAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace');
+            absoluteAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace',true);
+        }, 
+        success: function(data) {}
+    });
+}
+
+function smile_retake() {
+
+    $.ajax({ 
+        cache: false, 
+        type: 'GET', 
+        dataType: 'text', 
+        //contentType: "application/json", 
+        url: SMILEROUTES['retake'],
+        data: {}, 
+        async: false,
+        
+        error: function(xhr, text, err) {
+            absoluteAlert('Unable to retake.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace',true);
         }, 
         success: function(data) {}
     });
@@ -1097,7 +1148,7 @@ function smile_iqsets() {
         data: {}, 
         
         error: function(xhr, text, err) {
-            absoluteAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
+            absoluteAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace',true);
         }, 
         success: function(data) { 
             iqsets = data; 
@@ -1118,7 +1169,7 @@ function smile_iqset(id) {
         async: false,
         data: {},  
         error: function(xhr, text, err) {
-            absoluteAlert('Unable to call /smile/iqset/{key}', DELAY_NORMAL, 'trace');
+            absoluteAlert('Unable to call /smile/iqset/{key}', DELAY_ERROR, 'trace',true);
         }, 
         success: function(data) { iqset = data; }
     });
