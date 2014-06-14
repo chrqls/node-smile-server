@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.8.6';
+var VERSION = '0.8.7';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
@@ -103,10 +103,10 @@ var GlobalViewModel = {
     version: ko.observable(VERSION),
 
     // Session values
+    status: ko.observable(''),
+    group_name: ko.observable(''),
     teacher_name: ko.observable(''),
     session_name: ko.observable(''),
-    group_name: ko.observable(''),
-    status: ko.observable(''),
     new_iqset_name: ko.observable(''),
     message_for_student: ko.observable(''),
 
@@ -154,8 +154,10 @@ ko.extenders.required = function(target, overrideMessage) {
 
 /* -----------------------------------
  
+
                 ACTIONS
     (functions called by the view)
+
 
    ----------------------------------- */
 
@@ -588,8 +590,12 @@ GlobalViewModel.saveNewIQSet = function() {
 
 /* --------------------------------------------------------
 
+
+
                            UTILITY
          (encapsulation of code used by the actions)
+
+
 
    -------------------------------------------------------- */
 
@@ -796,21 +802,26 @@ function updateGVM() {
 }
 
 function calculateAndShowResults(dataAll) {
-    
-    // Getting /smile/all
-    //var dataAll = JSON.parse(smile_all());
 
-    // Variables to fill
     var students_results = [];
-    var answers;
     var size_Q;
+    var answers;
+    // To display in tables
     var scores = [];
     var best_score = 0;
+    var percents_success;
+    var percents_success_sessionIDs = [];
 
-    // Extracting results
+    // Extracting all values
     for(var i=0; i<dataAll.length; i++) {
 
         switch(dataAll[i].TYPE) {
+
+            case 'QUESTION':
+            case 'QUESTION_PIC':
+
+                percents_success_sessionIDs.push(dataAll[i].SessionID);
+                break;
 
             case 'ANSWER':
                 var studentResults = {};
@@ -823,11 +834,12 @@ function calculateAndShowResults(dataAll) {
             case 'START_SHOW':
                 answers = dataAll[i].RANSWER;
                 size_Q = dataAll[i].NUMQ;
+                percents_success = dataAll[i].RPERCENT;
                 break;
         }
     }
 
-    // Getting percents
+    // Data processing
     for(var i=0; i<students_results.length; i++) {
 
         var points = 0;
@@ -845,7 +857,7 @@ function calculateAndShowResults(dataAll) {
         scores.push(score);
     }
 
-    // Injecting scores into students table
+    // Injecting values to display in student and question tables
     $('table#students tr').each(function(index) {
         for(var i=0; i<scores.length; i++) {
             if($(this).find('td[smile=ip_of_student] input[type=hidden]').val() === scores[i].IP) {
@@ -859,6 +871,27 @@ function calculateAndShowResults(dataAll) {
                 html += scores[i].SCORE+'<span style="font-size:14px">%</span></span>'
 
                 $(this).find('.score_container').html(html);
+            }
+        }
+    });
+    $('table#questions tr').each(function(index) {
+        for(var i=0; i<percents_success.length; i++) {
+
+            if($(this).find('input[type=hidden]').attr('name') === percents_success_sessionIDs[i]) {
+                
+
+                console.log('TEST');
+                var html = '<span class="">';
+
+                var html;
+
+                if(parseInt(percents_success[i]) > 50)
+                     html = '<span class="percent_success">';
+                else html = '<span class="percent_fail">';
+
+                html += percents_success[i]+'<span style="font-size:14px">%</span></span>'
+
+                $(this).find('.percentSuccess_container').html(html);
             }
         }
     });
@@ -995,8 +1028,6 @@ function postMessage(type,values) {
             break;
 
         case 'iqset':
-
-            console.log(values);
 
             $.ajax({ 
                 cache: false, 
