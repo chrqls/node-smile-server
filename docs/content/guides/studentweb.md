@@ -2,40 +2,56 @@
 title: "Epoch SMILE Student Web Guide"
 date: "2014-06-04"
 aliases:
-  - "/doc/urls/"
+  - "/doc/studentweb/"
+  - "/doc/smilestudentweb/"
 groups: ["guides"]
 groups_weight: 40
 notoc: true
 ---
 
-## Pretty Urls
+The Epoch SMILE Student Web is designed for students who are participating in an Inquiry Based Learning session.  The web app requires a modern HTML5 compliant browser.
 
-By default Hugo will create content with 'pretty' urls. For example
-content created at /content/extras/urls.md will be rendered at
-/content/extras/urls/index.html and accessible at /content/extras/urls. No
-no standard server side configuration is required for these pretty urls to
-work. 
+## Logging In
 
-If you would like to have uglyurls you are in luck. Hugo supports the
-ability to create your entire site with ugly urls. Simply use the
-`--uglyurls=true` flag on the command line.
+To open the app, visit the landing page.
 
-If you want a specific piece of content to have an exact url you can
-specify this in the front matter under the url key. See [Content
-Organization](content/organization/) for more details. 
+![landing page](/static/img/smile-splash.png)
 
-## Canonicalization
+From here, click on the SMILE Student Web Button.  Just enter a username, or use the default username. 
 
-By default, all relative URLs encountered in the input will be canonicalized
-using `baseurl`, so that a link `/css/foo.css` becomes
-`http://yoursite.example.com/css/foo.css`.
+![SMILE Student Web Button](/static/img/smilestudent-login.png)
 
-Setting `canonifyurls` to `false` will prevent this canonicalization.
+After loggin in, the Student will wait until the Teacher is ready to begin the session.
 
-Benefits of canonicalization include fixing all URLs to be absolute, which may
-aid with some parsing tasks.  Note though that all real browsers handle this
-client-side without issues.
+![SMILE Student Web Login](/static/img/smilestudent-ready.png)
 
-Benefits of non-canonicalization include being able to have resource inclusion
-be scheme-relative, so that http vs https can be decided based on how this
-page was retrieved.
+## Phasae I - Start Making Questions
+
+When the class is ready, the Teacher will initiate the "Start Making Questions" Phase.  The student will be asked by the Teacher to create one or more questions with complete answers.
+
+![SMILE Student - Start Making Questions](/static/img/smilestudent-startmake.png)
+
+## Phase II - Start Answering Questions
+
+When all of the students have created an acceptable number of questions, the Teacher will move to the "Start Answering Questions" phase.  The Stuedent will be presented with a set of one or more questions to answer.  The questions are in the form of Multiple Choice, so the format will be familiar to many students.
+
+![SMILE Student - Start Answering Questions](/static/img/smilestudent-startanswer.png)
+
+After completing answers for all questions, the Student will be asked to wait for the teacher to wrap up the session and present results.
+
+![SMILE Student - Start Answering Questions 2](/static/img/smilestudent-startanswer2.png)
+
+
+## Phase III - View Results
+
+When the Teacher is ready to present the results, the results will be displayed in the browser.
+
+![SMILE Student - Results](/static/img/smilestudent-results.png)
+
+## Phase IV - After The Session, Recap
+
+At this point, it is up to the teacher to transition the students from the SMILE session into a recap of the session and help the students to dissect their own work, and evaluate peers.  Examination of question quality is important.
+
+Not Yet Implemented
+
+* Advanced visualization of results
