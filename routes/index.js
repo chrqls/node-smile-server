@@ -569,6 +569,7 @@ exports.handlePushMessage = function(req, res) {
     var type = null;
     var error = null;
 
+    // Android retake (old way to retake)
     if(JSON.stringify(message).indexOf("TYPE:'RE_TAKE'") != -1) {
         type = 'RE_TAKE';
         game.registerMessage(MESSAGE_RETAKE);
@@ -598,8 +599,9 @@ exports.handlePushMessage = function(req, res) {
         error = game.studentsWrapper.addStudent(message);
         break;
     case 'RE_TAKE':
+        // Android retaking (old way)
         console.log('Retaking...');
-        error = game.retake();
+        game.retake();
         break;
     case 'RESET':
         console.log('-Reset session-');
@@ -621,6 +623,13 @@ exports.handlePushMessage = function(req, res) {
         }
     }
 };
+
+exports.retakeSession = function(req, res) {
+
+    game.retake();
+    return res.sendText(HTTP_STATUS_OK, OK);
+}
+
 
 /**
     Creating a session with teacher name, session title, and group name

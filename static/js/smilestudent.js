@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '1.1.0';
+var VERSION = '1.1.1';
 
 var DELAY_UPDATE_BOARD = 1500;
 var DELAY_PRIVATE_MESSAGE = 5000;
@@ -354,8 +354,8 @@ GlobalViewModel.doAnswerNextQ = function() {
         // Submit All Questions
         //
         $('div#answer-form-area').block({
-            message: '<h1>Done.  Please wait for the rest of the students to finish Answering Questions</h1>',
-            css: { border: '3px solid #a00', width: '80%'
+            message: '<h4>Done.  Please wait for the rest of the students to finish Answering Questions</h4>',
+            css: { border: '3px solid #a00', width: '70%'
             }
         });
 

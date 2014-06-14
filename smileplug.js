@@ -199,6 +199,11 @@ js.put('/smile/iqset', routes.handlePostNewIQSet);
 js.post('/smile/iqset', routes.handlePostNewIQSet);
 
 /**
+    Retake
+**/
+js.get('/smile/retake', routes.retakeSession);
+
+/**
     Delete the IQSet based on an existing :id.  If :id does not exist
     return { 'error': <Reason> }
 **/

@@ -28,13 +28,13 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.8.4';
+var VERSION = '0.8.6';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
 var DELAY_ERROR = 60000;
-var DELAY_SHORT = 5000;
-var DELAY_NORMAL = 10000;/*
+var DELAY_SHORT = 9000;
+var DELAY_NORMAL = 18000;/*
 var DELAY_LONG = 20000;*/
 
 var SMILEROUTES = {
@@ -48,7 +48,8 @@ var SMILEROUTES = {
     'startsolve': '/smile/startsolvequestion',
     'seeresults': '/smile/sendshowresults',
     'deletequestion': '/smile/questionview/',
-    'talk': '/smile/talk/teacher/post'
+    'talk': '/smile/talk/teacher/post',
+    'retake': '/smile/retake'
 };
 
 var DEAMON_UPDATING_BOARD;
@@ -396,7 +397,8 @@ GlobalViewModel.seeResults = function() {
 
 GlobalViewModel.retake = function() {
     
-    // postMessage('seeresults');
+    var status = smile_retake();
+    console.log('status='+status);
     this.redirectView();
 }
 
@@ -838,7 +840,7 @@ function calculateAndShowResults(dataAll) {
                 points++;
             }
         }
-        score.SCORE = 100*points/size_Q;
+        score.SCORE = Math.round((100*points/size_Q) * 10 ) / 10;
         if(score.SCORE > best_score) best_score = score.SCORE;
         scores.push(score);
     }
@@ -1078,7 +1080,25 @@ function smile_reset() {
         async: false,
         
         error: function(xhr, text, err) {
-            absoluteAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace');
+            absoluteAlert('Unable to reset.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace',true);
+        }, 
+        success: function(data) {}
+    });
+}
+
+function smile_retake() {
+
+    $.ajax({ 
+        cache: false, 
+        type: 'GET', 
+        dataType: 'text', 
+        //contentType: "application/json", 
+        url: SMILEROUTES['retake'],
+        data: {}, 
+        async: false,
+        
+        error: function(xhr, text, err) {
+            absoluteAlert('Unable to retake.  Reason: ' + xhr.status + ':' + xhr.responseText, DELAY_ERROR, 'trace',true);
         }, 
         success: function(data) {}
     });
@@ -1097,7 +1117,7 @@ function smile_iqsets() {
         data: {}, 
         
         error: function(xhr, text, err) {
-            absoluteAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace');
+            absoluteAlert('Unable to call /smile/iqsets.  Reason: ' + xhr.status + ':' + xhr.responseText + '.  Please verify your connection or server status.', DELAY_ERROR, 'trace',true);
         }, 
         success: function(data) { 
             iqsets = data; 
@@ -1118,7 +1138,7 @@ function smile_iqset(id) {
         async: false,
         data: {},  
         error: function(xhr, text, err) {
-            absoluteAlert('Unable to call /smile/iqset/{key}', DELAY_NORMAL, 'trace');
+            absoluteAlert('Unable to call /smile/iqset/{key}', DELAY_ERROR, 'trace',true);
         }, 
         success: function(data) { iqset = data; }
     });
