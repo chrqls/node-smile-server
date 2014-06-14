@@ -28,7 +28,7 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.8.3';
+var VERSION = '0.8.4';
 
 // Interval of time used to update the GlobalViewModel
 var DELAY_UPDATE_BOARD = 5000;
@@ -195,6 +195,7 @@ GlobalViewModel.redirectView = function() {
             case 'START_SHOW':
                 $('.see_results').addClass('hidden');
                 $('.retake').removeClass('hidden');
+                calculateAndShowResults(dataAll);
                 break;
 
             case 'QUESTION':
@@ -204,7 +205,6 @@ GlobalViewModel.redirectView = function() {
                 addStudent(dataAll[i]);  break;
             case 'ANSWER':       
                 questionsAnsweredByStudent(dataAll[i].IP); break;
-            default: break;
         }
     }
     switchSection(section);
@@ -490,6 +490,10 @@ GlobalViewModel.removeQuestionFromSession = function() {
 
                                     var amount = $(this).find('td[smile=number_of_questions] span');
                                     amount.text(parseInt(amount.text())-1);
+                                    if(amount.text() === '0') {
+                                        amount.removeClass('sticker_positive');
+                                        amount.addClass('sticker_null');
+                                    }
                                 }
                             });
                         }
@@ -562,7 +566,7 @@ GlobalViewModel.saveNewIQSet = function() {
                           "NAME":GlobalViewModel.questions()[i].author,
                              "Q":GlobalViewModel.questions()[i].question,
                              "A":GlobalViewModel.questions()[i].answer,
-                            "IP":GlobalViewModel.questions()[i].ip,
+                            "IP":"No IP address",
                             "O4":GlobalViewModel.questions()[i].options[3],
                             "O3":GlobalViewModel.questions()[i].options[2],
                             "O2":GlobalViewModel.questions()[i].options[1],
@@ -656,6 +660,10 @@ function addQuestion(question) {
 
                 var amount = $(this).find('td[smile=number_of_questions] span');
                 amount.text(parseInt(amount.text())+1);
+                if(parseInt(amount.text()) > 0) {
+                    amount.removeClass('sticker_null');
+                    amount.addClass('sticker_positive');
+                }
             }
         });
     }
@@ -746,8 +754,9 @@ function updateGVM() {
                     absoluteAlert('New question from <b>'+dataAll[i].NAME+'</b>!',DELAY_NORMAL);
                 }
             break;
-            case 'ANSWER':       
-                questionsAnsweredByStudent(dataAll[i].IP,true); break;
+            case 'ANSWER':
+                questionsAnsweredByStudent(dataAll[i].IP,true); 
+                break;
         }
     }
 
@@ -784,6 +793,76 @@ function updateGVM() {
     });
 }
 
+function calculateAndShowResults(dataAll) {
+    
+    // Getting /smile/all
+    //var dataAll = JSON.parse(smile_all());
+
+    // Variables to fill
+    var students_results = [];
+    var answers;
+    var size_Q;
+    var scores = [];
+    var best_score = 0;
+
+    // Extracting results
+    for(var i=0; i<dataAll.length; i++) {
+
+        switch(dataAll[i].TYPE) {
+
+            case 'ANSWER':
+                var studentResults = {};
+                    studentResults.IP = dataAll[i].IP;
+                    studentResults.MYANSWER = dataAll[i].MYANSWER;
+                
+                students_results.push(studentResults);
+                break;
+            
+            case 'START_SHOW':
+                answers = dataAll[i].RANSWER;
+                size_Q = dataAll[i].NUMQ;
+                break;
+        }
+    }
+
+    // Getting percents
+    for(var i=0; i<students_results.length; i++) {
+
+        var points = 0;
+        var score = {};
+        score.IP = students_results[i].IP;
+
+        for(var j=0; j<answers.length; j++) {
+
+            if(parseInt(students_results[i].MYANSWER[j]) === answers[j]) {
+                points++;
+            }
+        }
+        score.SCORE = 100*points/size_Q;
+        if(score.SCORE > best_score) best_score = score.SCORE;
+        scores.push(score);
+    }
+
+    // Injecting scores into students table
+    $('table#students tr').each(function(index) {
+        for(var i=0; i<scores.length; i++) {
+            if($(this).find('td[smile=ip_of_student] input[type=hidden]').val() === scores[i].IP) {
+                
+                var html;
+
+                if(scores[i].SCORE === best_score)
+                     html = '<span class="gold_score">';
+                else html = '<span class="score">';
+
+                html += scores[i].SCORE+'<span style="font-size:14px">%</span></span>'
+
+                $(this).find('.score_container').html(html);
+            }
+        }
+    });
+}
+
+// Very useful to redirect views if a message already exists
 function typeExist(type) {
 
     var answer = false;
@@ -837,7 +916,7 @@ function postMessage(type,values) {
                 async: false,
                 
                 error: function(xhr, text, err) {
-                    absoluteAlert('Unable to send START_MAKE phase', DELAY_NORMAL, 'trace');
+                    absoluteAlert('Unable to send START_MAKE phase', DELAY_ERROR, 'trace', true);
                 }, 
                 success: function(data) {}
             });
@@ -855,10 +934,10 @@ function postMessage(type,values) {
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    absoluteAlert('Unable to send START_SOLVE phase', DELAY_NORMAL, 'trace');
+                    absoluteAlert('Unable to send START_SOLVE phase', DELAY_ERROR, 'trace', true);
                 }, 
                 success: function(data) {
-                    absoluteAlert('START_SOLVE sent!', DELAY_NORMAL, 'green');
+                    absoluteAlert('Your students can start answering questions.', DELAY_NORMAL, 'green');
                 }
             });
             break;
@@ -874,10 +953,11 @@ function postMessage(type,values) {
                 //async: false,
                 
                 error: function(xhr, text, err) {
-                    absoluteAlert('Unable to send START_SHOW phase', DELAY_NORMAL, 'trace');
+                    absoluteAlert('Unable to send START_SHOW phase', DELAY_ERROR, 'trace', true);
                 }, 
-                success: function(data) {
-                    absoluteAlert('START_SHOW sent!', DELAY_NORMAL, 'green');
+                success: function(dataAll) {
+                    absoluteAlert('Your students can see the results now!', DELAY_NORMAL, 'green');
+                    calculateAndShowResults(dataAll);
                 }
             });
             break;
@@ -929,7 +1009,7 @@ function postMessage(type,values) {
                 }, 
                 success: function(data) {
                     absoluteAlert('New iqset <i>"'+data.title+'"</i> saved!',DELAY_NORMAL,'green');
-                    switchVisibilitySaveButton();
+                    hideSaveForm();
                 }
             });
             break;

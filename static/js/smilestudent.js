@@ -257,10 +257,10 @@ GlobalViewModel.doSubmitQ = function() {
     } else {
         console.log("Cannot validateInquiry");
         $('div#inquiry-form-area').block({
-            message: '<h3>Please fill in all fields and check correct answer</h3>',
-            css: { border: '3px solid #a00', width: '30%'
+            message: '<h5>Please fill in all fields and check correct answer</h5>',
+            css: { border: '3px solid #a00', width: '50%'
             },
-            timeout: 7000
+            timeout: 3000
         });
     }
 
@@ -288,10 +288,10 @@ GlobalViewModel.doSubmitQandDone = function() {
         // XXX Refactoring candidate
         console.log("Cannot validateInquiry");
         $('div#inquiry-form-area').block({
-            message: '<h3>Please fill in all fields and check correct answer</h3>',
-            css: { border: '3px solid #a00', width: '30%'
+            message: '<h5>Please fill in all fields and check correct answer</h5>',
+            css: { border: '3px solid #a00', width: '50%'
             },
-            timeout: 7000
+            timeout: 3000
         });
     }
 }

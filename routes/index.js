@@ -473,7 +473,9 @@ exports.handleSendShowResultsPut = function(req, res) {
         });
     }
     game.setCurrentMessage(message);
-    return res.sendText(HTTP_STATUS_OK, OK);
+    
+    // We return all the messages to calculate the results
+    return res.sendJSON(HTTP_STATUS_OK, game.messages.past);
 };
 
 exports.handleCurrentSessionDataGet = function(req, res) {
