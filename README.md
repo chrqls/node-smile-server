@@ -31,6 +31,7 @@ Tests
 Making the Docs
 ===============
 
+* Install https://github.com/truedat101/gitchanges
 * Use Hugo ... so install it
 * rm -rf docs/public (only do this if you are knowing what you do and why you would do this, it should only need to be done once and it's done so don't touch it)
 * git subtree add --prefix docs/public git@github.com:RazortoothRTC/node-smile-server.git gh-pages --squash
@@ -44,6 +45,7 @@ Updating the Docs
 
 * git subtree pull --prefix=docs/public
 * Update the docs
+* If you are making a release, run < node-smile-server >/docs/tools/genreleasenotes.sh > currentrelease.txt , and put these notes into meta/release-notes.md
 * Run hugo from docs dir (to generate the new doc changes)
 * git commit -a
 * git subtree push  --prefix=docs/public git@github.com:RazortoothRTC/node-smile-server.git gh-pages
