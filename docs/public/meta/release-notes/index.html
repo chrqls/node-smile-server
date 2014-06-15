@@ -107,12 +107,15 @@
 <ul>
 <li>
 <ul>
-<li><a href="#toc_0"><strong>0.10.0</strong> March 1, 2014</a></li>
-<li><a href="#toc_1"><strong>0.9.0</strong> November 15, 2013</a></li>
-<li><a href="#toc_2"><strong>0.8.0</strong> August 2, 2013</a></li>
-<li><a href="#toc_3"><strong>0.7.0</strong> July 4, 2013</a></li>
-<li><a href="#toc_4"><strong>0.6.0</strong> July 2, 2013</a></li>
-<li><a href="#toc_5"><strong>0.5.0</strong> June 25, 2013</a></li>
+<li><a href="#toc_0">Changes between 1.0.6-jamsj and 1.0.7-jamsj</a></li>
+<li><a href="#toc_1">Changes between 1.0.4b-jamsj and 1.0.6-jamsj</a></li>
+<li><a href="#toc_2">Changes between 1.0.3-jamsj and 1.0.4-jamsj</a></li>
+<li><a href="#toc_3">Changes between 1.0.2-jamsj and 1.0.3-jamsj</a></li>
+<li><a href="#toc_4">Changes between 1.0.1-jamsj and 1.0.2-jamsj</a></li>
+<li><a href="#toc_5">Changes between 1.0.0-jamsj and 1.0.1-jamsj</a></li>
+<li><a href="#toc_6">Changes between 0.3.2 and 1.0.0-jamsj</a></li>
+<li><a href="#toc_7">Changes between 0.3.1 and 0.3.2</a></li>
+<li><a href="#toc_8">Changes between 0.3.0 and 0.3.1</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -121,94 +124,239 @@
           <h1>Release Notes</h1>
           
 
-<h2 id="toc_0"><strong>0.10.0</strong> March 1, 2014</h2>
+<h2 id="toc_0">Changes between 1.0.6-jamsj and 1.0.7-jamsj</h2>
 
 <ul>
-<li><a href="http://razortoothrtc.github.io/node-smile-server/extras/highlighting">Syntax highlighting</a> powered by pygments (<strong>slow</strong>)</li>
-<li>Ability to <a href="http://razortoothrtc.github.io/node-smile-server/content/ordering">sort content</a> many more ways</li>
-<li>Automatic <a href="http://razortoothrtc.github.io/node-smile-server/extras/toc">table of contents</a> generation</li>
-<li>Support for unicode urls, aliases and indexes</li>
-<li>Configurable per-section <a href="http://razortoothrtc.github.io/node-smile-server/extras/permalinks">permalink</a> pattern support</li>
-<li>Support for <a href="http://razortoothrtc.github.io/node-smile-server/extras/shortcodes">paired shortcodes</a></li>
-<li>Shipping with some <a href="http://razortoothrtc.github.io/node-smile-server/extras/shortcodes">shortcodes</a> (highlight &amp; figure)</li>
-<li>Adding <a href="http://razortoothrtc.github.io/node-smile-server/extras/urls">canonify</a> option to keep urls relative</li>
-<li>A bunch of <a href="http://razortoothrtc.github.io/node-smile-server/layouts/templatefunctions">additional template functions</a></li>
-<li>Watching very large sites now works on mac</li>
-<li>RSS generation improved. Limited to 50 items by default, can limit further in <a href="http://razortoothrtc.github.io/node-smile-server/layout/rss">template</a></li>
-<li>Boolean params now supported in <a href="http://razortoothrtc.github.io/node-smile-server/content/front-matter">frontmatter</a></li>
-<li>Launched website <a href="http://razortoothrtc.github.io/node-smile-server/showcase">showcase</a>. Show off your own hugo site!</li>
-<li>A bunch of <a href="https://github.com/spf13/hugo/commits/master">bug fixes</a></li>
+<li>refs #66 Add missing package.json bump for release to 1.0.7</li>
+<li>refs #66 Add SMILE Teacher 0.9.9b5 apk, bump version</li>
 </ul>
 
-<h2 id="toc_1"><strong>0.9.0</strong> November 15, 2013</h2>
+<h2 id="toc_1">Changes between 1.0.4b-jamsj and 1.0.6-jamsj</h2>
 
 <ul>
-<li>New <a href="http://razortoothrtc.github.io/node-smile-server/overview/usage">command based interface</a> similar to git (hugo server -s ./ )</li>
-<li>Amber template support</li>
-<li><a href="http://razortoothrtc.github.io/node-smile-server/extras/aliases">Aliases</a> (redirects)</li>
-<li>Support for top level pages (in addition to homepage)</li>
-<li>Complete overhaul of the documentation site</li>
-<li>Full Windows support</li>
-<li>Better index support including <a href="http://razortoothrtc.github.io/node-smile-server/content/ordering">ordering by content weight</a></li>
-<li>Add params to site config, available in .Site.Params from templates</li>
-<li>Friendlier json support</li>
-<li>Support for html &amp; xml content (with frontmatter support)</li>
-<li>Support for <a href="http://razortoothrtc.github.io/node-smile-server/content/summaries">summary</a> content divider (&lt;!–more–&gt;)</li>
-<li>HTML in <a href="http://razortoothrtc.github.io/node-smile-server/content/summaries">summary</a> (when using divider)</li>
-<li>Added <a href="http://razortoothrtc.github.io/node-smile-server/layout/variables">&ldquo;Minutes to Read&rdquo;</a> functionality</li>
-<li>Support for a custom 404 page</li>
-<li>Cleanup of how content organization is handled</li>
-<li>Loads of unit and performance tests</li>
-<li>Integration with travis ci</li>
-<li>Static directory now watched and copied on any addition or modification</li>
-<li>Support for relative permalinks</li>
-<li>Fixed watching being triggered multiple times for the same event</li>
-<li>Watch now ignores temp files (as created by Vim)</li>
-<li>Configurable number of posts on <a href="http://razortoothrtc.github.io/node-smile-server/layout/homepage/">homepage</a></li>
-<li><a href="http://razortoothrtc.github.io/node-smile-server/content/front-matter">Front matter</a> supports multiple types (int, string, date, float)</li>
-<li>Indexes can now use a default template</li>
-<li>Addition of truncated bool to content to determine if should show &lsquo;more&rsquo; link</li>
-<li>Support for <a href="http://razortoothrtc.github.io/node-smile-server/layout/variables">linkTitles</a></li>
-<li>Better handling of most errors with directions on how to resolve</li>
-<li>Support for more date / time formats</li>
-<li>Support for go 1.2</li>
-<li>Support for <code>first</code> in templates</li>
+<li>refs #52 Add 0.9.9b4 apk</li>
+<li>refs #52 Add apk, bump version to 1.0.6 for release, remove ol.d apks., bump smile student version</li>
+<li>[#42] Teacher can retake several times the same IQSet</li>
+<li>refs #52 Bump node smile server package to 1.0.5</li>
+<li>refs #52 Update versions listed in index.html</li>
+<li>[#42] Retake scenario well managed on server and web app now</li>
+<li>[#42] Web student application redirected to &lsquo;StartMaking&rsquo; when retaking but &lsquo;StartSolving&rsquo; is not working correctly</li>
+<li>[#42] Simplification of retake request</li>
+<li>Cleaning the console log</li>
+<li>[#23 RTC]Retaking without being able to update status on node-smile-server.(need to update teacher app)</li>
 </ul>
 
-<h2 id="toc_2"><strong>0.8.0</strong> August 2, 2013</h2>
+<h2 id="toc_2">Changes between 1.0.3-jamsj and 1.0.4-jamsj</h2>
 
 <ul>
-<li>Added support for pretty urls (filename/index.html vs filename.html)</li>
-<li>Hugo supports a destination directory</li>
-<li>Will efficiently sync content in static to destination directory</li>
-<li>Cleaned up options.. now with support for short and long options</li>
-<li>Added support for TOML</li>
-<li>Added support for YAML</li>
-<li>Added support for Previous &amp; Next</li>
-<li>Added support for indexes for the indexes</li>
-<li>Better Windows compatibility</li>
-<li>Support for series</li>
-<li>Adding verbose output</li>
-<li>Loads of bugfixes</li>
+<li>refs #103, #94 Bump version to 1.0.4</li>
+<li>refs #113 Add likes % calc in the IQManager Session Detail view.</li>
+<li>[#102] Removing useless console logging</li>
 </ul>
 
-<h2 id="toc_3"><strong>0.7.0</strong> July 4, 2013</h2>
+<h2 id="toc_3">Changes between 1.0.2-jamsj and 1.0.3-jamsj</h2>
 
 <ul>
-<li>Hugo now includes a simple server</li>
-<li>First public release</li>
+<li>refs #103, #91 Add newest teacher app, and bump versions of SMILE server to 1.0.3</li>
+<li>refs #74, #101 Fix IQ PIC data save on session save.  Also fix missing submit buttons on new session (after a session has completed)</li>
+<li>refs #74 Add the necessary $data to fix undefined errors.  Brilliant! So if PICURL is undefined, don&rsquo;t crash!</li>
+<li>refs #74 Fix iqset modal view of pic data for question</li>
+<li>[#74] Removing button when no image on the question.</li>
+<li>[#74] Loading the picture in a modal with Zurb (part Session)</li>
+<li>[#74] Loading the picture in a modal with Zurb (part IQSet)</li>
+<li>[#74] Displaying directly the picture in the table</li>
 </ul>
 
-<h2 id="toc_4"><strong>0.6.0</strong> July 2, 2013</h2>
+<h2 id="toc_4">Changes between 1.0.1-jamsj and 1.0.2-jamsj</h2>
 
 <ul>
-<li>Hugo includes an example documentation site which it builds</li>
+<li>refs #91, #103 Update text in index.html 1.0.2</li>
+<li>refs #91, #103 Bump version 1.0.2</li>
+<li>refs #91, #103 Add new version of SMILE Teacher 0.9.9b2-jamsj</li>
+<li>refs #103 Bump version to 1.0.2</li>
+<li>[#95] Removing opacity on IQManager</li>
+<li>[#101] Hiding submit buttons while posting the data</li>
+<li>[#74] Commenting the image button, to display directly the image</li>
+<li>Switching README.md with README.txt</li>
 </ul>
 
-<h2 id="toc_5"><strong>0.5.0</strong> June 25, 2013</h2>
+<h2 id="toc_5">Changes between 1.0.0-jamsj and 1.0.1-jamsj</h2>
 
 <ul>
-<li>Hugo is quite usable and able to build spf13.com</li>
+<li>refs #103 Add new tagged SMILE Teacher app 0.9.9b1 (for JAMsj)</li>
+<li>refs #26, #102 Remove some extra debug</li>
+<li>refs #40, #26 Fix the empty username validation on login.</li>
+<li>refs #98, #26 Add SessionID to Question submitted by a client if we don&rsquo;t already have a Question SessionID.</li>
+<li>refs #19 Drop questions handling on server side was incorrectly using SessionID.  This caused the deletion to fail.  Make sure also to handle the case where the index === 0.   This isn&rsquo;t ok to say (!idx), be more careful.</li>
+<li>refs #19,#26 Make sure deletion on server touches questions.currentQuestions as well as game.messages.past [] .  This is needed to fix the issue 60 on the teacher app.</li>
+<li>Updating gitignore</li>
+</ul>
+
+<h2 id="toc_6">Changes between 0.3.2 and 1.0.0-jamsj</h2>
+
+<ul>
+<li>refs #26,#94 Add correct version numbers in README to match release.</li>
+<li>refs #93, #26 Bump node package.json to 10.0.0, add more functional version of teacher APK v 0.9.6.</li>
+<li>refs #91 add 0.9.6 teacher app to the splash page.  Clean out the old versions.</li>
+<li>refs #26,#91 Add new APK for Teacher, version 0.9.6.  Wow, version bump!</li>
+<li>refs #26,#19 Ensure that the delete of question responds with a JSON response</li>
+<li>refs #26,#92 Add version for IQManager bump to 1.0.0prealpha1</li>
+<li>refs #26,#80 Add 1.0.0 bump to index.html and the smilestudent.js</li>
+<li>refs #26,#90 Add the proper removeAll to the students data and the session iqset data when we load a session.  otherwise we got dups.</li>
+<li>refs #26,#89 Add the proper removeAll to the students data and the session iqset data when we load a session.  otherwise we got dups.</li>
+<li>refs #26,#90 Make sure to drop the iqdata when we load a session in the IQManager.  Also remove the extra verbose logging in persistius.</li>
+<li>refs #26,#87 Don&rsquo;t forget to set the iqidx() when we doGetInquiry()</li>
+<li>refs #88,#26 use toFixed() instead of toPrecision() to get the right formatting of the student scores in the results.</li>
+<li>refs #26,#85 Remove footer from index page.</li>
+<li>refs #26,#84 add help alert to IQManager nav help.</li>
+<li>refs #26,#67 fix bug in the app-version for iqmanager.  Use jquery to set, not knockout.js</li>
+<li>refs #26,#67 Add version string (hardcoded into app) for now.  Need to add some Jquery to make it right.</li>
+<li>refs #26,#76 Got a nice working thumbs up/down with flair.</li>
+<li>refs #26,#49 Add jamsj logo to SMILE Student Web landing page.</li>
+<li>refs #55 Remove encumbered apps.  Bye bye to code we can&rsquo;t use from Stanford.</li>
+<li>refs #26,#55 More cleanup for the index landing page.</li>
+<li>refs #26,#55  Add IQManager URL to home page.  Also, remove the links to items we have legal issues with.</li>
+<li>refs #76 add the images for thumbsup/down rating.</li>
+<li>refs #76, #26 Add thumbs up rating.  Doesn&rsquo;t reset properly between questions.</li>
+<li>refs #75,#26 Add button mechanics to get the IQSet detail.  Need to attach iqid to the button, and then add a handler to get the click and hide reveal modal.</li>
+<li>refs #73,#26 Add way to set version properly in SMILE Strudent web</li>
+<li>refs #70,#26 Drop first 4 rows, including headers when submitting a CSV to the iqmanager.</li>
+<li>refs #54,#26 Add SMILE Plug community support link</li>
+<li>refs #54,#26 Add footer links + copyright, and some new icons, plus the support email for the server.</li>
+<li>refs #26 Was improperly checking message state to handle deletion of a question.  Should check the current message TYPE to get the state.</li>
+<li>refs #72 Add the view model reset of iqdetail.</li>
+<li>refs #69 Be sure to unblock the blocked screens so the student web can proceed.</li>
+<li>refs #62,#26 Fix for server not allowing the teacher to add questions from an IQSet containing Student originated questions.  We used to require them all to be authored by &ldquo;teacher&rdquo;.  No more.</li>
+<li>refs #26,#64.  Implement picture save.  Use data we have already in the session, and use the Questions listoOfPictures that it has to get the image data.  This is ok to store in JSON because it is base 64 encoded. Let&rsquo;s see how badly or not this bloats our DB in the long run.</li>
+<li>refs #26,#19 Some typos in the JS for deltion methods, need top handle them and also decrement the NUMQ.</li>
+<li>refs #69,#26 Unblock the UI if we are waiting.</li>
+<li>refs #26,#14 Fix typo</li>
+<li>refs #26,#14 Fix so that we can upload other image types.</li>
+<li>refs #50,#26 Implement mobile friendly checkboxes.  Fix the bug on the &ldquo;Answer Questions&rdquo; phase..</li>
+<li>refs #50,#26 Add basic implementation of mobile friendly radio button checkbox.</li>
+<li>refs #59,#26 Add reset functionality to SMILE Student web UI so that after a reset it clears the start make questions data model.</li>
+<li>refs #14,#26 Get pic url display working and proper submission.  Could do this probably easily with jquery, but want to try to stick with Knockout.js because it reduces the amount of debugging I have to do with jquery</li>
+<li>refs #14,#26 Add the image display to Student Web UI when you upload an image.  Also, make sure we only deal with jpegs.</li>
+<li>refs #26 Add new route for handling delete /smile/questionview/:id.json and implement with new method in Question.js called deleteQuestion(idx). Needs testing.</li>
+<li>refs #61,#26 Add state machine handler for state 5 (show results).  From here, we will get the message for reset.</li>
+<li>Removing useless Console.log() now</li>
+<li>refs #14 Don&rsquo;t fade out the image uploader.  Let it stick around.</li>
+<li>refs #26 Bug fixes for save handling of the JSON.  Had typo in spelling of application, also seems to post but posts too many questions.  Why???</li>
+<li>[#26 + smile_teacher_android/#41] Removing the useless function and adding some Console.log in handlePostNewIQSet</li>
+<li>refs #26 Add descending: true to args into Persisteus.  We should clean up the options to persisteus so that one can decide if ascending or descending is important.</li>
+<li>refs #26 Fix layout of session detail (add stats), fix all $index refs to get the function $index() observable, and increment by 1.</li>
+<li>[#26] This change log the saving questions to make a new IQSet. Now, we just need to save the values in database</li>
+<li>refs #26 Fix for improper map reduce function (session was using title not sessionName)</li>
+<li>refs #26 Trying to debug issues with session persistence.  There aren&rsquo;t issues with the persistence, but rather with the way we fetch sessions, by title &hellip; ???? Shouldn&rsquo;t it be by session name?   Added code to ensure we persist the session metadata (teacherName, sessionName, groupName).</li>
+<li>refs #26, #14 Fix file upload limit to about 1mb, add ui handling for image upload.</li>
+<li>refs #Add</li>
+<li>refs #54 Add an email for support.</li>
+<li>refs #26 Fix for bug with iqset detail not loading properly, was an unterminated <em>.  Go figure.</li>
+<li>refs #26 Add some docs for the iqset submission</li>
+<li>refs #26 Add an implementation of route /smile/iqset to handle both csv and json post.  Not tested.</li>
+<li>refs #26 Fix the issues with the repeat dups of sessions and iqsets.</li>
+<li>Handle properly the csv upload to allow repeat uploads of the same file (without returning improperly the number of data sets).</li>
+<li>refs #26 Fix the upload limit on CSV files for iqmanager.  Also, remove dependency on knockout.mapping.</li>
+<li>refs #26 Check in missing debug ko.js</li>
+<li>[#36] Adding &lsquo;createSessionFromTeacherApp()&rsquo; to display the session id in the console</li>
+<li>Updating .gitignore</li>
+<li>refs #26 Got the basic basic Session Detail Screen completed.  I think this is good enough to release after some more testing.</li>
+<li>refs #26 Add the data model updates to support SessionSummary and a page that includes the iq set.</li>
+<li>refs #26 Add complete model for sessionSummary.</li>
+<li>refs #26 Add the model for sessionSummary.</li>
+<li>refs #26 Switch to using getList() for the questions returned in the session data.</li>
+<li>refs #26, #29 Remove optimization for results cache, add title for Student Web</li>
+<li>refs #26 Add KO 3.0 and start working on session model.</li>
+<li>refs #26 Add a model for the summary data.</li>
+<li>refs #26, go the basic view working for sessions.</li>
+<li>refs #26 Add click handler to the IQSets button.</li>
+<li>refs #26 Added working IQSet Detail section.  UI is a little funky.  Get rid of the panel on top and use some header text or something.  Works. Need to implement the open image buttons.  Ignore for now.</li>
+<li>refs #26 Remove the iqset row if the user confirms delete</li>
+<li>refs #26 Fix for tr color in alt rows</li>
+<li>refs #26 Missing the complete implementation to handle server DELETE method, add to JS.js (export delete method) and add routes MAP to smileplug.js</li>
+<li>refs #26 Add implementation of the delete iqset route: DELETE /smile/iqset/:id</li>
+<li>refs #26 Add the delete functionality to js.js and add a route to handle deltion of an IQSet.</li>
+<li>refs #26 Add key display and restructure dialog1 function</li>
+<li>refs #26 Fix blockUI for the iqset delete</li>
+<li>refs #26 Add missing icon for circle x.</li>
+<li>refs #26 Apply proper bindings and table row data .  All delete buttons for inquiry sets get an ID from the DB</li>
+<li>refs #26 Get the bindings working for iqsets Collection.</li>
+<li>refs #26 Initial gui for IQSets page, and add SMILE branding.</li>
+<li>refs #26 Add pushSection routine to handle section fadeIn/fadeOut.  It calculates the old section and fades it out, and fades in the new one.</li>
+<li>refs #26 Add multiview model to replace monolithic view model</li>
+<li>refs #26 Add better layout on summary iqset</li>
+<li>refs #26 Ko.js is tricky when you don&rsquo;t initialize your view model correctly.  Got the computed observables working finally.  Need to clean up this UI.</li>
+<li>refs #26 Add the ko-observable array for the iqdata to the summary.</li>
+<li>refs #26 Add new iqmanager html and js.</li>
+<li>refs #26,#48 Implement csv upload.  Add new branding.</li>
+<li>refs #26, #43 Implement proper remote logout to clear the session.</li>
+<li>refs #26, #43 Move the release version forward to 0.3.3</li>
+<li>refs #43 Add push message type for RESET.</li>
+</ul>
+
+<h2 id="toc_7">Changes between 0.3.1 and 0.3.2</h2>
+
+<ul>
+<li>refs #47 Clean up the main readme.md</li>
+<li>refs #47 Bump release version to 0.3.2 and tag release.</li>
+<li>refs #26, #39 Fix the question layout, use <p> instead of <h4> which is block visibility.  I may change this later because it looks nicer, but need to deal with the case where lines wrap past the end.  Shouldn&rsquo;t happen in practice.</li>
+<li>refs #26, #39 Fix a number of new foundation 4 and general layout problems.  Add reveal.js as this actually handles semi-normal layout. I&rsquo;m a bit confused at how we are treating the data in #iq-area, but can work it out later.</li>
+<li>refs #26, #39 Was missing a div needed to display the &ldquo;waiting to start making questions&rdquo;.  Clean up some harmless js.</li>
+<li>refs #26, #39, #38 Undo the lint fixes &hellip;.</li>
+<li>refs #26, #39, #38 Take care of the majority of the lint errors, we&rsquo;ll leave the redefs and comma errors.</li>
+<li>refs #26, #39 Fix login state transition, all a result of foundation 4 getting rid of &ldquo;tabs&rdquo; in favor of html5 flavored sections.</li>
+<li>refs #26 #39 Add updated blockui version, add section.js from foundation, and fixed smilestudent.js issues with the tab handling.  Also, get tabs working.</li>
+<li>refs #26 Fix the columns, use <size>-# .  Not &lt;# spelled out&gt;.</li>
+<li>refs #26 Initial upgrade to foundation 4.3.2.</li>
+<li>refs #26 Add GET /smile/session/:id</li>
+<li>Add /smile/questions route and refactor the route for getting all current session data: /smile/session/current</li>
+<li>refs #26 Add /smile/iqset:id GET route + test case.</li>
+<li>refs #26 Add test case for /smile/iqsets &hellip; probably should move it into some other test file &hellip; doesn&rsquo;t belong with csvtests.</li>
+<li>refs #26 Fixes for the persistius map for iqset, fixes for incoming handler for new iqsets to not persist the label, just the value.  Update test case to clean up data.</li>
+<li>refs #26 Finally have one good test case for the IQSet route submission via csv</li>
+<li>refs #26 clean up the test case a bit with comments for csv uploads</li>
+<li>refs #26 Progress on the functional test for the csv upload, and added routes for /smile/iqset which are starting to take shape.-</li>
+<li>refs #26 Fix lint</li>
+<li>refs #26 Add in call to persist the IQSet</li>
+<li>refs #26 Add the CSV hanler and post method to create new questions</li>
+<li>refs #26 Update the docs for the smileplug.js routes.</li>
+<li>refs #26 Fix the bug introduced with the change in the route for /smile/all (implementation should stay the same)</li>
+<li>refs #26 Fix the lint, and also stake out what we&rsquo;ll do for /smile/iqset related requests in terms of interface.</li>
+<li>refs #26 in handleSendShowResultsPut we will check whether game.resultsSaved, and if store to persisteus.</li>
+<li>refs #26 Improperly double declaring Persistius</li>
+<li>refs #26 Add the new code to persist the data, and also capture the teacher meta data on start make questions.  Has a double persist race condition that needs fixing.</li>
+<li>refs #5 This needs a test case.  And it needs some more testing.</li>
+<li>refs #5 Add getAllSessionData.</li>
+<li>refs #5 Add routes.handleSessionStats to return some simple session stats.  We also map this to route: /smile/view/sessionstats</li>
+<li>refs #26 Fix reference to persisteus.</li>
+<li>refs #26 Add better mapping funtions, sort by date, ascending by default.</li>
+<li>refs #26 A functioning map for returning all sessions.</li>
+<li>refs #26 Get some impelementation behind persisteus.</li>
+<li>refs #26 Add persisteus test cases</li>
+<li>refs #26 Add pouchdb db init.</li>
+<li>refs #26 Add the stubs for a library to handle the persistence via pouchdb/couchdb.  Plus add winston.</li>
+<li>refs#31 fix js linty</li>
+<li>refs #26 add pouchdb dependency.</li>
+<li>Fix for #29.  Make sure we do parseInt() on scores sent.</li>
+<li>Returning JSON for [Solving Questions] screen (instead of  HTML) to manage i18n directly on android app. I also put in comment some useless code</li>
+<li>[Issue 19] =&gt; for detail result screen, the server only sends JSON now (and not a webpage for student android app)</li>
+</ul>
+
+<h2 id="toc_8">Changes between 0.3.0 and 0.3.1</h2>
+
+<ul>
+<li>Prepare the 0.3.1 release with the latest teacher and student apps</li>
+<li>Updated content for japanese questions.</li>
+<li>Fix for issue #22, add devDependencies</li>
+<li>Fixes #14.</li>
+<li>Fixes #10.</li>
+<li>Fixes #18. Correct default metadata.</li>
+<li>Fixes #9.</li>
+<li>Fixes #8.</li>
+<li>Fixes #18.</li>
+<li>Fixes #18.</li>
+<li>Fixes #6.</li>
+<li>Fixes #15.</li>
 </ul>
 
         </div>
