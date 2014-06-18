@@ -123,8 +123,8 @@
 		section[smile=general-board] table#questions .percentSuccess_container {
 			font-size: 20px;	
 			color: white;
-			font-weight:bold;
-			margin-right:15px;
+			font-weight: bold;
+			margin-right: 15px;
 			width: 20px;
 			text-align: right;
 		}
@@ -140,10 +140,10 @@
 			font-weight:bold;
 		}
 		section[smile=general-board] table#questions .percent_success {
-			text-shadow:0 0 4px #00a830;
+			text-shadow: 0 0 4px #00a830;
 		}
 		section[smile=general-board] table#questions .percent_fail {
-			text-shadow:0 0 4px #F00;
+			text-shadow: 0 0 4px #F00;
 		}
 
 		/* -------
@@ -152,6 +152,42 @@
 
 		section[smile=general-board] .content {
 			min-height: 200px;
+		}
+
+		section[smile=student-detail] #title-name {
+			display: inline-block;
+			padding: 2px 10px;
+			font-weight: bold;
+			border-radius: 10px 0 10px 0;
+			box-shadow: 0px 0px 0px 2px #333;
+			background-color: #666;
+		}
+		section[smile=student-detail] #title-ip {
+			display:inline-block;
+			padding:3px 6px;
+			font-size:9px;
+			border:1px solid #331833;
+			border-radius: 10px 10px 0 0;
+			background-color: #614f60;
+		}
+
+		section[smile=student-detail] .question {
+			border: 1px dashed #999;
+			background-color: white;
+			margin: 5px 0;
+			padding: 10px;
+			font-family: Comic sans MS;
+			font-size: 70%;
+		}
+		section[smile=student-detail] .rightAnswer {
+			background-color: rgb(153, 255, 102);
+			padding: 0 5px 0 2px;
+			
+			box-shadow: 0px 0px 1px 1px rgba(153, 255, 102, 1);
+			/* Try to add those 2 lines if 'box-shadow' does not work on all browsers
+			-webkit-box-shadow: 0px 0px 1px 1px rgba(153, 255, 102, 1);
+			-moz-box-shadow:    0px 0px 1px 1px rgba(153, 255, 102, 1);
+			*/
 		}
 
 		.style_redRight {
@@ -208,8 +244,8 @@
 			
 			<div class="row" id="session_values" data-bind="if: teacher_name"> 
 				<span class="round label">
-					<span style="color:#fcf4ce" data-bind="text: teacher_name"></span> - 
-					<span style="color:#fde6eb" data-bind="text: session_name"></span> - 
+					<span style="color:#fcf4ce" data-bind="text: teacher_name"></span> &diams; 
+					<span style="color:#fde6eb" data-bind="text: session_name"></span> &diams; 
 					<span style="color:#e6f6fd" data-bind="text: group_name"></span>
 				</span>
 			</div>
@@ -321,9 +357,13 @@
 											<div class="large-12 columns" smile="talk-to-student">
 
 												<div id="talkButton_without_form" class="row">
-													<div class="small-2 columns" onclick="showTalkForm()">
-														<span class="zurb_labelAlone">Talk</span>
+													<div class="small-2 columns" onclick="detailStudent()" style="padding-right:0">
+														<span class="zurb_labelAlone">Detail</span>
 													</div>
+													<div class="small-2 end columns" onclick="showTalkForm()" style="padding-left:0">
+														<span class="postfix">Talk</span>
+													</div>
+													
 												</div>
 
 												<div id="talkButton_with_form" class="row collapse hidden">
@@ -441,6 +481,33 @@
 							</div>
 
 							<a href="#" data-bind='click: usePreparedQuestions' class="expand secondary button">Back</a>
+						</section>
+
+						<section  smile="student-detail" class="hidden">
+						
+							<div data-bind="foreach: student_detail" >
+							    
+							    <div style="margin-bottom:15px">
+							    	<div style="text-align:center;color:white;font-weight:bold">
+							    		<span id="title-ip" data-bind="text: ip"></span><br>
+								    	<span id="title-name" data-bind="text: name"></span>
+									</div>
+
+							    	<div data-bind="foreach: questions" >
+							    		<div class="question">
+										    <div><span style="color:grey" data-bind="text: $data.question"></span></div>
+										    
+										    <div id="options" data-bind="foreach: $data.options" >
+										    	<div style="margin:5px 0"><span style="margin:0" data-bind="text: $data"></span></div>
+										    </div>
+										    <input type="hidden" data-bind="attr: {value: $data.answer}" />
+										    <div><img data-bind="attr:{src: urlImage}"></div>
+									    </div>    
+									</div>
+								</div>
+							</div>
+							
+							<a href="#" data-bind='click: redirectView' class="secondary expand button">Back</a>
 						</section>
 
 						<section  smile="question-detail" class="hidden">

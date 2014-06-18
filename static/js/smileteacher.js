@@ -28,10 +28,10 @@
  #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-var VERSION = '0.8.7';
+var VERSION = '0.8.9';
 
 // Interval of time used to update the GlobalViewModel
-var DELAY_UPDATE_BOARD = 5000;
+var DELAY_UPDATE_BOARD = 3000;
 var DELAY_ERROR = 60000;
 var DELAY_SHORT = 9000;
 var DELAY_NORMAL = 18000;/*
@@ -72,6 +72,7 @@ var Student = function(name,ip) {
 
     this.name = name;
     this.ip = ip;
+    this.questions = [];
 }
 
 var Question = function(sessionID,urlImage,author,question,answer,options,ip,type) {
@@ -121,7 +122,10 @@ var GlobalViewModel = {
     questions: ko.observableArray([]),
 
     // Detail of a question
-    question_detail: ko.observableArray([])
+    question_detail: ko.observableArray([]),
+
+    // Detail of a student
+    student_detail: ko.observableArray([])
 };
 
 /* ------------------
@@ -404,6 +408,82 @@ GlobalViewModel.retake = function() {
     this.redirectView();
 }
 
+function detailStudent() {
+
+    var selected = $('table#students tr.selected');
+
+    if(selected.length == 1) {
+
+        var IP_studentToDetail = selected.find('td[smile=ip_of_student] input[type=hidden]').val();
+        
+        // We remove the previous student detailed
+        GlobalViewModel.student_detail.removeAll();
+
+        // We get the /smile/all
+        var dataAll = JSON.parse(smile_all());
+
+        var studentToDetail = new Student('Unknown',IP_studentToDetail);
+
+        for (i = 0; i < dataAll.length; i++) {
+
+            if(dataAll[i].TYPE === 'HAIL' && dataAll[i].IP === IP_studentToDetail) {
+                studentToDetail.name = dataAll[i].NAME;
+            }
+
+            // If the question is still in session, we load the details
+            if((dataAll[i].TYPE === 'QUESTION' || dataAll[i].TYPE === 'QUESTION_PIC') && dataAll[i].IP === IP_studentToDetail) {
+
+                var options = [];
+                options.push(
+                    dataAll[i].O1,
+                    dataAll[i].O2,
+                    dataAll[i].O3,
+                    dataAll[i].O4
+                );
+
+                var question = new Question(
+                    dataAll[i].SessionID,
+                    dataAll[i].PICURL,
+                    dataAll[i].NAME,
+                    dataAll[i].Q,
+                    dataAll[i].A,
+                    options,
+                    dataAll[i].IP,
+                    dataAll[i].TYPE
+                );
+
+                studentToDetail.questions.push(question);
+            }
+        }
+
+        // console.log('studentToDetail='+JSON.stringify(studentToDetail));
+
+        GlobalViewModel.student_detail.push(studentToDetail);
+
+        // We highlight the right answers
+        $('section[smile=student-detail] .question').each(function() {
+
+            var answer = parseInt($(this).find('[type=hidden]').val());
+
+            var options = $(this).find('#options span');
+            
+            $(this).find('#options span').each(function(index) {
+        
+                if(index+1 === answer) {
+                    $(this).addClass('rightAnswer');
+                }
+            });
+        });
+
+        switchSection('student-detail');
+    
+    } else if(selected.length > 1) {
+        absoluteAlert('Please select <b>only</b> one student', DELAY_SHORT,'red');
+    } else {
+        absoluteAlert('Please <b>select</b> a student', DELAY_SHORT,'red');
+    }
+}
+
 function detailQuestion(sessionID) {
 
     // We remove the previous question detailed to put the new one
@@ -509,7 +589,7 @@ GlobalViewModel.removeQuestionFromSession = function() {
 }
 
 /*
-    TALK TO A STUDENT
+    TALK TO A STUDENT ?
 */
 function showTalkForm() {
     $('#talkButton_with_form').removeClass('hidden');
