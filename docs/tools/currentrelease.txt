@@ -1,18 +1,9 @@
----
-title: "Release Notes"
-date: "2013-07-01"
-aliases: ["/doc/release-notes/"]
-groups: ["meta"]
-groups_weight: 10
----
-## Changes between 1.0.6-jamsj and 1.0.7-jamsj
-
+Changes between 1.0.6-jamsj and 1.0.7-jamsj
 * refs #66 Add missing package.json bump for release to 1.0.7
 * refs #66 Add SMILE Teacher 0.9.9b5 apk, bump version
 
 
-## Changes between 1.0.4b-jamsj and 1.0.6-jamsj
-
+Changes between 1.0.4b-jamsj and 1.0.6-jamsj
 * refs #52 Add 0.9.9b4 apk
 * refs #52 Add apk, bump version to 1.0.6 for release, remove ol.d apks., bump smile student version
 * [#42] Teacher can retake several times the same IQSet
@@ -25,15 +16,13 @@ groups_weight: 10
 * [#23 RTC]Retaking without being able to update status on node-smile-server.(need to update teacher app)
 
 
-## Changes between 1.0.3-jamsj and 1.0.4-jamsj
-
+Changes between 1.0.3-jamsj and 1.0.4-jamsj
 * refs #103, #94 Bump version to 1.0.4
 * refs #113 Add likes % calc in the IQManager Session Detail view.
 * [#102] Removing useless console logging
 
 
-## Changes between 1.0.2-jamsj and 1.0.3-jamsj
-
+Changes between 1.0.2-jamsj and 1.0.3-jamsj
 * refs #103, #91 Add newest teacher app, and bump versions of SMILE server to 1.0.3
 * refs #74, #101 Fix IQ PIC data save on session save.  Also fix missing submit buttons on new session (after a session has completed)
 * refs #74 Add the necessary $data to fix undefined errors.  Brilliant! So if PICURL is undefined, don't crash!
@@ -44,8 +33,7 @@ groups_weight: 10
 * [#74] Displaying directly the picture in the table
 
 
-## Changes between 1.0.1-jamsj and 1.0.2-jamsj
-
+Changes between 1.0.1-jamsj and 1.0.2-jamsj
 * refs #91, #103 Update text in index.html 1.0.2
 * refs #91, #103 Bump version 1.0.2
 * refs #91, #103 Add new version of SMILE Teacher 0.9.9b2-jamsj
@@ -56,8 +44,7 @@ groups_weight: 10
 * Switching README.md with README.txt
 
 
-## Changes between 1.0.0-jamsj and 1.0.1-jamsj
-
+Changes between 1.0.0-jamsj and 1.0.1-jamsj
 * refs #103 Add new tagged SMILE Teacher app 0.9.9b1 (for JAMsj)
 * refs #26, #102 Remove some extra debug
 * refs #40, #26 Fix the empty username validation on login.
@@ -67,8 +54,7 @@ groups_weight: 10
 * Updating gitignore
 
 
-## Changes between 0.3.2 and 1.0.0-jamsj
-
+Changes between 0.3.2 and 1.0.0-jamsj
 * refs #26,#94 Add correct version numbers in README to match release.
 * refs #93, #26 Bump node package.json to 10.0.0, add more functional version of teacher APK v 0.9.6.
 * refs #91 add 0.9.6 teacher app to the splash page.  Clean out the old versions.
@@ -168,8 +154,7 @@ groups_weight: 10
 * refs #43 Add push message type for RESET.
 
 
-## Changes between 0.3.1 and 0.3.2
-
+Changes between 0.3.1 and 0.3.2
 * refs #47 Clean up the main readme.md
 * refs #47 Bump release version to 0.3.2 and tag release.
 * refs #26, #39 Fix the question layout, use <p> instead of <h4> which is block visibility.  I may change this later because it looks nicer, but need to deal with the case where lines wrap past the end.  Shouldn't happen in practice.
@@ -215,8 +200,7 @@ groups_weight: 10
 * [Issue 19] => for detail result screen, the server only sends JSON now (and not a webpage for student android app)
 
 
-## Changes between 0.3.0 and 0.3.1
-
+Changes between 0.3.0 and 0.3.1
 * Prepare the 0.3.1 release with the latest teacher and student apps
 * Updated content for japanese questions.
 * Fix for issue #22, add devDependencies
