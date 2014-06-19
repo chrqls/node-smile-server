@@ -501,7 +501,10 @@
 										    	<div style="margin:5px 0"><span style="margin:0" data-bind="text: $data"></span></div>
 										    </div>
 										    <input type="hidden" data-bind="attr: {value: $data.answer}" />
-										    <div><img data-bind="attr:{src: urlImage}"></div>
+										    <div>
+										    	<span data-bind="text: urlImage"></span><br>
+										    	<img data-bind="attr:{src: urlImage}">
+										    </div>
 									    </div>    
 									</div>
 								</div>
@@ -529,10 +532,11 @@
 										<img data-bind="attr:{src: urlImage}">
 									</p>
 								</div>
-								<a href="#" onclick="confirmDeletion(this.name)" data-bind="attr: {name: session_id}" class="alert expand button delete">Delete</a>    
+								<ul class="button-group radius even-2">
+									<li><a href="#" data-bind='click: $root.redirectView' class="secondary expand button">Back</a></li>
+									<li><a href="#" onclick="confirmDeletion(this.name)" data-bind="attr: {name: session_id}" class="alert expand button delete">Delete</a></li>
+								</ul>
 							</div>
-							
-							<a href="#" data-bind='click: redirectView' class="secondary expand button">Back</a>
 						</section>
 
 						<section smile="confirm-deletion" class="hidden">

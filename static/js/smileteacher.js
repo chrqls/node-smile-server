@@ -351,8 +351,7 @@ GlobalViewModel.startMakingQuestionsWithIQSet = function() {
                                       .querySelector('[class=selected]')
                                       .getAttribute('position_iqset');
         
-        /* We get the position to get the id of the iqset
-        var iqset = JSON.parse(smile_iqset(GlobalViewModel.iqsets()[GlobalViewModel.position()].id));*/
+        /* We get the position to get the id of the iqset */
         var iqset = JSON.parse(smile_iqset(GlobalViewModel.iqsets()[positionOfIQSet].id));
         var iqdata = iqset.iqdata;
 
@@ -455,8 +454,6 @@ function detailStudent() {
                 studentToDetail.questions.push(question);
             }
         }
-
-        // console.log('studentToDetail='+JSON.stringify(studentToDetail));
 
         GlobalViewModel.student_detail.push(studentToDetail);
 
@@ -958,10 +955,6 @@ function calculateAndShowResults(dataAll) {
         for(var i=0; i<percents_success.length; i++) {
 
             if($(this).find('input[type=hidden]').attr('name') === percents_success_sessionIDs[i]) {
-                
-
-                console.log('TEST');
-                var html = '<span class="">';
 
                 var html;
 
