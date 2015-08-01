@@ -195,7 +195,6 @@ GlobalViewModel.doLogin = function() {
     }
     if (!self.hasSubmitted()) {
         console.log('doLogin');
-        absoluteAlert('Logging as ' + self.username(), DELAY_SHORT,'green');
         doSmileLogin(self.clientip(), self.username(), self.realname());
     }
     self.hasSubmitted(true);
@@ -589,7 +588,7 @@ function doSmileLogin(clientip, username, realname) {
             GlobalViewModel.hasSubmitted(false); // Reset this so clicks will work
         }, 
         success: function(data) {
-            absoluteAlert('Successfully logged in', DELAY_NORMAL,'green');
+            absoluteAlert('Successfully logged as <b>'+username+'</b>', DELAY_NORMAL,'green');
             // Move to state 2 now
             statechange(1, 2);
             GlobalViewModel.loginstatusmsg("Logged In");
@@ -806,7 +805,8 @@ function statechange(from, to, data, cb) {
             console.log('SMILESTATE = 2');
             var $next = $('div.section-container section p.title').find('a[href="' + STATEMACHINE["2"].id + '"]');
             if ($next) {
-                absoluteAlert('Jump to: ' + STATEMACHINE["2"].label + ' phase.', DELAY_SHORT);
+                //absoluteAlert('Jump to: ' + STATEMACHINE["2"].label + ' phase.', DELAY_SHORT);
+                absoluteAlert('Please waiting...', DELAY_SHORT);
                 console.log('go to href = ' + $next.attr('href'));
                 $('#logout_button').show();
                 // Note, we won't disable the login screen, user can click back to it
